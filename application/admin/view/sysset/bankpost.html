@@ -1,0 +1,30 @@
+<form {if(empty($item))}action="{:url('admin/sysset/bankadd')}" {else}action="{:url('admin/sysset/bankadd')}"{/if} method="post"  class="form-horizontal form-validate" enctype="multipart/form-data">
+<input type="hidden" name="id" value="{$item['id']}" />
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button data-dismiss="modal" class="close" type="button">×</button>
+            <h4 class="modal-title">{if !empty($item['id'])}编辑{else}添加{/if}支持的银行</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="col-sm-2 control-label must">银行名称</label>
+                <div class="col-sm-9 col-xs-12">
+                    <input type="text" name="bankname" class="form-control" value="{$item['bankname']}" data-rule-required='true'/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">状态</label>
+                <div class="col-sm-9 col-xs-12">
+                    <label class="radio-inline"><input type="radio"  name="status" value="1" {if $item['status'] ==1} checked="checked"{/if} /> 启用</label>
+                    <label class="radio-inline"><input type="radio"  name="status" value="0" {if empty($item['status'])} checked="checked"{/if} /> 禁用</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="submit">提交</button>
+            <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+        </div>
+    </div>
+</div>
+</form>

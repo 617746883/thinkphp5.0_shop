@@ -1,0 +1,232 @@
+{template '_header'}
+
+ 
+
+<div class="page-heading"> 
+
+	
+
+	<span class='pull-right'>
+
+		
+
+		{ifp 'groups.category.add'}
+
+                            <a class="btn btn-primary btn-sm" href="{:url('groups/category/add')}">添加新商品分类</a>
+
+		{/if}
+
+                
+
+		<a class="btn btn-default  btn-sm" href="{:url('groups/category')}">返回列表</a>
+
+                
+
+                
+
+	</span>
+
+	<h2>{if !empty($item['id'])}编辑{else}添加{/if}商品分类 <small>{if !empty($item['id'])}修改【{$item['name']}】{/if}</small></h2> 
+
+</div>
+
+
+
+    <form  {ife 'groups.category' $item}action="" method="post"{/if} class="form-horizontal form-validate" enctype="multipart/form-data" >
+
+ 
+
+                {if !empty($item)}
+
+                <div class="form-group">
+
+                    <label class="col-sm-2 control-label">分类连接(点击复制)</label>
+
+                    <div class="col-sm-9 col-xs-12">
+
+                        <p class='form-control-static'><a href='javascript:;' title='点击复制连接' class="js-clip" data-url="{php echo mobileUrl('groups/list',array('cate'=>$item['id']))}">
+
+                                {php echo mobileUrl('groups/list',array('cate'=>$item['id']))}
+
+                            </a>
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                {/if}
+
+                <div class="form-group">
+
+                    <label class="col-sm-2 control-label">排序</label>
+
+                    <div class="col-sm-9 col-xs-12">
+
+                        {ife 'groups.category' $item}
+
+                        <input type="text" name="displayorder" class="form-control" value="{$item['displayorder']}" />
+
+                        {else}
+
+                        <div class='form-control-static'>{$item['displayorder']}</div>
+
+                        {/if}
+
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="col-sm-2 control-label must">分类名称</label>
+
+                    <div class="col-sm-9 col-xs-12">
+
+                        {ife 'groups.category' $item}
+
+                        <input type="text" name="catename" class="form-control" value="{$item['name']}" data-rule-required="true" />
+
+                        {else}
+
+                        <div class='form-control-static'>{$item['name']}</div>
+
+                        {/if}
+
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="col-sm-2 control-label">分类图片</label>
+
+                    <div class="col-sm-9 col-xs-12">
+
+                        {ife 'groups.category' $item}
+
+                        {php echo tpl_form_field_image('thumb', $item['thumb'])}
+
+                        <span class="help-block">建议尺寸: 100*100，或正方型图片 </span>
+
+                        {else}
+
+                        {if !empty($item['thumb'])}
+
+                        <a href='{php echo tomedia($item['thumb'])}' target='_blank'>
+
+                           <img src="{php echo tomedia($item['thumb'])}" style='width:100px;border:1px solid #ccc;padding:1px' />
+
+                        </a>
+
+                        {/if}
+
+                        {/if}
+
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                        <label class="col-sm-2 control-label">是否首页推荐</label>
+
+                        <div class="col-sm-9 col-xs-12">
+
+                             {ife 'groups.goods' $item}
+
+                            <label class="radio-inline">
+
+                                <input type="radio" name='isrecommand' value="0" {if empty($item['isrecommand'])}checked{/if} /> 否
+
+                            </label>
+
+                            <label class="radio-inline">
+
+                                <input type="radio" name='isrecommand' value="1" {if $item['isrecommand']==1}checked{/if} /> 是
+
+                            </label>
+
+                                {else}
+
+                             <div class='form-control-static'>{if empty($item['isrecommand'])}是{else}否{/if}</div>
+
+                             {/if}
+
+                        </div>
+
+                    </div>
+
+                
+
+                <div class="form-group">
+
+                    <label class="col-sm-2 control-label">是否显示</label>
+
+                    <div class="col-sm-9 col-xs-12">
+
+                        {ife 'groups.category' $item}
+
+                        <label class='radio-inline'>
+
+                            <input type='radio' name='enabled' value=1' {if $item['enabled']==1}checked{/if} /> 是
+
+                        </label>
+
+                        <label class='radio-inline'>
+
+                            <input type='radio' name='enabled' value=0' {if $item['enabled']==0}checked{/if} /> 否
+
+                        </label>
+
+                        {else}
+
+                        <div class='form-control-static'>{if empty($item['enabled'])}否{else}是{/if}</div>
+
+                        {/if}
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="form-group"></div>
+
+                <div class="form-group">
+
+                    <label class="col-sm-2 control-label"></label>
+
+                    <div class="col-sm-9 col-xs-12">
+
+                         {ife 'groups.category' $item}
+
+                            <input type="submit" value="提交" class="btn btn-primary"  />
+
+                            
+
+                        {/if}
+
+                       <input type="button" name="back" onclick='history.back()' {ifp 'groups.category.add|groups.category.edit'}style='margin-left:10px;'{/if} value="返回列表" class="btn btn-default" />
+
+                    </div>
+
+                </div>
+
+
+
+ 
+
+
+
+    </form>
+
+ 
+
+{template '_footer'}
+
+
+
+
+<!--6Z2S5bKb5piT6IGU5LqS5Yqo572R57uc56eR5oqA5pyJ6ZmQ5YWs5Y+454mI5p2D5omA5pyJ-->

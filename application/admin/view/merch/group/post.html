@@ -1,0 +1,66 @@
+{include file='_header'}
+<style>
+    .checkbox-inline{
+        display: block;
+    }    
+    .btns a i{
+        display: inline-block;
+        width: 100%;
+        height: 20px;
+        background: #f95959;
+    }
+    .btn-color {
+        width: 25px;
+        height: 25px;
+        border: 1px solid #fff;
+        margin: 2px;
+        padding: 0;
+    }
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">{if !empty($item['id'])}编辑{else}添加{/if}新商户分组<small>{if !empty($item['id'])}修改【{$item['buildingname']}】{/if}</small></span>
+</div>
+<div class="page-content">
+    <div class="page-sub-toolbar">
+        <a class="btn btn-primary btn-sm" href="{:url('admin/community/add')}">添加新商户分组</a>
+    </div>
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$item['id']}"/>
+        <div class="form-group">
+            <label class="col-lg control-label must">分组名称</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="groupname" class="form-control" value="{$item['groupname']}" required/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">状态</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'>
+                    <input type='radio' name='status' value=1' {if $item['status']==1}checked{/if} /> 启用
+                </label>
+                <label class='radio-inline'>
+                    <input type='radio' name='status' value=0' {if $item['status']==0}checked{/if} /> 禁用
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">是否默认分组</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'>
+                    <input type='radio' name='isdefault' value=1' {if $item['isdefault']==1}checked{/if} /> 是
+                </label>
+                <label class='radio-inline'>
+                    <input type='radio' name='isdefault' value=0' {if $item['isdefault']==0}checked{/if} /> 否
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"/>
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div>
+    </form>
+</div>
+{include file='_footer'}

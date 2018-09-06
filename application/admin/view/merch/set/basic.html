@@ -1,0 +1,24 @@
+<div class="form-group">
+    <label class="col-lg control-label">是否开启多商户</label>
+    <div class="col-sm-8">
+        <label class="radio-inline"><input type="radio"  name="data[is_openmerch]" value="1" {if $data['is_openmerch'] ==1} checked="checked"{/if} /> 开启</label>
+        <label class="radio-inline"><input type="radio"  name="data[is_openmerch]" value="0" {if $data['is_openmerch'] ==0} checked="checked"{/if} /> 不开启</label>
+        <div class='help-block'></div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg control-label">商户提现方式</label>
+    <div class="col-sm-9 col-xs-12" >
+        <label for="applycashweixin" class="checkbox-inline">
+            <input type="checkbox" name="data[applycashweixin]" value="1" id="applycashweixin" {if !empty($data['applycashweixin'])}checked="true"{/if} /> 提现到微信钱包
+        </label>
+        <label for="applycashalipay" class="checkbox-inline">
+            <input type="checkbox" name="data[applycashalipay]" value="1" id="applycashalipay" {if !empty($data['applycashalipay'])}checked="true"{/if} /> 手动提现到支付宝
+        </label>
+        <label for="applycashcard" class="checkbox-inline">
+            <input type="checkbox" name="data[applycashcard]" value="1" id="applycashcard" {if !empty($data['applycashcard'])}checked="true"{/if} /> 手动提现到银行卡
+        </label>
+        <div class='help-block'>支持的银行请到<a href='{:url('admin/sysset/bank')}' target='_blank'>【银行设置】</a>进行设置,使用手动提现到银行卡必须设置支持的银行</div>
+        <div class='help-block'>提示: 提现方式支持多选</div>
+    </div>
+</div>

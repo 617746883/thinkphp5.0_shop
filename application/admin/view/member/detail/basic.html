@@ -1,0 +1,129 @@
+<div class="form-group">
+    <label class="col-lg control-label">会员</label>
+    <div class="col-sm-9 col-xs-12">
+        <img class="radius50" src="{$member['avatar']}" style='width:50px;height:50px;padding:1px;border:1px solid #ccc' onerror="this.src='/public/static/images/noface.png'"/>
+        {$member['nickname']}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg control-label">会员等级</label>
+    <div class="col-sm-9 col-xs-12">
+        <select name='data[level]' class='form-control'>
+            <option value=''>{$shop['levelname']?'普通会员':$shop['levelname']}</option>
+            {foreach name='levels' item="level"}
+            <option value='{$level['id']}' {if $member['level']==$level['id']}selected{/if}>{$level['levelname']}</option>
+            {/foreach}
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg control-label">真实姓名</label>
+    <div class="col-sm-9 col-xs-12">
+        {:tpl_form_field_editor(array('name'=>'data[realname]', 'value'=>$member['realname']))}
+    </div>
+</div>
+<!-- <div class="form-group">
+    <label class="col-lg control-label">积分上限</label>
+    <div class="col-sm-9">
+        <span class="input-group">
+        <label class="radio-inline"><input type="radio" class="btn-maxcredit" value="0" {if empty($member['diymaxcredit'])}checked{/if} name="data[diymaxcredit]" >读取系统设置</label>
+        <label class="radio-inline"><input type="radio" class="btn-maxcredit" value="1" {if !empty($member['diymaxcredit'])}checked{/if} name="data[diymaxcredit]">自定义</label>
+        <input type="number" class="form-control  maxcreditinput input-sm" value="{php echo intval($member['maxcredit'])}" style="margin-left:5px;float: right; display: {if empty($member['diymaxcredit'])}none{else}inline-block{/if}; width: 150px;" name="data[maxcredit]" >
+        </span>
+        <span class='help-block text-danger'>会员积分上限，0为不限制(后台手动充值不限制，已持有积分不限制，保存后生效)</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-lg control-label">积分</label>
+    <div class="col-sm-3">
+        <div class='form-control-static'>{$member['credit1']}
+            <a class="text-primary " data-toggle='ajaxModal' href="{:url('finance/recharge', array('type'=>'credit1','id'=>$member['id']))}" style="padding-left: 5px;">充值</a>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-lg control-label">余额</label>
+    <div class="col-sm-3">
+        <div class='form-control-static'>{$member['credit2']}
+            <a class="text-primary " data-toggle='ajaxModal' href="{:url('finance/recharge', array('type'=>'credit2','id'=>$member['id']))}" style="padding-left: 5px;">充值</a>
+        </div>
+    </div>
+</div>  -->
+<div class="form-group">
+    <label class="col-lg control-label">注册时间</label>
+    <div class="col-sm-9 col-xs-12">
+        <div class='form-control-static'>{:date("Y-m-d H:i:s",$member['createtime'])}</div>
+    </div>
+</div>
+
+
+{if !empty($member['birthyear'])}
+<div class="form-group">
+    <label class="col-lg control-label">出生日期</label>
+    <div class="col-sm-9 col-xs-12">
+        <div class='form-control-static'>{$member['birthyear']}-{$member['birthmonth']}-{$member['birthday']}</div>
+    </div>
+</div>
+{/if}
+<div class="form-group">
+    <label class="col-lg control-label">黑名单</label>
+    <div class="col-sm-9 col-xs-12">
+        <label class="radio-inline"><input type="radio" name="data[isblack]" value="1" {if $member['isblack']==1}checked{/if}>是</label>
+        <label class="radio-inline" ><input type="radio" name="data[isblack]" value="0" {if $member['isblack']==0}checked{/if}>否</label>
+        <span class="help-block">设置黑名单后，此会员无法访问商城</span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg control-label">备注</label>
+    <div class="col-sm-9 col-xs-12">
+        <textarea name="data[content]" class='form-control' rows="5">{$member['content']}</textarea>
+    </div>
+</div>
+
+<div class="form-group-title">用户绑定 </div>
+<div class="alert alert-danger">以下信息修改后会导致用户无法登录APP端，如需更改请告知该用户！</div>
+<div class="form-group">
+    <label class="col-lg control-label">手机号码</label>
+    <div class="col-sm-9 col-xs-12">
+        {if empty($member['mobileverify'])}
+            {:tpl_form_field_editor(array('name'=>'data[mobile]', 'value'=>$member['mobile']))}
+        {else}
+            <input type="text" class="form-control" value="{$member['mobile']}" disabled />
+        {/if}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg control-label">用户名</label>
+    <div class="col-sm-9 col-xs-12">
+        {:tpl_form_field_editor(array('name'=>'data[username]', 'value'=>$member['username']))}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg control-label">绑定手机号</label>
+    <div class="col-sm-9 col-xs-12">
+        <label class="radio-inline"><input type="radio" value="1" name="data[mobileverify]" {if $member['mobileverify']==1}checked disabled{else}{/if}>已绑定</label>
+        <label class="radio-inline" ><input type="radio" value="0" name="data[mobileverify]" {if $member['mobileverify']==0}checked{else} disabled name="data[mobileverify]"{/if}>未绑定</label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg control-label">用户密码</label>
+    <div class="col-sm-9 col-xs-12">
+        {:tpl_form_field_editor(array('name'=>'data[pwd]', 'value'=>''))}
+        <div class="form-control-static">密码留空则不修改</div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $(".btn-maxcredit").unbind('click').click(function () {
+            var val = $(this).val();
+            if(val==1){
+                $(".maxcreditinput").css({'display':'inline-block'});
+            }else{
+                $(".maxcreditinput").css({'display':'none'});
+            }
+        });
+    })
+</script>

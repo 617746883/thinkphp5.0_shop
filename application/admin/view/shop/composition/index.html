@@ -1,0 +1,67 @@
+{include file='_header'}
+
+<style type='text/css'>
+    .dd-handle { height: 40px; line-height: 30px}
+    .dd-list { width:500px;}
+    .dd-handle, 
+    .dd-handle:hover {height: inherit; width: 100%; background: #f01; padding: 0; margin: 0; border: 0; background: none; font-weight: 100;}
+    .dd-item {background: #fff url(/public/static/images/index-sort.jpg) no-repeat; position: relative; border: 2px solid rgba(0,0,0,0);}
+    .dd-item:hover {border: 2px dashed #44abf7;}
+    .dd-item-search {height: 36px; background-position: 70px 0;}
+    .dd-item-adv {height: 100px; background-position: 70px -34px;}
+    .dd-item-notice {height: 34px; background-position: 70px -254px;}
+    .dd-item-nav {height: 120px; background-position: 70px -134px;}
+    .dd-item-cube {height: 140px; background-position: 70px -290px;}
+    .dd-item-banner {height: 75px; background-position: 70px -435px;}
+    .dd-item-goods {height: 360px; background-position: 70px -520px;}
+    .dd-item-seckill {height: 145px; background-position: 70px -874px;}
+    .dd-item .pull-left {font-size: 14px;}
+</style>
+
+<div class="page-header">当前位置：<span class="text-primary">首页排版</span></div>
+
+<div class="page-content">
+    <form action="" method="post" class="form-validate">
+        <div class="dd" id="div_nestable">
+            <ol class="dd-list">
+                {foreach name='sorts' key='k' item='v'}
+                    <li class="dd-item full dd-item-{$k}" data-id="{$k}">
+                        <div class="pull-left">{$v['text']}</div>
+                        <div class="dd-handle" >
+                            <span class="pull-right">是否显示
+                                <input class="js-switch small" id="visible_{$k}" name="visible[{$k}]" type="checkbox" {if $v['visible']}checked{/if} value="1" />
+                            </span>
+                        </div>
+                    </li>
+                {/foreach}
+            </ol>
+        </div>
+        <div class="form-group" style="height: auto; overflow: hidden; margin-top: 15px;">
+            <div class="col-sm-9 col-xs-12">
+                <input id="save_sort" type="submit" class="btn btn-primary " value="保存" style="margin-left:60px;">
+                <input type="hidden" name="datas" value="" />
+            </div>
+        </div>
+    </form>
+</div>
+
+<script language='javascript'>
+	require(['/public/static/js/dist/jquery/nestable/jquery.nestable.js'], function () {
+		$('#div_nestable').nestable({maxDepth: 1});
+		$('.dd-item').addClass('full');
+		$(".dd-handle a,.dd-handle span").mousedown(function (e) {
+			e.stopPropagation();
+		});
+		$("#save_sort").click(function () {
+            var data = [];
+            $(":checkbox").each(function (index,item) {
+                var temp = $(this).parents("li").data('id');
+                data.push({id:temp});
+            });
+			var json = window.JSON.stringify(data);
+			$(':input[name=datas]').val(json);
+		});
+	});
+</script>
+
+{include file='_footer'}

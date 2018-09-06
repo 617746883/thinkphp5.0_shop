@@ -1,0 +1,181 @@
+{include file='_header'}
+<style type="text/css">
+    .pd0{padding:0;}
+    .trhead td {  background:#efefef;text-align: center}
+    .trbody td {  text-align: center; vertical-align:top;border-left:1px solid #f2f2f2;overflow: hidden; font-size:12px;}
+    .trorder { background:#f8f8f8;border:1px solid #f2f2f2;text-align:left;}
+    .ops { border-right:1px solid #f2f2f2; text-align: center;}
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">订单管理</span>
+</div>
+<div class="page-content">
+<div class="main">
+    <form action="" method="get" class="form-horizontal table-search" role="form">
+        <div class="page-toolbar m-b-sm m-t-sm">
+            <div class="col-sm-6">
+                <div class="btn-group btn-group-sm" style='float:left'>
+                    {:tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d H:i', $starttime),'endtime'=>date('Y-m-d H:i', $endtime)),true);}
+                </div>
+            </div>
+            <div class="col-sm-6 pull-right">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name="paytype" class="form-control input-sm select-md" style="width:100px;">
+                            <option value="" {if $paytype==''}selected{/if}>支付方式</option>
+                            {foreach name='paytype' key='key' item='type'}
+                            <option value="{$key}" {if $paytype == "$key"} selected="selected" {/if}>{$type}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="input-group-select">
+                        <select name='searchtime' class='form-control  input-sm select-md' style="width:100px;"  >
+                            <option value=''>不按时间</option>
+                            <option value='apply' {if $searchtime=='apply'}selected{/if}>申请时间</option>
+                            <option value='operate' {if $searchtime=='operate'}selected{/if}>同意退换货时间</option>
+                            <option value='send' {if $searchtime=='send'}selected{/if}>买家发货时间</option>
+                            <option value='return' {if $searchtime=='return'}selected{/if}>卖家发货时间</option>
+                            <option value='end' {if $searchtime=='end'}selected{/if}>完成时间</option>
+                        </select>
+                    </div>
+                    <div class="input-group-select">
+                        <select name='searchfield'  class='form-control  input-sm select-md'   style="width:100px;"  >
+                            <option value='orderno' {if $searchfield=='ordersn'}selected{/if}>订单号</option>
+                            <option value='member' {if $searchfield=='member'}selected{/if}>会员信息</option>
+                            <option value='address' {if $searchfield=='address'}selected{/if}>收件人信息</option>
+                            <option value='expresssn' {if $searchfield=='expresssn'}selected{/if}>快递单号</option>
+                            <option value='goodstitle' {if $searchfield=='goodstitle'}selected{/if}>商品名称</option>
+                        </select>
+                    </div>
+                    <input type="text" class="form-control input-sm"  name="keyword" value="{$keyword}" placeholder="请输入关键词"/>
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit"> 搜索</button>
+                    <button type="submit" name="export" value="1" class="btn btn-success">导出</button>
+                </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    {if !empty(count($list))}
+    <table class='table table-responsive' style='table-layout: fixed;'>
+        <tr style='background:#f8f8f8'>
+            <td style='width:60px;border-left:1px solid #f2f2f2;'>商品</td>
+            <td style='width:150px;'></td>
+            <td style='width:70px;text-align: right;;'>单价/数量</td>
+            <td  style='width:100px;text-align: center;'>买家</td>
+            <td style='width:90px;text-align: center;'>支付/配送</td>
+            <td style='width:80px;text-align: center;'>金额</td>
+            <td style='width:90px;text-align: center;'>申请时间</td>
+            <td style='width:120px;text-align: center'>状态</td>
+        </tr>
+        {foreach name='list' item='item'}
+        <tr ><td colspan='8' style='height:20px;padding:0;border-top:none;'>&nbsp;</td></tr>
+        <tr class='trorder'>
+            <td colspan='4' >
+                <span style="font-weight: bold;">{php echo date('Y-m-d',$item['applytime'])} {php echo date('H:i:s',$item['applytime'])}</span>
+                维权编号:  {$item['refundno']}
+                {if !empty($item['refundstate'])}<label class='label label-danger'>{$r_type[$item['rtype']]}申请</label>{/if}
+                {if !empty($item['refundstate']) && $item['refundstatus'] == 4}<label class='label label-default'>客户退回物品</label>{/if}
+            </td>
+            <td colspan='4' style='text-align:right;font-size:12px;' class=''>
+                <a class='op'  data-toggle="ajaxModal" href="{:url('admin/groups/order/remarksaler', array('id' => $item['id']))}" >
+                    {if !empty($item['remarksaler'])}
+                        <i class="icow icow-flag-o" style="color: #df5254;display: inline-block;vertical-align: middle" title="  查看备注"></i>
+                        备注
+                        {else}
+                        <i class="icow icow-yibiaoji" style="color: #999;display: inline-block;vertical-align: middle" title="  添加备注" ></i>
+                         备注
+                    {/if}
+                </a>
+                {if empty($item['statusvalue'])}
+                <a class='op'  data-toggle='ajaxModal' href="{:url('admin/groups/order/close',array('id'=>$item['orderid']))}" >
+                    <i class="icow icow-shutDown" title=""  style="color: #999;margin-right: 3px;display: inline-block;vertical-align: middle"></i> 关闭订单
+                </a>
+                {/if}
+                {if !empty($item['rexpresssn'])}
+                <a class="op" data-toggle="ajaxModal"  href="{:url('admin/groups/order/changeexpress', array('id' => $item['id']))}">
+                    <i class="icow icow-wuliu" style="color: #999;margin-right: 3px;display: inline-block;vertical-align: middle;"></i>修改物流
+                </a>
+                {/if}
+            </td>
+        </tr>
+        <tr class='trbody'>
+            <td style='overflow:hidden;'><img src="{php echo tomedia($item['thumb'])}" style='width:50px;height:50px;border:1px solid #ccc; padding:1px;' onerror="this.src='../addons/ewei_shopv2/static/images/nopic.png'"></td>
+            <td style='text-align: left;overflow:hidden;border-left:none;'>{$item['title']}</td>
+            <td style='text-align:right;border-left:none;'>
+                ¥ {if $item['is_team']==1}{$item['groupsprice']}{else}{$item['singleprice']}{/if}
+                <br/>x1
+            </td>
+            <td style='text-align: center;' >
+                <a href="{:url('admin/member/list/detail',array('id'=>$item['mid']))}"> {$item['nickname']}</a>
+                <br/>
+                {$item['mrealname']}<br/>{$item['mmobile']}</td>
+            <td style='text-align:center;' >
+                {if $item['pay_type']=='wechat'}
+                <span> <i class="icow icow-weixinzhifu text-success" style="font-size: 17px"></i>微信支付</span>
+                {elseif $item['pay_type']=='credit'}
+                <span> <i class="icow icow-yue text-warning" style="font-size: 17px;"></i><span>余额支付</span></span>
+                {elseif $item['pay_type']=='alipay'}
+                <span><i class="icow icow-zhifubaozhifu text-primary" style="font-size: 17px"></i>支付宝支付</span>
+                {elseif $item['pay_type']}
+                <span class='label label-default'>{$item['pay_type']}</span>
+                {elseif $item['pay_type']==''}
+                <span> <i class="icow icow-shibai text-warning" style="font-size: 17px;"></i><span>未支付</span></span>
+                {/if}
+                <br />
+                <span style="margin-top:5px;display:block;">
+                    {if $item['isverify'] == 1}
+                    线下核销
+                    {elseif !empty($item['addressid'])}
+                    快递
+                    {elseif !empty($item['isvirtualsend']) || !empty($item['virtual'])}
+                    自动发货{if !empty($item['isvirtualsend'])}(虚拟物品){else}(虚拟卡密){/if}
+                    {elseif $item['dispatchtype']}
+                    自提
+                    {else}
+                    其他
+                    {/if}
+                </span>
+            </td>
+            <td style='text-align:center' >
+                ¥ {php echo number_format($item['applyprice'],2)}
+            </td>
+            <td style='text-align:center' >
+                {if !empty($item['refundid'])}
+                <a class='op text-primary' style="display: block"  href="{:url('admin/groups/refund/detail', array('id' => $item['orderid']))}" >维权{if $item['refundstate']>0}处理{else}详情{/if}</a>
+                {/if}
+                <a  style="display: block" class='op text-primary'  href="{:url('admin/groups/order/detail', array('orderid' => $item['orderid']))}" >订单详情</a>
+                {if !empty($item['expresssn'])}
+                <a  style="display: block" class='op text-primary'  data-toggle="ajaxModal" href="{:url('admin/util/express', array('id' => $item['id'],'express'=>$item['express'],'expresssn'=>$item['expresssn']))}"   >物流信息</a>
+                {/if}
+            </td>
+            <td  class='ops' style='line-height:20px;text-align:center' >
+                {if $item['refundstatus'] == -2}<span class="text-default">客户取消{$r_type[$refund['rtype']]}</span>
+                {elseif $item['refundstatus'] == -1}<span class="text-default">已拒绝{$r_type[$refund['rtype']]}</span>
+                {elseif $item['refundstatus'] == 0}<span class="text-warning">等待商家处理申请</span>
+                {elseif $item['refundstatus'] == 1}<span class="text-default">{$r_type[$refund['rtype']]}完成</span>
+                {elseif $item['refundstatus'] == 3}<span class="text-warning">等待客户退回物品</span>
+                {elseif $item['refundstatus'] == 4}<span class="text-warning">客户退回物品，等待商家重新发货</span>
+                {elseif $item['refundstatus'] == 5}<span class="text-warning">等待客户收货</span>{/if}
+                <br />
+                {template 'groups/order/ops'}
+            </td>
+        </tr>
+        <tr style="border-bottom:none;background:#f9f9f9;">
+            <td colspan='8' style='text-align:left;height:0;padding:0'></td>
+        </tr>
+        {/foreach}
+    </table>
+    <div style="text-align:right;width:100%;">
+        {$pager}
+    </div>
+    {else}
+    <div class='panel panel-default'>
+        <div class='panel-body' style='text-align: center;padding:30px;'>
+            暂时没有任何订单!
+        </div>
+    </div>
+    {/if}
+</div>
+</div>
+{include file='_footer'}

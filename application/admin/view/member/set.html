@@ -1,0 +1,50 @@
+{include file='_header'}
+<div class="page-header">当前位置：<span class="text-primary">会员设置</span></div>
+  <div class="page-content">
+      <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data" >
+            <div class="form-group">
+                <label class="col-lg control-label must">会员权限说明链接</label>
+                <div class="col-sm-9 col-xs-12">
+                    <input type="text" name="data[memberurl]" class="form-control" value="{$data['memberurl']}" url/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg control-label must">会员等级说明链接</label>
+                <div class="col-sm-9 col-xs-12">
+                    <input type="text" name="data[levelurl]" class="form-control" value="{$data['levelurl']}" url/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg control-label must">默认会员等级名称</label>
+                <div class="col-sm-9 col-xs-12">
+                    <input type="text" name="data[levelname]" class="form-control" value="{$data['levelname']}" url/>
+                </div>
+            </div>
+            <div class="form-group">
+              <label class="col-lg control-label">会员等级升级依据</label>
+              <div class="col-sm-9 col-xs-12">
+                  <label class="radio radio-inline">
+                      <input type="radio" name="data[leveltype]" value="0" {if empty($data['leveltype'])}checked{/if}/> 已完成的订单金额
+                  </label>
+                  <label class="radio radio-inline">
+                      <input type="radio" name="data[leveltype]" value="1" {if $data['leveltype']==1}checked{/if}/> 已完成的订单数量
+                  </label>
+                  <span class="help-block">默认为完成订单金额</span>
+              </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg control-label must">会员说明</label>
+                <div class="col-sm-9 col-xs-12">
+                    {:tpl_ueditor('data[explain]',$data['explain'],array('height'=>350))}
+                </div>
+            </div>
+            <div class="form-group">
+              <label class="col-lg control-label"></label>
+              <div class="col-sm-9 col-xs-12">
+                  <input type="submit" value="提交" class="btn btn-primary"  />
+              </div>
+            </div>
+      </form>
+  </div>
+
+{include file='_footer'}     

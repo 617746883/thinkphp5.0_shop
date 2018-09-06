@@ -1,0 +1,59 @@
+{include file='_header'}
+
+<div class="page-header">当前位置：<span class="text-primary">缴费申请</span></div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal form-search" role="form">
+        <div class="page-toolbar">
+           <div class="pull-right col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" name='keyword' value="{$keyword}" placeholder="请输入说明" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit">搜索</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    {if empty(count($list))}
+        <div class="panel panel-default">
+            <div class="panel-body empty-data">未查询到相关数据</div>
+        </div>
+    {else}
+        <form action="" method="post">
+            <table class="table table-responsive table-hover" >
+                <thead class="navbar-inner">
+                    <tr>
+                        <th style="width: 80px;">编号</th>
+                        <th style="width: 80px;">app编号</th>
+                        <th style="width: 220px;">说明</th>
+                        <th style="width: 120px;">创建时间</th>
+                        <th style='width:60px'></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name='list' item='row'}
+                        <tr>
+                            <td>{$row['id']}</td>
+                            <td>{$row['applyid']}</td>
+                            <td>{$row['description']}</td>
+                            <td>
+                            <?php echo date("Y/m/d",$row['createtime'])?>
+                            </td>
+                            <td></td> 
+                        </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align: right">
+                        {$pager}
+                    </td>
+                    <td></td><td></td>
+                </tr>
+                </tfoot>
+            </table>
+        </form>
+    {/if}
+</div>
+
+{include file='_footer'}

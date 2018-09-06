@@ -1,0 +1,84 @@
+<style type='text/css'>
+    body { width:100%;}
+    .img-thumbnail { width:100px; height:100px;}
+    .img-nickname { height:25px;line-height:25px;width:90px;margin-left:5px;margin-right:5px;position: absolute;bottom:55px;color:#fff;text-align: center;background:rgba(0,0,0,0.7)}
+</style>
+<div class="form-group">
+    <label class="col-lg control-label">支持线下核销</label>
+    <div class="col-sm-6 col-xs-6">
+        <label class="radio-inline"><input type="radio" name="isverify" value="1" {if $item['isverify'] == 1}checked="true"{/if} {if !empty($item)} disabled{/if}  /> 支持</label>
+        <label class="radio-inline"><input type="radio" name="isverify" value="0" {if empty($item['isverify']) || $item['isverify'] == 0}checked="true"{/if} {if !empty($item)} disabled{/if} /> 不支持</label>
+    </div>
+</div>
+
+<div class="form-group verify_groups" {if empty($item['isverify'])}style="display:none;"{/if}>
+    <label class="col-lg control-label">核销类型</label>
+    <div class="col-sm-6 col-xs-6">
+        <label class="radio-inline"><input type="radio" name="verifytype" value="0" {if empty($item['verifytype'])}checked="true"{/if}  /> 按订单核销</label>
+        <label class="radio-inline"><input type="radio" name="verifytype" value="1" {if $item['verifytype'] == 1}checked="true"{/if}   /> 按次核销</label>
+        <div class='input-group' id="verifynum" style="margin:10px 0;{if $item['verifytype'] == 0}display:none;{/if}">
+            <span class="input-group-addon">核销次数</span>
+            <input type="text" name="verifynum" value="{$item['verifynum']}" class="form-control"/>
+            <span class="input-group-addon">次</span>
+        </div>
+        <p class="help-block">
+            按订单核销： 不管够买多少 一次核销完成<br>
+            按次核销：  一个消费码使用多次
+        </p>
+    </div>
+</div>
+<div class="form-group verify_groups" {if empty($item['isverify'])}style="display:none;"{/if}>
+    <label class="col-lg control-label">核销限时</label>
+    <div class="col-sm-9 col-xs-12">
+        <label class="radio-inline">
+            <input type="radio" name='isendtime' value="0" {if empty($item['isendtime'])}checked{/if} /> 指定时间核销
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name='isendtime' value="1" {if $item['isendtime']==1}checked{/if} /> 限时核销
+        </label>
+    </div>
+</div>
+<div class="form-group verify_groups" id="usetime" {if empty($item['isverify']) || !empty($item['isendtime'])}style="display:none;"{/if}>
+    <label class="col-lg control-label">自动使用期限</label>
+    <div class="col-sm-9 col-xs-12">
+        <div class="input-group">
+            <input type='text' class='form-control' name='usetime' value="{$item['usetime']}" />
+            <span class="input-group-addon">天</span>
+        </div>
+        <span class='help-block'>商品购买X天后自动使用，自动使用后无法退款，设置为0则没有限制。</span>
+    </div>
+</div>
+<div class="form-group" id="endtime" {if empty($item['isverify']) || empty($item['isendtime'])}style="display:none;"{/if}>
+    <label class="col-lg control-label">使用有效期至</label>
+    <div class="col-sm-9 col-xs-12">
+        {php echo tpl_form_field_date('endtime', $endtime,true)}
+    </div>
+</div>
+
+<div class="form-group verify_groups" {if empty($item['isverify'])}style="display:none;"{/if}>
+    <label class="col-lg control-label">线下兑换门店选择</label>
+    <div class="col-sm-9 col-xs-12 chks">
+       {php echo tpl_selector('storeids',array('text'=>'storename','type'=>'text', 'preview'=>true, 'multi'=>1, 'url'=>url('shop/verify/store/query'), 'items'=>$stores,'buttontext'=>'选择门店','placeholder'=>'请输入门店名称'))}
+        <span class='help-block'>如果不选择门店，则此商品支持在所有门店兑换</span>
+    </div>
+  
+</div>
+<script type="text/javascript">
+    $(function(){
+        $("input[name='verifytype']").click(function(){
+            if(this.value== true){
+                $("#verifynum").show()
+            }else{
+                $("#verifynum").hide();
+            }
+        });
+        $("input[name='isverify']").click(function(){
+            if($(this).val()==1){
+                $(".verify_groups").show();
+            }else{
+                $(".verify_groups").hide();
+            }
+        })
+
+    })
+</script>

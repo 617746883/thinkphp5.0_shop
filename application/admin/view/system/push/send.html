@@ -1,0 +1,115 @@
+{include file='_header'}
+
+<div class="page-header">
+    当前位置：<span class="text-primary">新建消息推送</span>
+</div>
+
+<div class="page-content">
+    <div class="page-sub-toolbar">
+         <span class=''>
+            <a class="btn btn-primary btn-sm" href="{:url('admin/shop/banneradd')}">推送消息</a>
+        </span>
+    </div>
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$item['id']}"/>
+        <div class="form-group">
+            <label class="col-lg control-label must">标题</label>
+            <div class="col-sm-9 col-xs-12 ">
+                <input type="text" id='title' name="title" class="form-control" value="{$item['title']}" data-rule-required="true"/>
+            </div>
+        </div>
+       <div class="form-group">
+            <label class="col-lg control-label must">副标题</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="subtitle" class="form-control" value="{$item['subtitle']}"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">消息关联</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="input-group form-group" style="margin: 0;">
+                    <input type="text" value="{$item['link']}" class="form-control valid" name="link" placeholder="" id="bannerlink">
+                    <span class="input-group-btn">
+                        <span data-input="#bannerlink" data-toggle="selectUrl" class="btn btn-default">选择链接</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class='page-heading'><h2 class="form-group-title">发送对象</h2></div>
+        <div class="form-group">
+            <label class="col-lg control-label">推送对象</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class="radio-inline"><input type="radio" name="send1" value="1"  checked /> 指定用户发送</label>
+                <label class="radio-inline"><input type="radio" name="send1" value="2"    /> 按用户等级发送</label>
+                <label class="radio-inline"><input type="radio" name="send1" value="3"  /> 按用户分组等级发送</label>
+                <label class="radio-inline"><input type="radio" name="send1" value="4" />全部发送</label>
+            </div>
+        </div>
+        <div class="form-group choose choose_1">
+            <label class="col-lg control-label" >选择会员</label>
+            <div class="col-sm-9 col-xs-12">
+                <span style="line-height: 35px"> 按用户发送</span>
+                <textarea id="send_mid" name="send_mid" class="form-control" rows="5" placeholder="请用半角逗号隔开ID, 如 1,2" id="value_1"></textarea>
+               <!-- {php echo tpl_selector('send_openid',array('key'=>'openid','text'=>'nickname', 'thumb'=>'avatar','multi'=>1,'placeholder'=>'昵称/姓名/手机号','buttontext'=>'选择通知人', 'items'=>$salers,'url'=>webUrl('member/query') ))}-->
+            </div>
+        </div>
+
+        <div class="form-group choose choose_2" style='display: none' >
+            <label class="col-lg control-label" >选择会员等级</label>
+            <div class="col-sm-8 col-lg-9 col-xs-12">
+                <select id="send_level" name="send_level" class="form-control" id="value_2" >
+                    <option value="">全部</option>
+                    <option value="0">普通等级</option>
+                    {foreach name='list' item='type'}
+                    <option value="{$type['id']}">{$type['levelname']}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        <div class="form-group choose choose_3" style='display:none '>
+            <label class="col-lg control-label" >选择会员分组</label>
+
+            <div class="col-sm-8 col-lg-9 col-xs-12">
+                <select id="send_group" name="send_group" class="form-control"  id="value_3">
+                    <option value="">全部</option>
+                    <option value="0">无分组</option>
+                    {foreach name='list2' item='type2'}
+                    <option value="{$type2['id']}">{$type2['groupname']}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"/>
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+  
+    $(function () {
+        $(':radio[name=send1]').click(function () {
+            var v = $(this).val();
+            $(".choose").hide();
+            $(".choose_" + v).show();
+        })
+
+        $('form').submit(function () {
+            var c = $('input[name=send1]:checked').val();
+            var v = $('#value_' + c).val();
+            if (c == 1 && v == '') { 
+                tip.msgbox.err('请输入要发放的用户id!');
+                $('form').attr('stop',1); 
+                return false;
+            }
+            $('form').removeAttr('stop');
+            return true;
+        });
+    });
+</script>           
+
+{include file='_footer'}

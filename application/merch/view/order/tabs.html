@@ -1,0 +1,63 @@
+<style type='text/css'>
+	.order-list a {
+		position: relative;
+	}
+	.order-list span  {
+	 
+	float:right;margin-right:20px;
+	}
+</style>
+<ul class="menu-head-top">
+    <li {if $action=='index'} class="active" {/if}><a href="{:url('merch/order/index')}">订单概述 <i class="fa fa-caret-right"></i></a></li>
+</ul>
+
+<div class='menu-header'>订单</div>
+<ul class='order-list'>
+    <li {if $action=='olist1'}class="active"{/if}>
+        <a href="{:url('merch/order/olist1')}">待发货 <span class='text-danger status1'>--</span></a>
+    </li>
+    <li {if $action=='olist2'}class="active"{/if}>
+        <a href="{:url('merch/order/olist2')}">待收货 <span class='text-warning status2'>--</span></a>
+    </li>
+    <li {if $action=='olist0'}class="active"{/if}>
+        <a href="{:url('merch/order/olist0')}">待付款 <span class="status0">--</span></a>
+    </li>
+    <li {if $action=='olist3'}class="active"{/if}>
+        <a href="{:url('merch/order/olist3')}">已完成 <span class='text-primary status3'>--</span></a>
+    </li>
+    <li {if $action=='olist_1'}class="active"{/if}>
+        <a href="{:url('merch/order/olist_1')}">已关闭 <span class="status_1">--</span></a>
+    </li>
+    <li {if $action=='olist_all' && $_GET['status']=='' && $_GET['refund']!='1'}class="active"{/if}>
+        <a href="{:url('merch/order/olist_all')}" >全部订单<span class="all">--</span></a>
+    </li>
+    <li {if $action=='detail'}class="active"{/if}>
+        <a href="#">订单详情</a>
+    </li>
+</ul>
+
+<div class='menu-header'>维权</div>
+<ul class='order-list'>
+    <li {if $action=='status4'}class="active"{/if}>
+        <a href="{:url('merch/order/refund4')}">维权申请 <span class='text-danger status4'>--</span></a>
+    </li>
+    <li {if $action=='status5'}class="active"{/if}>
+        <a href="{:url('merch/order/refund5')}">维权完成 <span class="status5">--</span></a>
+    </li>
+</ul>
+<script>
+    $(function () {
+        $.ajax({type: "GET",url: "{:url('merch/order/ajaxgettotals',array('merch'=>$merch['id']))}",dataType:"json",success: function(data){
+                var res = data.result;
+                $("span.status0").text(res.status0);
+                $("span.status1").text(res.status1);
+                $("span.status2").text(res.status2);
+                $("span.status3").text(res.status3);
+                $("span.status4").text(res.status4);
+                $("span.status5").text(res.status5);
+                $("span.status_1").text(res.status_1);
+                $("span.all").text(res.all);
+            }
+        });
+    });
+</script>

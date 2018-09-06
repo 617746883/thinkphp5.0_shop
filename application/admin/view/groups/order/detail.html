@@ -1,0 +1,703 @@
+{template '_header'}
+<style type='text/css'>
+    .ordertable { width:100%;position: relative;margin-bottom:10px}
+    .ordertable tr td:first-child { text-align: right }
+    .ordertable tr td {padding:10px 5px 0;vertical-align: top}
+    .ordertable1 tr td { text-align: right; }
+    .ops .btn { padding:5px 10px;}
+    .order-container{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+    }
+    .order-container-left{
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+    }
+    .order-container-static{
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+        padding: 30px 50px 0;
+    }
+    .font20{
+        font-size:20px;
+        font-weight:bold;;
+    }
+    .trbagpack span{
+        margin: 0 10px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .trbagpack span.address{
+        width:150px;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;
+    }
+    tfoot .price{
+        float: right;
+    }
+    tfoot .price-inner{
+        display: inline-block;
+        vertical-align: middle;
+        width:100px;
+        text-align: right;
+    }
+    .packbag-group{
+        border:1px solid #efefef;
+    }
+    .packbag{
+        padding: 0 30px;
+    }
+    .packbag-title{
+        line-height: 33px;
+    }
+    .packbag-group .packbag-list{
+        padding: 20px 33px;
+        border-bottom: 1px solid #efefef;
+        display: flex;
+        align-items: center;
+    }
+    .packbag-list .packbag-media{
+        width:100px;
+    }
+    .packbag-list .packbag-inner{
+        border-left:1px solid #efefef;
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+    }
+    .packbag-goods-list{
+        display: flex;
+        flex-wrap: wrap;
+        width:100%;
+    }
+    .packbag-goods{
+        width:25%;
+        display: flex;
+        display: -webkit-flex;
+        margin: 10px 0 5px;
+    }
+    .packbag-goods-media{
+        width:52px;
+        height: 52px;
+        margin-right: 10px;
+    }
+    .packbag-goods-media img{
+        width:52px;
+        height: 52px;
+        border: 1px solid #efefef;
+    }
+    .packbag-goods-inner{
+        flex:1;
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+        overflow: hidden;
+    }
+    .packbag-goods-inner p{
+        color: #999;
+    }
+    .packbag-goods-inner .title{
+        width:100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .table .trorder td{
+        border-right:1px solid #efefef;
+    }
+    .table .trorder td:nth-of-type(1){
+        border:none;
+    }
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">订单详情</span>
+</div>
+<div class="page-content">
+    {if $order['status']!=-1}
+    <div class="step-region" >
+        <ul class="ui-step ui-step-4" >
+            <li {if $order['status']>=0}class="ui-step-done"{/if}>
+            <div class="ui-step-number" >1</div>
+            <div class="ui-step-title" >买家下单</div>
+            <div class="ui-step-meta" >{if 0<=$order['status']}{:date('Y-m-d',$order['createtime'])}<br/>{:date('H:i:s',$order['createtime'])}{/if}</div>
+            </li>
+            <li {if $order['status']>=1}class="ui-step-done"{/if}>
+            <div class="ui-step-number">2</div>
+            <div class="ui-step-title">买家付款</div>
+            <div class="ui-step-meta">{if 1<=$order['status']}{:date('Y-m-d',$order['paytime'])}<br/>{:date('H:i:s',$order['paytime'])}{/if}</div>
+            </li>
+            <li {if $order['status']>=2}class="ui-step-done"{/if}>
+            <div class="ui-step-number" >3</div>
+            <div class="ui-step-title">卖家发货</div>
+            <div class="ui-step-meta" >{if 2<=$order['status']}{:date('Y-m-d',$order['sendtime'])}<br/>{:date('H:i:s',$order['sendtime'])}{/if}</div>
+            </li>
+            <li {if $order['status']>=3}class="ui-step-done"{/if}>
+            <div class="ui-step-number" >4</div>
+            <div class="ui-step-title">订单完成</div>
+            <div class="ui-step-meta">{if 3<=$order['status']}{:date('Y-m-d',$order['finishtime'])}<br/>{:date('H:i:s',$order['finishtime'])}{/if}</div>
+            </li>
+        </ul>
+    </div>
+    {/if}
+    <form class="form-horizontal form" action="" method="post">
+        <input type="hidden" name="id" value="{$order['id']}" />
+        <input type="hidden" name="dispatchid" value="{$dispatch['id']}" />
+        <div  class='row order-container'>
+            <div class="order-container-left"  style="border-right: 1px solid #efefef;">
+                <div class='panel-body' >
+                    <div class="form-group" style='padding:0 10px;'>
+                        <table class='ordertable' style='table-layout:fixed'>
+                            <tr>
+                                <td style='width:80px'>订单编号：</td>
+                                <td>{$order['orderno']}</td>
+                            </tr>
+                            <tr>
+                                <td>订单金额：</td>
+                                <td>¥ {:number_format($order['price']+$order['freight'],2)} &nbsp;&nbsp;
+                                </td>
+                            </tr>
+                            {if !empty($coupon)}
+                            <tr>
+                                <td>优惠券：</td>
+                                <td><a href="{:url('admin/sale/coupon/edit',array('id'=>$coupon['id']))}" target='_blank'>{$coupon['couponname']}</a> &nbsp;&nbsp;<a data-toggle='popover' data-html='true' data-placement='right'
+                                                                                                                                                                          data-content="<table style='width:100%;'>
+                    <tr>
+                        <td style='border:none;text-align:right;'>优惠方式：</td>
+                        <td style='border:none;text-align:right;'>
+                        {if $coupon['backtype']==0}
+                            立减 {$coupon['deduct']} 元
+                        {else if $coupon['backtype']==1}
+                            打 {$coupon['discount']} 折
+                        {else if $coupon['backtype']==2}
+                            {if $coupon['backmoney']>0}返 {$coupon['backmoney']} 余额{/if}
+                            {if $coupon['backcredit']>0}返 {$coupon['backcredit']} 积分{/if}
+                            {if $coupon['backredpack']>0}返 {$coupon['backredpack']} 红包{/if}
+                        {/if}
+                        </td>
+                    </tr>
+                    {if $coupon['backtype']==2}
+                        <tr>
+                            <td style='border:none;text-align:right;'>返利方式：</td>
+                            <td style='border:none;text-align:right;'>
+                            {if $order['backwhen']==0}
+                                交易完成后(过退款期限)
+                            {else if $order['backwhen']==1}
+                                订单完成后(收货后)
+                            {else}
+                                订单付款后
+                            {/if}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style='border:none;text-align:right;'>返利情况：</td>
+                            <td style='border:none;text-align:right;'>
+                            {if empty($coupon['back'])}
+                                未返利
+                            {else}
+                                已返利
+                            {/if}
+                            </td>
+                        </tr>
+                        {if !empty($coupon['back'])}
+                        <tr>
+                            <td style='border:none;text-align:right;'>返利时间：</td>
+                            <td style='border:none;text-align:right;'>{:date('Y-m-d H:i',$coupon['backtime'])}</td>
+                        </tr>
+                        {/if}
+                    {/if}
+                </table>
+    "><i class='fa fa-question-circle'></i></a></td>
+                            </tr>
+                            {/if}
+                            <tr>
+                                <td style='width:80px'>付款方式：</td>
+                                <td>
+                                    {if $order['pay_type'] == ''}
+                                    未付款
+                                    {else}
+                                    {if $order['pay_type'] == 'credit'}
+                                    余额支付
+                                    {elseif $order['pay_type'] == 'wechat'}
+                                    微信支付
+                                    {elseif $order['pay_type'] == 'alipay'}
+                                    支付宝支付
+                                    {elseif $order['pay_type'] == 'system'}
+                                    <span class='label label-default'>系统虚拟</span>
+                                    {else}
+                                    其他方式
+                                    {/if}
+                                    {/if}
+                                    {if $order['refundtime']}
+                                    <span class='label label-default'>已退款</span>
+                                    {/if}
+                                </td>
+                            </tr>
+                            {if $order['pay_type'] == 'system'}
+                            {else}
+                            <tr>
+                                <td>买家：</td>
+                                <td><a href="{:url('admin/member/list/detail',array('id'=>$member['id']))}" target='_blank'>{$member['nickname']}</a> &nbsp;&nbsp;<a data-toggle='popover' data-trigger="hover" data-html='true' data-placement='right'
+                                                                                                                                                                          data-content="<table style='width:100%;'>
+                    <tr>
+                        <td  style='border:none;text-align:right;' colspan='2'><img src='{$member['avatar']}' onerror=this.src='../addons/ewei_shopv2/plugin/groups/template/mobile/default/images/avatar.png' style='width:100px;height:100px;padding:1px;border:1px solid #ccc' /></td>
+                    </tr>
+                    <tr>
+                        <td  style='border:none;text-align:right;'>ID：</td>
+                        <td  style='border:none;text-align:right;'>{$member['id']}</td>
+                    </tr>
+                    <tr>
+                        <td  style='border:none;text-align:right;'>昵称：</td>
+                        <td  style='border:none;text-align:right;'>{$member['nickname']}</td>
+                    </tr>
+                    {if $member['realname']}
+                    <tr>
+                        <td  style='border:none;text-align:right;'>姓名：</td>
+                        <td  style='border:none;text-align:right;'>{$member['realname']}</td>
+                    </tr>
+                    {/if}
+                    {if $member['mobile']}
+                    <tr>
+                        <td  style='border:none;text-align:right;'>手机号：</td>
+                        <td  style='border:none;text-align:right;'>{$member['mobile']}</td>
+                    </tr>
+                    {/if}
+                    {if $member['weixin']}
+                    <tr>
+                        <td  style='border:none;text-align:right;'>微信号：</td>
+                        <td  style='border:none;text-align:right;'>{$member['weixin']}</td>
+                    </tr>
+                    {/if}
+                    </table>
+    "><i class='icow icow-help' style="font-size: 13px;color: #2f3434;margin-left: -3px"></i></a></td>
+                            </tr>
+                            {/if}
+                            {if !empty($order['invoicename'])}
+                            <tr>
+                                <td style='width:80px'>发票抬头：</td>
+                                <td>{$order['invoicename']}</td>
+                            </tr>
+                            {/if}
+                            <tr>
+                                <td style='width:80px'>配送方式：</td>
+                                <td>
+                                    {if $order['isverify'] == 1}
+                                    线下核销
+                                    {elseif !empty($order['addressid'])}
+                                    快递
+                                    {elseif !empty($order['isvirtualsend']) || !empty($order['virtual'])}
+                                    自动发货{if !empty($order['isvirtualsend'])}(虚拟物品){else}(虚拟卡密){/if}
+                                    {elseif $order['dispatchtype']}
+                                    自提
+                                    {else}
+                                    其他
+                                    {/if}
+                                </td>
+                            </tr>
+                            {if $order['isverify']==1}
+                            <tr>
+                                <td style='width:80px'>核销方式：</td>
+                                <td>{if $order['verifytype']==0}
+                                    整单核销
+                                    {elseif $order['verifytype']==1}
+                                    按次核销
+                                    {elseif $order['verifytype']==2}
+                                    按消费码核销
+                                    {/if}
+                                </td>
+                            </tr>
+                            {if $order['verifytype']==0}
+                            <tr>
+                                <td style='width:80px'>消费码：</td>
+                                <td>{$order['verifycode']}</td>
+                            </tr>
+                            {if $verify['isverify']}
+                            <tr>
+                                <td style='width:80px'>核销时间：</td>
+                                <td>{:date('Y-m-d H:i:s', $verify['verifytime'])}</td>
+                            </tr>
+                            {if !empty($saler)}
+                            <tr>
+                                <td style='width:80px'>核销人：</td>
+                                <td>{$saler['nickname']}( {$saler['salername']} )</td>
+                            </tr>
+                            {/if}
+                            {if !empty($store)}
+                            <tr>
+                                <td style='width:80px'>核销门店：</td>
+                                <td>{$store['storename']}</td>
+                            </tr>
+                            {/if}
+                            {/if}
+                            {elseif $order['verifytype']==1}
+                            <tr>
+                                <td style='width:80px'>消费记录：</td>
+                                <td>
+                                    <a href='javascript:;' onclick='$("#verify-modal").modal()'><i class="fa fa-question-circle"></i> 查看</a>
+                                    <div id="verify-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog" style='width:850px'>
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                                                    <h3>核销记录</h3>
+                                                </div>
+                                                <div class="modal-body" >
+                                                    <div style='max-height:500px;overflow:auto;min-width:800px;'>
+                                                        <table style='width:100%;' class='table'>
+                                                            <tr><td style='width:150px'>时间</td><td style='width:100px'>核销员</td><td>门店</td></tr>
+                                                            {loop $verifyinfo $v}
+                                                            {if !empty($v['id'])}
+                                                            <tr><td>{:date('Y-m-d H:i',$v['verifytime'])}</td><td>{$v['salername']}<br/><small>{$v['nickname']}</small></td><td>{$v['storename']}</td></tr>
+                                                            {/if}
+                                                            {/loop}
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="javascript:void(0);" class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {elseif $order['verifytype']==2}
+                            <tr>
+                                <td style='width:80px'>消费码：</td>
+                                <td>{$order['verifycode']}</td>
+                            </tr>
+                            {loop $verifyinfo $v}
+                            {if $v['verified']}
+                            <tr>
+                                <td style='width:80px'>{$v['verifycode']}</td>
+                                <td>
+                                    <a data-toggle='popover' data-html='true' data-placement='right'
+                                       data-content="<table style='width:100%;'>
+                                <tr>
+                                    <td  style='border:none;text-align:right;'>核销员：</td>
+                                    <td  style='border:none;text-align:right;'>{$v['salername']}/{$v['nickname']}</td>
+                                </tr>
+                                <tr>
+                                    <td  style='border:none;text-align:right;'>门店：</td>
+                                    <td  style='border:none;text-align:right;'>{$v['storename']}</td>
+                                </tr>
+                                <tr>
+                                    <td  style='border:none;text-align:right;'>时间：</td>
+                                    <td  style='border:none;text-align:right;'>{:date('Y-m-d H:i',$v['verifytime'])}</td>
+                                </tr>
+                                </table>" ><i class="fa fa-question-circle"></i> 使用信息</a>
+                                </td>
+                            </tr>
+                            {/if}
+                            {/loop}
+                            {/if}
+                            {/if}
+                            {if !empty($order['addressid'])}
+                            <tr>
+                                <td style='width:80px'>收货人：</td>
+                                <td style='word-break: break-all;white-space: normal'>
+                                    {$user['realname']}<br />{$user['mobile']}<br />{$user['address']} <a class='js-clip' data-url="{$user['address']}, {$user['realname']}, {$user['mobile']}">[复制]</a></td>
+                            </tr>
+                            {elseif $order['isverify']==1 || !empty($order['virtual']) ||!empty($order['isvirtual'])}
+                            {if $order['status']>=2 && !empty($order['virtual']) }
+                            <tr>
+                                <td style='width:80px'>发货信息：</td>
+                                <td style='word-break: break-all;white-space: normal'>{:str_replace("\n","<br/>", $order['virtual_str'])}</td>
+                            </tr>
+                            {/if}
+                            <tr>
+                                <td style='width:80px'>联系人：</td>
+                                <td style='word-break: break-all;white-space: normal'>{$order['realname']}, {$order['mobile']}</td>
+                            </tr>
+                            {else}
+                            {if $order['pay_type'] == 'system'}{else}
+                            <tr>
+                                <td style='width:80px'>自提码：</td>
+                                <td>{$order['verifycode']}</td>
+                            </tr>
+                            <tr>
+                                <td style='width:80px'>自提人：</td>
+                                <td style='word-break: break-all;white-space: normal'>{$user['address']},  {$user['realname']}, {$user['mobile']}</td>
+                            </tr>
+                            {/if}
+                            {/if}
+                            {if !empty($order['message'])}
+                            <tr>
+                                <td style='width:80px'>买家备注：</td>
+                                <td>{$order['message']}</td>
+                            </tr>
+                            {/if}
+                            {if !empty($order['addressid'])}
+                            <tr>
+                                <td style='width:80px'></td>
+                                <td style='word-break: break-all;white-space: normal'>
+                                    {ifp 'groups.order.changeaddress'}
+                                    <a class="btn btn-primary btn-xs" data-toggle="ajaxModal" href="{:url('admin/groups/order/changeaddress', array('id' => $order['id']))}">编辑收货信息</a>
+                                    {/if}
+                                </td>
+                            </tr>
+                            {/if}
+                        </table>
+                        {if !empty($order_data)}
+                        <table class='ordertable' style='table-layout:fixed;border-top:1px dotted #ccc'>
+                            <tr>
+                                <td style='width:120px'><h4>统一下单信息</h4></td>
+                                <td></td>
+                            </tr>
+                            {php $datas = $order_data}
+                            {php $ii = 0;}
+                            {loop $order_fields $key $value}
+                            <tr {if $ii>1}class="diymore2" style="display:none;"{/if}>
+                                <td style='width:80px'>{:$value['tp_name']}：</td>
+                                <td>
+                                    {template 'diyform/diyform'}
+                                </td>
+                            </tr>
+                            {if $ii==2}
+                            <tr class="diymore22">
+                                <td colspan="2"><a href="javascript:void(0);" style="padding-right: 100px;" id="showdiymore2">查看完整信息</a></td>
+                            </tr>
+                            {/if}
+                            {php $ii++;}
+                            {/loop}
+                        </table>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+            <div class="order-container-static" >
+                <div class='panel-body' style='height:380px;' >
+                    <div class=' status'>
+                        <span class="">订单状态： </span>
+                                {if $order['status'] == 0}
+                                <span class="text-warning font20">待付款</span>
+                                {/if}
+                                <!--{if $order['status'] == 1}-->
+                                <!--<span class="text-success font20">已付款</span>-->
+                                <!--{/if}-->
+                                {if $order['status'] == 1 && $order['success']==1}
+                                <span class="text-warning font20">待发货</span>
+                                {/if}
+                                {if $order['status'] == 2}<span class="text-warning font20">待收货</span>{/if}
+                                {if $order['status'] == 3}<span class="text-success font20">交易完成</span>{/if}
+                                {if $order['status'] == -1}
+                                <span class="text-default font20">已关闭</span>
+                                {/if}
+                                <span class="form-control-static">
+                                    {if $order['status'] == 0}
+                                    （等待买家付款）
+                                    {/if}
+                                    <!--{if $order['status'] == 1}-->
+                                    <!--（买家已经付款，请商家尽快发货）-->
+                                    <!--{/if}-->
+                                    {if $order['status'] == 1 && $order['success']==1}
+                                    （买家已经付款，请商家尽快发货）
+                                    {/if}
+                                    {if $order['status'] == 2}
+                                    （ 商家已发货，等待买家收货并交易完成）
+                                    {/if}
+                                    {if $order['status'] == -1}
+                                    {if !empty($refund) && $refund['status']==1}
+                                    <span class="label label-default">已退款</span> {if !empty($refund['refundtime'])}退款时间: {:date('Y-m-d H:i:s',$refund['refundtime'])}{/if}
+                                    {/if}
+                                    {/if}
+                                </span>
+                    </div>
+                    <div class="">
+                            {if !empty($order['expresssn']) && $order['status']>=2 && !empty($order['addressid'])}
+                        <ul>
+                            <li class="text">
+                                快递公司: <span class="text-default">{if empty($order['expresscom'])}其他快递{else}{$order['expresscom']}{/if}</span>
+                            </li>
+                            <li class="text">
+                                快递单号: <span class="text-default">{$order['expresssn']}</span> <a class='op text-primary' data-toggle="ajaxModal" href="{:url('admin/util/express', array('id' => $order['id'],'express'=>$order['express'],'expresssn'=>$order['expresssn']))}">查看物流</a>
+                            </li>
+                            <li class="text">
+                                发货时间: <span class="text-default">{:date('Y-m-d H:i:s', $order['sendtime'])}</span>
+                            </li>
+                        </ul>
+                            {/if}
+                    </div>
+                    <div class="">
+                            <p class="form-control-static ops">
+                                {if $order['status'] == 1 && $order['success'] == 1}
+                                {ifp 'groups.order.send'}
+                                <a class="btn btn-primary btn-xs" data-toggle="ajaxModal" href="{:url('admin/groups/order/send', array('id' => $order['id']))}">确认发货</a>
+                                {/if}
+                                {/if}
+                                {if $order['status'] == 2 && !empty($order['pay_type'])}
+                                {ifp 'groups.order.sendcancel'}
+                                <a class="text-primary" data-toggle='ajaxModal'  href="{:url('admin/groups/order/sendcancel', array('id' => $order['id']))}" >取消发货</a>
+                                {/if}
+                                {/if}
+                                {if $order['status'] == 0}
+                                {ifp 'groups.order.pay'}
+                                <a class="btn btn-primary btn-xs" data-toggle="ajaxPost" href="{:url('admin/groups/order/pay', array('id' => $order['id']))}" data-confirm="确认此订单已付款吗？">确认付款</a>
+                                {/if}
+                                {/if}
+                                {ifp 'groups.order.remarksaler'}
+                                <a  data-toggle="ajaxModal" href="{:url('admin/groups/order/remarksaler', array('id' => $order['id']))}" {if !empty($order['remark'])}style='color:red'{/if} >
+                                {if !empty($order['remark'])}查看备注{else}添加备注{/if}</a>
+                                {/if}
+                            </p>
+                    </div>
+                    {if $order['status'] >0}
+                    <div class='order-tips'>
+                        <span class='order-tips-title'>友情提醒：</span>
+                        {if $order['status'] == 0}
+                        {if $order['paytype']==3}
+                        <span class=' order-tips-row'>订单为货到付款，请您务必联系买家确认后再进行发货</span>
+                        {else}
+                        <span class=' order-tips-row'>您可以联系买家进行付款，否则订单会根据设置自动关闭</span>
+                        {/if}
+                        {/if}
+                        {if $order['status'] == 1}
+                        <span class=' order-tips-row'>如果无法进行发货，请及时联系买家进行妥善处理;</span>
+                        {/if}
+                        {if $order['status'] == 2}
+                        <span class=' order-tips-row'>请及时关注物流状态，确保买家及时收到商品;</span>
+                        <span class=' order-tips-row'>如果买家未收到货物或有退换货请求，请及时联系买家妥善处理</span>
+                        {/if}
+                        {if $order['status']==3}
+                        <span class=' order-tips-row'>交易成功，如买家有售后申请，请与买家进行协商，妥善处理</span>
+                        {/if}
+                    </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+        <br />
+        <h3 class="order-title">商品信息</h3>
+
+                <table class="table table-hover">
+                    <thead class="navbar-inner">
+                    <tr class="trorder">
+                        <th style="width:70px">商品</th>
+                        <th></th>
+                        <th style="text-align: center;">单价(元)</th>
+                        <th style="text-align: center;">数量</th>
+                        <th style="text-align: center;">金额(元)</th>
+                        {if !empty($goods['diyformdata'])}
+                        <th style="width:80px;"></th>
+                        {/if}
+                    </tr>
+                    </thead>
+                    <tr class="trorder">
+                        <td class='full'>
+                            <img src="{:tomedia($order['thumb'])}" onerror="this.src='../addons/ewei_shopv2/static/images/nopic.png'" style='width:50px;height:50px;border:1px solid #ccc; padding:1px;'>
+                        </td>
+                        <td>
+                            {$order['title']}
+                        </td>
+                        <td style="text-align: center;">
+                            {if $order['is_team']==1}
+                            ¥ {$order['groupsprice']}
+                            {else}
+                            ¥ {$order['singleprice']}
+                            {/if}
+                        </td>
+                        <td style="text-align: center;">1</td>
+                        <td style='text-align: center;'>
+                            ¥ {:number_format($order['price'] + $order['freight'],2)}
+                        </td>
+                        {if !empty($goods['diyformdata'])}
+                        <td>
+                            <a href='javascript:;' class=btn-xs' hide="1"  data="{$goods['id']}" onclick="showDiyInfo(this)">自定义信息</a>
+                        </td>
+                        {/if}
+                    </tr>
+                    {if !empty($goods['diyformdata'])}
+                    <tr>
+                        <td colspan='5'>
+                            <table class='ordertable' style='table-layout:fixed;display: none;' id="diyinfo_{$goods['id']}">
+                                {php $datas = $goods['diyformdata']}
+                                {loop $goods['diyformfields'] $key $value}
+                                <tr>
+                                    <td style='width:80px'>{:$value['tp_name']}：</td>
+                                    <td>
+                                        {template 'diyform/diyform'}
+                                    </td>
+                                </tr>
+                                {/loop}
+                            </table>
+                        </td>
+                    </tr>
+                    {/if}
+                    <tfoot>
+                    <tr class="trorder">
+                        <td colspan="5">
+                            <div class="price">
+                                <p> <span class="price-inner">  订单金额：</span><span style="font-weight: bold"> ¥ {:number_format($order['price']+$order['freight'],2)}</span></p>
+                                <p><span class="price-inner">商品小计：</span><span  style="font-weight: bold">¥ {:number_format($order['price'] + $order['discount'] ,2)}</span></p>
+                                <p><span class="price-inner">运费：</span><span>¥ {:number_format( $order['freight'],2)}</span></p>
+                                {if $order['discount']>0}
+                                <p><span class="price-inner">团长优惠：</span><span class="text-danger">- ¥{$order['discount']}</span></p>
+                                {/if}
+                                {if $order['discountprice']>0}
+                                <p><span class="price-inner">会员折扣：</span><span class="text-danger">-¥ {:number_format( $order['discountprice'],2)}</span></p>
+                                {/if}
+                                {if $order['creditmoney']>0}
+                                <p><span class="price-inner">积分抵扣：</span><span class="text-danger">-¥ {:number_format( $order['creditmoney'],2)}</span></p>
+                                {/if}
+                                {if $order['deductcredit2']>0}
+                                <p><span class="price-inner">余额抵扣：</span ><span class="text-danger">-¥ {:number_format( $order['deductcredit2'],2)}</span></p>
+                                {/if}
+                                {if $order['deductenough']>0}
+                                <p><span class="price-inner">满额立减：</span><span class="text-danger">-¥ {:number_format( $order['deductenough'],2)}</span></p>
+                                {/if}
+                                {if $order['couponprice']>0}
+                                <p><span class="price-inner">优惠券优惠：</span><span class="text-danger">-¥ {:number_format( $order['couponprice'],2)}</span></p>
+                                {/if}
+                                {if $order['isdiscountprice']>0}
+                                <p><span class="price-inner">促销优惠：</span><span class="text-danger">-¥ {:number_format( $order['isdiscountprice'],2)}</span></p>
+                                {/if}
+                                {if intval($order['changeprice'])!=0}
+                                <p><span class="price-inner">卖家改价：</span><span style='{if 0<$order['changeprice']}color:green{else}color:red{/if}'>{if 0<$order['changeprice']}+{else}-{/if}¥ {:number_format(abs($order['changeprice']),2)}</span></p>
+                                {/if}
+                                {if intval($order['changedispatchprice'])!=0}
+                                <p><span class="price-inner">卖家改运费：</span><span style='{if 0<$order['changedispatchprice']}color:green{else}color:red{/if}'>{if 0<$order['changedispatchprice']}+{else}-{/if}¥ {:abs($order['changedispatchprice'])}</span></p>
+                                {/if}
+                                <p><span class="price-inner">实付款：</span><span style="font-size: 14px;font-weight: bold;color: #e4393c">¥ {:number_format($order['price'] - $order['creditmoney'] + $order['freight'],2)}</span></p>
+                            </div>
+
+                        </td>
+                    </tr>
+                    </tfoot>
+
+                </table>
+    </form>
+</div>
+<script language='javascript'>
+    $(function () {
+        $("#showdiymore1").click(function () {
+            $(".diymore1").show();
+            $(".diymore11").hide();
+        });
+        $("#showdiymore2").click(function () {
+            $(".diymore2").show();
+            $(".diymore22").hide();
+        });
+    });
+    function showDiyInfo(obj){
+        var data = $(obj).attr('data');
+        var id = "diyinfo_" + data;
+        var hide = $(obj).attr('hide');
+        if(hide=='1'){
+            $("#"+id).slideDown();
+        }
+        else{
+            $("#"+id).slideUp();
+        }
+        $(obj).attr('hide',hide=='1'?'0':'1');
+    }
+</script>
+{template '_footer'}
+<!--青岛易联互动网络科技有限公司-->

@@ -104,6 +104,9 @@ tpl_form_field_color($name, $value = '')
 > input修改控件
 tpl_form_field_editor($params = array(), $callback = NULL)
 
+## 传送门
+接口说明文档，[戳这里](https://apizza.net/console/project/12a1a944551624de77bb1a3d6c25d4c1/dev "戳这里")
+
 
 
 

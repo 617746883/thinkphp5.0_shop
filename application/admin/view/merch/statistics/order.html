@@ -1,0 +1,143 @@
+{include file='_header'}
+<style type='text/css'>
+    .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+        padding: 10px 20px;
+    }
+    .table > tbody>.trbody > td{
+        border-top:none !important;
+    }
+    .trhead td {  background:#efefef;text-align: center}
+    .trbody td {  text-align: center; vertical-align:top;border-left:1px solid #f2f2f2;overflow: hidden; font-size:12px;}
+    .trorder { background:#f8f8f8;border:1px solid #f2f2f2;text-align:left;}
+    .ops { border-right:1px solid #f2f2f2; text-align: center;}
+    .popover-content table{
+        margin-bottom: 0;
+        width:145px;
+    }
+    .popover-content table tr td, .popover-content table tr th{
+        padding: 0;
+        height:20px;
+        border:none;
+    }
+</style>
+<div class="page-header">
+ 当前位置：<span class="text-primary">订单统计 </span>
+</div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal"  id="form1">
+        <div class="page-toolbar m-b-sm m-t-sm">
+            <div class="col-sm-5">
+                {:tpl_daterange('datetime', array('sm'=>true,'placeholder'=>'下单时间'),true);}
+            </div>
+            <div class="col-sm-6 pull-right">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name='searchfield'  class='form-control  input-sm select-md'   style="width:120px;">
+                            <option value='ordersn' {if $searchfield=='ordersn'}selected{/if}>订单号</option>
+                            <option value='member' {if $searchfield=='member'}selected{/if}>会员信息</option>
+                            <option value='address' {if $searchfield=='address'}selected{/if}>收件人信息</option>
+                            <option value='merchname' {if $searchfield=='merchname'}selected{/if}>商户名称</option>
+                        </select>
+                    </div>
+                    <input type="text" class="form-control input-sm"  name="keyword" value="{$keyword}" placeholder="请输入关键词"/>
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit"> 搜索</button>
+                        <button type="submit" name="export" value="1" class="btn btn-success">导出</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    {if empty(count($list))}
+    <div class='panel panel-default'>
+        <div class='panel-body' style='text-align: center;padding:30px;'>
+            暂时没有任何订单!
+        </div>
+    </div>
+    {else}
+    <table class='table table-responsive' style='table-layout: fixed;'>
+        <tr style='background:#f8f8f8'>
+            <td style='width:60px;border-left:1px solid #f2f2f2;'>商品</td>
+            <td style='width:150px;'></td>
+            <td style='width:70px;text-align: right;;'>单价/数量</td>
+            <td  style='width:100px;text-align: center;'>收货人</td>
+            <td style='width:90px;text-align: center;'>支付/配送</td>
+            <td style='width:100px;text-align: center;'>价格</td>
+            <td style='width:100px;text-align: center;'>商户名称</td>
+        </tr>
+        {foreach name='list' item='row'}
+        {foreach name="$row['goods']" item='g'}
+        <tr ><td colspan='7' style='height:20px;padding:0;border-top:none;'>&nbsp;</td></tr>
+        <tr class='trorder'>
+            <td colspan='7' >
+                <span style="font-weight: bold;">{:date('Y-m-d',$item['createtime'])} {:date('H:i:s',$item['createtime'])}</span>
+                订单编号: {$row['ordersn']}
+            </td>
+            </td>
+        </tr>
+        <tr class="trbody" style="border: 1px solid #efefef;">
+            <td style="width:60px;">
+                <img src="{$g['thumb']}" style="width: 50px; height: 50px;border:1px solid #ccc;padding:1px;" onerror="this.src='/public/static/images/nopic.png'"\>
+            </td>
+            <td style='text-align: left;overflow:hidden;border-left:none;'>{$g['title']}</td>
+            <td style='text-align:right;border-left:none;'> {$g['realprice']/$g['total']}<br/>x {$g['total']}</td>
+            <td style="text-align: center">{$row['addressname']}</td>
+            <td style="text-align: center">{if $row['paytype'] == 1}
+                <span> <i class="icow icow-yue text-warning" style="font-size: 17px;"></i><span>余额支付</span></span>
+                {elseif $row['paytype'] == 11}
+                <span> <i class="icow icow-kuajingzhifuiconfukuan text-danger" style="font-size: 17px"></i>后台付款</span>
+                {elseif $row['paytype'] == 2}
+                <span> <i class="icow icow-zaixianzhifu text-info" style="font-size: 17px"></i>在线支付</span>
+                {elseif $row['paytype'] == 21}
+                <span> <i class="icow icow-weixinzhifu text-success" style="font-size: 17px"></i>微信支付</span>
+                {elseif $row['paytype'] == 22}
+                <span><i class="icow icow-zhifubaozhifu text-primary" style="font-size: 17px"></i>支付宝支付</span>
+                {elseif $row['paytype'] == 23}
+                <span class="label label-primary">银联支付</span>
+                {elseif $row['paytype'] == 3}
+                <span> <i class="text-primary icow icow-icon" style="font-size: 17px"></i>货到付款</span>
+                {/if}
+            </td>
+            <td style="text-align: center">
+                <a  data-toggle='popover' data-placement='right' data-html="true" data-trigger='hover' data-html='true'
+                   data-content="<table class='table table-hover'>
+                            <tr><th>商品小计</th><td>{$row['goodsprice']}</td></tr>
+                            <tr><th>运费</th><td>{$row['dispatchprice']}</td></tr>
+                            {if $row['discountprice']>0}
+                            <tr><th>会员折扣</th><td class='text-danger'>{if $row['discountprice']>0}-{$row['discountprice']}{/if}</td></tr>
+                            {/if}
+                            {if $row['deductprice']>0}
+                            <tr><th>积分抵扣</th><td class='text-danger'>{if $row['deductprice']>0}-{$row['deductprice']}{/if}</td></tr>
+                             {/if}
+                             {if $row['deductcredit2']>0}
+                            <tr><th>余额抵扣</th><td class='text-danger'>{if $row['deductcredit2']>0}-{$row['deductcredit2']}{/if}</td></tr>
+                             {/if}
+                             {if $row['deductenough']>0}
+                            <tr><th>满额立减</th><td class='text-danger'>{if $row['deductenough']>0}-{$row['deductenough']}{/if}</td></tr>
+                             {/if}
+                             {if $row['couponprice']>0}
+                            <tr><th>优惠券优惠</th><td class='text-danger'>{if $row['couponprice']>0}-{$row['couponprice']}{/if}</td></tr>
+                             {/if}
+                            <tr><th>卖家改价</th><td {if 0<$item['changeprice']} class='text-default'{else}class='text-danger'{/if}>{if 0<$item['changeprice']}+{else}-{/if}{php echo number_format(abs($item['changeprice']),2)}</td></tr>
+                            <tr><th>卖家改运费</th><td {if 0<$item['changedipatchpriceprice']} class='text-default'{else}class='text-danger'{/if}>{if 0<$item['changedipatchpriceprice']}+{else}-{/if}{php echo number_format(abs($item['changedipatchpriceprice']),2)}</td></tr>
+                            <tr><th>实际总金额</th><td style='font-weight:bold'>{$row['price']}</td></tr>
+                            </table>">
+                    <b>{$row['price']}</b>
+                    <i  class="fa fa-question-circle"></i>
+                </a>
+            </td>
+            <td style="text-align: center">{$row['merchname']}</td>
+        </tr>
+        {/foreach}
+        {/foreach}
+        <tfoot>
+        <tr>
+            <td class="text-right" colspan="7">
+                {$pager}
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+    {/if}
+</div>
+{include file='_footer'}

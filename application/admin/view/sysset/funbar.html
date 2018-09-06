@@ -1,0 +1,89 @@
+{include file='_header'}
+ 
+<div class="page-header">当前位置：<span class="text-primary">数据库优化</span></div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal form-search" role="form">
+        <div class="page-toolbar">
+            <div class="pull-left">
+            </div>
+            <div class="pull-right col-md-6">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name="status" class='form-control'>
+                            <option value="" {if $status == ''} selected{/if}>状态</option>
+                            <option value="1" {if $status == '1'} selected{/if}>显示</option>
+                            <option value="0" {if $status == '0'} selected{/if}>隐藏</option>
+                        </select>
+                    </div>
+                    <input type="text" class="form-control" name='keyword' value="{$keyword}" placeholder="请输入关键词" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit"> 搜索</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {if empty(count($array))}
+        <div class="panel panel-default">
+            <div class="panel-body empty-data">未查询到相关数据</div>
+        </div>
+    {else}
+        <form action="" method="post">
+            <div class="page-table-header">
+                <input type='checkbox' />
+                <div class="btn-group">全选/全不选
+                </div>
+            </div>
+            <table class="table table-responsive table-hover" >
+                <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:25px;"></th>
+                        <th style="width: 300px;">标题</th>
+                        <th>电话/地址</th>
+                        <th></th>
+                        <th style='width:60px'>显示</th>
+                        <th style="width: 65px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name='array' item='row'}
+                        <tr>
+                            <td>
+                                <input type='checkbox'   value="{$row}"/>
+                            </td>
+                            <td>{$row}</td>
+                            <td></td>
+                            <th></th>
+                            <td>
+                            </td>
+                            <td style="text-align:left;">
+                            </td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td colspan="3">
+                        <div class="btn-group">全选/全不选
+                        </div>
+                    </td>
+                    <td colspan="2" style="text-align: right">
+                        {$pager}
+                    </td>
+                </tr>
+                </tfoot>
+                <div class="form-group">
+            <label class="col-lg control-label"></label>
+            </table>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"/>
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div>
+        </form>
+    {/if}
+</div>
+
+{include file='_footer'}

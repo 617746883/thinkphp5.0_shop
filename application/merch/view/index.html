@@ -1,0 +1,163 @@
+{include file='_header'}
+
+<div class="page-heading">
+    <span class='pull-right'>
+        <a class='btn btn-primary btn-sm' href="{:url('merch/goods/add')}"><i class='fa fa-plus'></i> 添加商品</a>
+    </span>
+    <h2>商城概述</h2>
+</div>
+{if count($notice)>0}
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div id="w0" class="list-group">
+            <a class="list-group-item" href="#w0-1" data-toggle="collapse" data-parent="#w0" id="notice">
+                <span style="padding-left: 2rem;">{$notice[0]['title']}</span><b class="caret pull-right" style="margin-top: 8px;"></b>
+            </a>
+            <div id="w0-1" class="submenu panel-collapse collapse">
+                {foreach name='notice' key='key' item='value'}
+                <a class="list-group-item" href="javascript:" data-toggle="ajaxModal" data-href="{:url('merch/index/view',array('id'=>$value['id']));}">
+                    <span style="padding-left: 2rem;">{$value['title']}</span>
+                </a>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+    {/if}
+    <div class="col-md-12 col-sm-12">
+        <div class="contact-box">
+            <div class="col-sm-1" style="padding:0">
+                <img onerror="this.src='/public/static/images/nopic100.jpg'" src="{if empty($merch['logo'])}/public/static/images/nopic100.jpg{else}{$merch['logo']}{/if}" style="width:65px;height:65px;border-radius:5px">
+            </div>
+            <div class="col-sm-10"  style="padding-left:10px">
+                <h3 >{$merch['merchname']}</h3>
+                <p >{$merch['desc']}</p>
+            </div>
+            <div class="col-sm-1" style="padding-left: 0"><a class="btn btn-primary btn-sm" href="{:url('merch/sysset/index')}" style="color: #fff"> 点击修改</a></div>
+        <div class="clearfix"></div>
+        </div>
+    </div>
+
+        <div class="col-md-12 col-sm-12">
+        <div class="contact-box" style="border: 1px solid #e7eaec">
+            <div class="forum-item">
+                <div class="row">
+                    <a href="{:url('merch/goods/out')}">
+                        <div class="col-sm-3 forum-info">
+                            <span class="views-number">
+                                {$goods_totals}
+                            </span>
+                            <div>
+                                <small>已售罄商品</small>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{:url('merch/order/olist1')}">
+                        <div class="col-sm-3 forum-info">
+                            <span class="views-number">
+                                {$order_totals['status1']}
+                            </span>
+                            <div>
+                                <small>待发货订单</small>
+                            </div>
+                        </div>
+                        </a>
+
+                    <a href="{:url('merch/order/refund4')}">
+                        <div class="col-sm-3 forum-info">
+                            <span class="views-number">
+                                {$order_totals['status4']}
+                            </span>
+                            <div>
+                                <small>维权中订单</small>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="{:url('merch/order/olist3')}">
+                        <div class="col-sm-3 forum-info">
+                            <span class="views-number">
+                                {$order_totals['status3']}
+                            </span>
+                            <div>
+                                <small>已完成订单</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+    </div>
+</div>
+
+    <div class="col-md-12 col-sm-12">
+        {if count($order_ok)>0}
+        <div class="ibox float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="ibox-title">
+                <h5>用户购买待发货订单</h5>
+            </div>
+            <div class="ibox-content">
+                <table class="table table-hover no-margins">
+                    <thead>
+                    <tr>
+                        <th class="col-sm-1">状态</th>
+                        <th class="col-sm-2">日期</th>
+                        <th class="col-sm-1">金额</th>
+                        <th class="col-sm-2">用户</th>
+                        <th class="col-sm-3">订单号</th>
+                        <th class="col-sm-2">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {foreach name='order_ok' key='key' item="value"}
+                    <tr>
+                        <td><span class="label label-warning">待发货</span>
+                        </td>
+                        <td>{:date('Y-m-d H:i',$value['createtime'])}</td>
+                        <td class="text-navy">{$value['price']}</td>
+                        <td>{$value['address']['realname'] ? $value['address']['realname'] : $value['invoicename']}</td>
+                        <td class="text-navy">{$value['ordersn']}</td>
+                        <td><a href="{:url('merch/order/detail',array('id'=>$value['id']))}" class="btn btn-xs btn-primary">查看详情</a></td>
+                    </tr>
+                    {/foreach}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {else}
+        <div class="panel panel-default">
+            <div class="panel-body" style="text-align: center;padding:30px;">
+                暂时没有任何待处理订单!
+            </div>
+        </div>
+        {/if}
+    </div>
+</div>
+<input type="hidden" name="len" value="0">
+<input type="hidden" name="index" value="0">
+
+<script type="text/javascript">
+    function AutoScroll(obj,len){
+        var text = $(obj).find("a span");
+        var index = $("input[name='index']").val();
+        $("input[name='index']").val(parseInt(index)+1);
+        $("input[name='len']").val(text.length);
+        if (text.length > index) {
+            $("#notice span").text($(text[index]).text());
+        } else {
+            $("input[name='index']").val(parseInt(0));
+            $("#notice span").text($(text[0]).text());
+        }
+    }
+    $(document).ready(function(){
+        var scrollDiv = setInterval('AutoScroll("#w0-1")',3000);
+        $("#w0").hover(
+            function () {
+                clearInterval(scrollDiv);
+            },
+            function () {
+                scrollDiv = setInterval('AutoScroll("#w0-1")',3000);
+            }
+        );
+    });
+</script>
+
+{include file='_footer'}

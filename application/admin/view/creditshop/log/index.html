@@ -1,0 +1,242 @@
+{include file='_header'}
+<style type='text/css'>
+	.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+		padding: 10px 20px;
+	}
+	.table > tbody>.trbody{
+		border:1px solid #efefef;
+	}
+	.table > tbody>.trbody > td{
+		border-top:none !important;
+	}
+	.trhead td {  background:#efefef;text-align: center}
+	.trbody td {  text-align: center; vertical-align:top;border-left:1px solid #f2f2f2;overflow: hidden; font-size:12px;}
+	.trorder { background:#f8f8f8;border:1px solid #f2f2f2;text-align:left;}
+	.ops { border-right:1px solid #f2f2f2; text-align: center;}
+</style>
+
+<div class="page-header">
+	当前位置：<span class="text-primary">{if $type=='0'}兑换记录
+		{elseif $type=='1'}抽奖记录
+		{elseif $type=='2'}待发货
+		{elseif $type=='3'}待收货
+		{elseif $type=='4'}已完成
+		{elseif $type=='5'}待核销
+		{elseif $type=='6'}已核销
+		{elseif $type=='7'}全部核销{/if}
+	</span>
+</div>
+<div class="page-content">
+	<form action="" method="get" class="form-horizontal table-search">
+		<div class="page-toolbar m-b-sm m-t-sm">
+			<div class="col-sm-5">
+				<div class='input-group input-group-sm'>
+					{:tpl_daterange('time', array('sm'=>true,'placeholder'=>'参与时间'),true);}
+				</div>
+			</div>
+			<div class="col-sm-6 pull-right">
+				<div class="input-group">
+					<div class="input-group-select">
+						<select name='status' class="form-control input-sm select-md" style="width:100px;">
+							<option value='' {if $_GET['status']==''}selected{/if}>状态</option>
+							{if empty($type)}
+							<option value='2' {if $_GET['status']=='2'}selected{/if}>未兑换</option>
+							<option value='3' {if $_GET['status']=='3'}selected{/if} >已兑换</option>
+							{else}
+							<option value='1' {if $_GET['status']=='1'}selected{/if}>未中奖</option>
+							<option value='2' {if $_GET['status']=='2'}selected{/if} >已中奖</option>
+							<option value='3' {if $_GET['status']=='3'}selected{/if} >已兑换</option>
+							{/if}
+						</select>
+					</div>
+					<div class="input-group-select">
+						<select name='searchfield' class='form-control  input-sm select-md' style="width:120px;">
+							<option value='member' {if $_GET['searchfield']=='member'}selected{/if}>会员信息</option>
+							<option value='address' {if $_GET['searchfield']=='address'}selected{/if}>收件人信息</option>
+							<option value='logno' {if $_GET['searchfield']=='logno'}selected{/if}>活动编号</option>
+							<option value='eno' {if $_GET['searchfield']=='eno'}selected{/if}>兑换码</option>
+							<option value='store' {if $_GET['searchfield']=='store'}selected{/if}>兑换门店</option>
+							<option value='express' {if $_GET['searchfield']=='express'}selected{/if}>快递单号</option>
+							<option value='goods' {if $_GET['searchfield']=='goods'}selected{/if}>商品名称</option>
+						</select>
+					</div>
+					<input type="text" class="form-control input-sm" name="keyword" value="{$_GET['keyword']}" placeholder="请输入关键词" />
+					<span class="input-group-btn">
+						<button class="btn btn-primary" type="submit"> 搜索</button>
+						<button type="submit" name="export" value="1" class="btn btn-success">导出</button>
+					</span>
+				</div>
+			</div>
+		</div>
+	</form>
+	{if count($list)>0}
+	<!--<table class="table table-responsive">-->
+		<!--<thead>-->
+			<!--<th>商品</th>-->
+			<!--<th>类型</th>-->
+			<!--<th>用户</th>-->
+			<!--<th>消耗</th>-->
+			<!--<th>状态</th>-->
+			<!--<th>操作</th>-->
+		<!--</thead>-->
+	<!--</table>-->
+	<table class="table table-responsive ">
+		<thead>
+			<tr style='background:#f8f8f8'>
+				<th style="width: 250px;" >编号/商品</th>
+				<th style="text-align: center">信息</th>
+				<th style="text-align: center" >粉丝</th>
+				<th style="text-align: center">会员</th>
+				<th style="text-align: center">支付</th>
+				<th style="text-align: center">消耗</th>
+				<th style="text-align: center">操作</th>
+				<th style="text-align: center">状态</th>
+			</tr>
+		</thead>
+		<tbody>
+			{foreach name='list' item='row'}
+			<tr ><td colspan='8' style='height:20px;padding:0;border:none;'>&nbsp;</td></tr>
+			<tr class='trorder' style='background:#f8f8f8'>
+				<td colspan="8">{$row['logno']}</td>
+			</tr>
+			<tr class="trbody">
+				<td style="text-align: left"><img src="{$row['thumb']}" style='width:30px;height:30px;padding1px;border:1px solid #ccc' onerror="this.src='/public/static/images/nopic.png'" /> {$row['title']}</td>
+				<td style='line-height:22px;'>
+					{if $row['type']==1}
+					<span class='label label-danger'>抽奖</span> {else}
+					<span class='label label-primary'>兑换</span> {/if}
+					<br/>
+					{if $row['iscoupon']==0}
+						{if $row['isverify']==1}
+							<span class='label label-warning' {if !empty($row[ 'merchname'])}data-toggle='popover' data-placement='top' data-trigger='hover' data-content='{$row['merchname']}' data-title='兑换门店' {/if}>
+								线下兑换 {if !empty($row['merchname'])}<i class='fa fa-question-circle'></i>{/if}
+							</span>
+						{else}
+							<span class='label label-success'>快递配送</span>
+						{/if}
+					{else}
+						{if $row['goodstype'] == 1}
+							<span class='label label-success'>优惠券</span>
+						{elseif $row['goodstype'] == 2}
+							<span class='label label-warning'>余额</span>
+						{elseif $row['goodstype'] == 3}
+							<span class='label label-danger'>红包</span>
+						{/if}
+					{/if}
+				</td>
+				<td>
+					<img class="radius50" src="{$row['avatar']}" style='width:30px;height:30px;padding1px;border:1px solid #ccc'  onerror="this.src='/public/static/images/noface.png'"/> {$row['nickname']}
+				</td>
+				<td>
+					{:empty($row['realname'])?$row['mrealname']:$row['realname']}<br /> {php echo empty($row['mobile'])?$row['mmobile']:$row['mobile']}
+				</td>
+				<td>
+					{if $row['paytype']==-1}
+					<span class='text-default'>无需支付</span>
+					{else}
+					{if $row['paytype']==0}
+					{if $row['paystatus']==0}
+						<span><i class="icow icow-yue text-default"></i>余额未支付</span>
+					{else}
+						<span><i class="icow icow-yue text-warning"></i>余额已支付</span>
+					{/if}
+					{elseif $row['paytype']==1}
+					{if $row['paystatus']==0}<span class='text-default'><i class="icow icow-weixin"></i>微信未支付</span>{else}<span class='text-default'><i class="icow icow-weixin text-success"></i>微信已支付</span>{/if}
+					{elseif $row['paytype']==2}
+					{if $row['paystatus']==0}<span class='text-default'><i class="icow icow-zhifubao"></i>支付宝未支付</span>{else}<span class='text-default'><i class="icow icow-zhifubao text-primary"></i>支付宝已支付</span>{/if}
+					{/if}
+					{/if}
+					<br/>
+					{if $row['dispatchstatus']==-1}<span class='text-default'>无需运费</span>
+					{elseif $row['dispatchstatus']==0}<span class='text-default'>未支付运费</span>
+					{elseif $row['dispatchstatus']==1}<span class='text-primary'>已支付运费</span> {/if}
+				</td>
+				<td>{if $row['credit']>0}-{$row['credit']}积分<br/>{/if} {if $row['money']>0 || $row['dispatch'] > 0} -{php echo number_format($row['money'] + $row['dispatch'],2)}现金 {/if}
+				</td>
+				<td>
+					<a class='text-primary' href="{php echo webUrl('creditshop/log/detail',array('id' => $row['id']));}">
+						查看详情
+					</a>
+					{if $row['addressid']!=0 && $row['expresssn']>0}
+					<br/>
+					<a class='text-primary' data-toggle="ajaxModal" href="{php echo webUrl('util/express', array('id' => $row['id'],'express'=>$row['express'],'expresssn'=>$row['expresssn']))}">
+						 物流信息
+					</a>
+					{/if}
+					{if $row['canexchange']}
+					<br/>
+					<a class='text-primary' data-toggle='ajaxModal' href="{php echo webUrl('creditshop/log/doexchange',array('id' => $row['id'],'type'=>$row['goodstype']));}">
+						兑换
+					</a>
+					{/if}
+				</td>
+				<td style='line-height:22px;'>
+					{if $row['status'] ==1 && $row['type']==1}<span class='text-danger'>未中奖</span>{/if}
+					{if $row['goodstype']==0}
+						{if $row['isverify']==1}
+							{if $row['status'] ==2}<span class='text-warning'>待核销</span>{/if}
+							{if $set['isreply'] == 1}
+								{if $row['status'] ==3 && $row['iscomment'] == 0 }<span class='text-default'>等待评价</span>{/if}
+								{if $row['status'] ==3 && $row['iscomment'] == 1 }<span class='text-success'>追加评价</span>{/if}
+								{if $row['status'] ==3 && $row['iscomment'] == 2 }<span class='text-danger'>已完成</span>{/if}
+							{else}
+								{if $row['status'] ==3}<span class='text-danger'>已完成</span>{/if}
+							{/if}
+						{else}
+							{if $row['status'] ==2 && $row['addressid'] == 0 }<span class='text-warning'>{if $row['type']==0}已兑换{else}已中奖{/if}</span>{/if}
+							{if $row['status'] ==2 && $row['addressid'] > 0 && $row['time_send'] == 0}<span class='text-default'>待发货</span>{/if}
+							{if $row['status'] ==3 && $row['time_send'] > 0 && $row['time_finish'] ==0 }<span class='text-success'>已发货</span>{/if}
+							{if $set['isreply'] == 1}
+								{if $row['status'] ==3 && $row['time_finish'] > 0 && $row['iscomment'] == 0 }<span class='text-default'>等待评价</span>{/if}
+								{if $row['status'] ==3 && $row['time_finish'] > 0 && $row['iscomment'] == 1 }<span class='text-success'>追加评价</span>{/if}
+								{if $row['status'] ==3 && $row['time_finish'] > 0 && $row['iscomment'] == 2 }<span class='text-danger'>已完成</span>{/if}
+							{else}
+								{if $row['status'] ==3 && $row['time_finish'] > 0}<span class='text-danger'>已完成</span>{/if}
+							{/if}
+						{/if}
+					{elseif $row['goodstype']==1}
+						{if $set['isreply'] == 1}
+							{if $row['status'] ==3 && $row['iscomment'] == 0 }<span class='text-default'>等待评价</span>{/if}
+							{if $row['status'] ==3 && $row['iscomment'] == 1 }<span class='text-success'>追加评价</span>{/if}
+							{if $row['status'] ==3 && $row['iscomment'] == 2 }<span class='text-danger'>已发放</span>{/if}
+						{else}
+							{if $row['status'] ==3}<span class='text-danger'>已发放</span>{/if}
+						{/if}
+					{elseif $row['goodstype']==2}
+						{if $set['isreply'] == 1}
+							{if $row['status'] ==3 && $row['iscomment'] == 0 }<span class='text-default'>等待评价</span>{/if}
+							{if $row['status'] ==3 && $row['iscomment'] == 1 }<span class='text-success'>追加评价</span>{/if}
+							{if $row['status'] ==3 && $row['iscomment'] == 2 }<span class='text-danger'>已发放</span>{/if}
+						{else}
+							{if $row['status'] ==3 }<span class='text-danger'>已发放{/if}
+						 {/if}
+					 {elseif $row['goodstype']==3}
+						 {if $set['isreply'] == 1}
+							 {if $row['status'] ==3 && $row['iscomment'] == 0 }<span class='text-success'>等待评价</span>{/if}
+							 {if $row['status'] ==3 && $row['iscomment'] == 1 }<span class='text-success'>追加评价</span>{/if}
+							 {if $row['status'] ==3 && $row['iscomment'] == 2 }<span class='text-danger'>已发放</span>{/if}
+						 {else}
+							{if $row['status'] ==3}<span class='text-danger'>已发放</span>{/if}
+						 {/if}
+					 {/if}
+					<br/>
+				</td>
+
+			</tr>
+			{/loop}
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="8" class="text-right">{$pager}</td>
+			</tr>
+		</tfoot>
+	</table>
+	{else}
+	<div class='panel panel-default'>
+		<div class='panel-body' style='text-align: center;padding:30px;'>
+			暂时没有任何记录!
+		</div>
+		{/if}
+	</div>
+</div>
+{include file='_footer'}

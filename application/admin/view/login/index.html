@@ -1,0 +1,114 @@
+{include file='_header_base'}
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+<link rel="stylesheet" href="__STATIC__/login/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="__STATIC__/login/css/form-elements.css">
+<link rel="stylesheet" href="__STATIC__/login/css/style.css">
+    <!-- Top content -->
+    <div class="top-content">    	
+        <div class="inner-bg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2 text">
+                        <h1><strong>{$shopset['name']}</strong> 后台管理系统</h1>
+                        <div class="description">
+                        	<!-- <p>
+                            	<a href="javascript"><strong>{$copyright['title']}</strong></a>  {$copyright['copyright']}
+                        	</p> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3 form-box">
+                    	<div class="form-top">
+                    		<div class="form-top-left">
+                    			<h3>登陆到管理系统</h3>
+                        		<p>Enter your username and password to log on:</p>
+                    		</div>
+                    		<div class="form-top-right">
+                    			<i class="fa fa-lock"></i>
+                    		</div>
+                        </div>
+                        <div class="form-bottom">
+		                    <form action="" method="post" role="form" class="form-horizontal form-validate" enctype="multipart/form-data">
+		                    	<div class="form-group">
+		                    		<label class="sr-only" for="form-username">Username</label>
+		                        	<input type="text" name="username" placeholder="Username..." class="form-username form-control" id="form-username">
+		                        </div>
+		                        <div class="form-group">
+		                        	<label class="sr-only" for="form-password">Password</label>
+		                        	<input type="password" name="password" placeholder="Password..." class="form-password form-control" id="form-password">
+		                        </div>
+                                {:token('__token__', 'sha1')}
+                                <input type="hidden" name="referurl" value="{$referurl}">
+		                        <button type="button" class="btn" onClick="checkSubmit()">Sign in!</button>
+		                    </form>
+	                    </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3 social-login">
+                        <p>
+                            <a href="javascript:;"><strong>{$copyright['title']}</strong></a>  {$copyright['copyright']}
+                        </p>
+                    	<!-- <h3>...or login with:</h3>
+                    	<div class="social-login-buttons">
+                        	<a class="btn btn-link-2" href="#">
+                        		<i class="fa fa-facebook"></i> Facebook
+                        	</a>
+                        	<a class="btn btn-link-2" href="#">
+                        		<i class="fa fa-twitter"></i> Twitter
+                        	</a>
+                        	<a class="btn btn-link-2" href="#">
+                        		<i class="fa fa-google-plus"></i> Google Plus
+                        	</a>
+                    	</div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+
+    <!-- Javascript -->
+    <script src="__STATIC__/login/js/jquery.backstretch.min.js"></script>
+    <script src="__STATIC__/login/js/scripts.js"></script>
+    
+    <!--[if lt IE 10]>
+        <script src="__STATIC__/login/js/placeholder.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+        function checkSubmit() {
+            var username = $.trim($('input[name=username]').val());
+            var password = $.trim($('input[name=password]').val());
+            if(username == ''){
+                alert('请填写用户名!');
+                return false;
+            }
+            if(password == ''){
+                alert('请填写密码!');
+                return false;
+            }            
+            $.ajax({
+                type : 'post',
+                url : "{:url('admin/login/checklogin')}",
+                data : $("form").serialize(),
+                dataType : 'json',
+                success : function(res){
+                    if(res.status == 1){
+                        // alert('登录成功!');
+                        setTimeout(function() {
+                            location.href=res.result.url;
+                        }, 1000);
+                    }else{
+                        alert(res.result.message);
+                    }
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert('网络失败，请刷新页面后重试');
+                }
+            })   
+        }
+    </script>
+</body>
+</html>

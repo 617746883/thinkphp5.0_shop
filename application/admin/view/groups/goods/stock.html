@@ -1,0 +1,31 @@
+<div class="form-group">
+    <label class="col-lg control-label">编码</label>
+    <div class="col-sm-5">
+        <input type="text" name="goodssn" id="goodssn" class="form-control hasoption" value="{$item['goodssn']}" {if $item['hasoption']}readonly{/if}//>
+    </div>
+</div>
+<div class="form-group">
+    <label class=" col-lg control-label">条码</label>
+    <div class="col-sm-5">
+        <input type="text" name="productsn" id="productsn" class="form-control hasoption" value="{$item['productsn']}" {if $item['hasoption']}readonly{/if}//>
+    </div>
+</div>
+<div class="form-group" style="display: none;">
+    <label class="col-lg control-label">重量</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" name="weight" id="weight" class="form-control hasoption" value="{$item['weight']}" {if $item['hasoption']}readonly{/if}/>
+            <span class="input-group-addon">克</span>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-lg control-label">库存</label>
+    <div class="col-sm-10">
+        <input type="text" name="total" id="total" class="form-control hasoption" value="{$item['total']}"  style="width:150px;display: inline;margin-right: 20px;" {if $item['hasoption']}readonly{/if}/>
+        <label class="checkbox-inline">
+            <input type="checkbox" id="showtotal" value="1" name="showtotal" {if $item['showtotal']==1}checked{/if} />显示库存
+        </label>
+    </div>
+</div>

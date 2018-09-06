@@ -1,0 +1,23 @@
+{
+    "name": "topthink/think-worker",
+    "description": "workerman extend for thinkphp5",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "liu21st",
+            "email": "liu21st@gmail.com"
+        }
+    ],
+    "require": {
+	"workerman/workerman":"^3.3.0",
+	"topthink/framework":"5.1.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "think\\worker\\": "src"
+        },
+        "files": [
+            "src/config.php"
+        ]
+    }
+}

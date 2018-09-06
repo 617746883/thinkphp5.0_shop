@@ -1,0 +1,111 @@
+<form action="{:url('admin/community/houseorder')}" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <div class="form-group">
+            <input type="hidden" id="houseid" name="houseid" value="{$houseid}" />
+            <label class="col-lg control-label">选择年份</label>
+            <div class="col-sm-9 col-xs-12">
+               <select name="times" id="times" class="select form-control select-group" style="width:130px;display:inline;">
+               {foreach name='year_array' item='vo'}
+                <option value="{$vo}" {if $timestart==$vo }selected{/if}>{$vo}</option>
+               {/foreach}
+               </select>
+               <input type="submit" value="更改年份" class="btn btn-primary"/>
+            </div>
+        </div>
+        </form>
+            <!-- <div class="page-table-header">
+                <input type='checkbox' />
+                <div class="btn-group">
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/community/houseorderdelete')}"><i class='icow icow-shanchu1'></i> 删除</button>
+                </div>
+            </div> -->
+            <table class="table table-responsive table-hover" >
+                <thead class="navbar-inner">
+                    <tr>
+                        <!-- <th style="width:25px;"></th> -->
+                        <th style="width: 80px;">月份</th>
+                        <th style="width: 100px;"></th>
+                        <th style="width: 180px;">用水总数(m³)</th>
+                        <th style="width: 180px;">单价(元/m³)</th>
+                        <th style="width: 1px;"></th>
+                        <th style="width: 180px;">是否缴费</th>
+                        <th style="width: 180px;">应交水费(元)</th>
+                        <th style="width: 95px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {foreach name='month' item='ii'}
+				<?php $a=0; ?>
+                    {foreach name='list' item='row'}
+                    {if date("m",$row['timestart'])==$ii}
+                   <?php $a=1;
+                   ?>
+                        <tr>
+                            <!-- <td>
+                                <input type='checkbox'   value="{$row['id']}"/>
+                            </td> -->
+                            <td>{$ii}</td>
+                            <td><br> 
+                            <td>{$row['water']}<br> 
+                            <td>{$row['water_m']}<br> 
+                            <td><br> 
+                            <td>{if $row['status']==1}待完成<br>缴费时间 {:date("Y-m-d",$row['paymenttime'])}{/if}{if $row['status']==0}未缴费{/if}{if $row['status']==2}已完成<br>完成时间 {:date("Y-m-d",$row['completiontime'])}{/if}</td> 
+                            <td>{$row['watermoney']}
+                            </td>
+                            <td style="text-align:left;">
+                                <a href="{:url('admin/community/houseorderedit', array('m'=>$ii,'houseid' => $houseid,'nian' => date("Y",$row['timestart']),'fei'=> 'water'))}" class="btn btn-op btn-operation" >
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="修改及详情">
+                                        <i class='icow icow-bianji2'></i>
+                                    </span>
+                                </a>
+                                <!-- <a data-toggle='ajaxRemove' href="{:url('admin/community/houseorderdelete', array('id' => $row['id']))}"class="btn btn-op btn-operation" data-confirm='确认要删除此水电单吗?'>
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="删除">
+                                       <i class='icow icow-shanchu1'></i>
+                                    </span>
+                                </a> -->
+                            </td>
+                        </tr>
+                        {/if}
+                    {/foreach}
+                    {if $a!=1}
+                        <tr>
+                            <!-- <td>
+                                <input type='checkbox'   value="{$row['id']}"/>
+                            </td> -->
+                            <td>{$ii}</td>
+                            <td> <br> 
+                            <td><br> 
+                            <td><br> 
+                            <td><br> 
+                            <td></td>
+                            <td>
+                            </td>
+                            <td style="text-align:left;">
+                               <a href="{:url('admin/community/houseorderedit', array('m'=>$ii,'houseid'=>$houseid,'nian' => $timestart,'fei'=> 'water'))}" class="btn btn-op btn-operation" >
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="修改及详情">
+                                        <i class='icow icow-bianji2'></i>
+                                    </span>
+                                </a>
+                                <!-- <a data-toggle='ajaxRemove' href="{:url('admin/community/houseorderdelete', array('id' => $row['id']))}"class="btn btn-op btn-operation" data-confirm='确认要删除此水电单吗?'>
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="删除">
+                                       <i class='icow icow-shanchu1'></i>
+                                    </span>
+                                </a> -->
+                            </td>
+                        </tr>
+                        {/if}
+                  {/foreach}  
+                </tbody>
+                <tfoot>
+                <tr>
+                    <!-- <td><input type="checkbox"></td>
+                    <td colspan="4">
+                        <div class="btn-group">
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/community/houseorderdelete')}"><i class='icow icow-shanchu1'></i> 删除</button>
+                        </div>
+                    </td> -->
+                    <!-- <td colspan="8" style="text-align: right">
+                        {$pager}
+                    </td> -->
+                </tr>
+                </tfoot>
+            </table>

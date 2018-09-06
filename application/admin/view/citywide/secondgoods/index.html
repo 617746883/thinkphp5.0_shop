@@ -1,0 +1,208 @@
+{include file='_header'}
+
+<style>
+    tbody tr td{
+        position: relative;
+    }
+    tbody tr  .icow-weibiaoti--{
+        visibility: hidden;
+        display: inline-block;
+        color: #fff;
+        height:18px;
+        width:18px;
+        background: #e0e0e0;
+        text-align: center;
+        line-height: 18px;
+        vertical-align: middle;
+    }
+    tbody tr:hover .icow-weibiaoti--{
+        visibility: visible;
+    }
+    tbody tr  .icow-weibiaoti--.hidden{
+        visibility: hidden !important;
+    }
+    .full .icow-weibiaoti--{
+        margin-left:10px;
+    }
+    .full>span{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        vertical-align: middle;
+        align-items: center;
+    }
+    tbody tr .label{
+        margin: 5px 0;
+    }
+    .goods_attribute a{
+        cursor: pointer;
+    }
+    .newgoodsflag{
+        width: 22px;height: 16px;
+        background-color: #ff0000;
+        color: #fff;
+        text-align: center;
+        position: absolute;
+        bottom: 70px;
+        left: 57px;
+        font-size: 12px;
+    }
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">宝贝管理</span>
+</div>
+<div class="page-content">
+    <div class="fixed-header">
+        <div style="width:25px;"></div>
+        <div style="width:80px;">商品</div>
+        <div class="flex1">&nbsp;</div>
+        <div style="width: 100px;">二手价</div>
+        <div style="width: 80px;">原价</div>
+        <div style="width: 80px;">新旧程度</div>
+        <div  style="width: 120px;">联系人</div>
+        <div class="flex1">描述</div>
+        <div style="width:80px;" >状态</div>
+        <div style="width: 120px;">操作</div>
+    </div>
+    <form action="" method="get" class="form-horizontal form-search" role="form">
+        <div class="page-toolbar">
+            <div class="input-group col-sm-6 pull-right">
+                <span class="input-group-select">
+                    <select name="cate" class='form-control select2' style="width:200px;" data-placeholder="商品分类">
+                        <option value="" {if empty($cate)}selected{/if} >商品分类</option>
+                        {foreach name='category' item='c'}
+                        <option value="{$c['id']}" {if $cate==$c['id']}selected{/if} >{$c['name']}</option>
+                        {/foreach}
+                    </select>
+                </span>
+                <input type="text" class="input-sm form-control" name='keyword' value="{$keyword}" placeholder="ID/名称/编号/条码/商户名称">
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit"> 搜索</button>
+                </span>
+            </div>
+        </div>
+    </form>
+    {if !empty(count($list))}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-table-header">
+                <input type='checkbox' />
+                <div class="btn-group">
+                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch'  data-href="{:url('admin/citywide/secondgoodsstatus',array('status'=>0))}">
+                        <i class='icow icow-xiajia3'></i> 下架
+                    </button>
+                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/citywide/secondgoodsstatus',array('status'=>1))}">
+                        <i class='icow icow-shangjia2'></i> 上架
+                    </button>
+                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除吗?" data-href="{:url('admin/citywide/secondgoodsdelete')}">
+                        <i class='icow icow-shanchu1'></i> 删除</button>
+                	<button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="确定要通过审核吗?" data-href="{:url('admin/citywide/secondgoodschecked')}">
+                    <i class='icow icow-shenhetongguo'></i> 批量审核通过</button>
+                </div>
+            </div>
+		    <table class="table table-responsive">
+		        <thead class="navbar-inner">
+		            <tr>
+		                <th style="width:25px;"></th>
+		                <th style="width:100px;">商品</th>
+		                <th style="">&nbsp;</th>
+		                <th style="width: 100px;">二手价</th>
+		                <th style="width: 80px;">原价</th>
+		                <th style="width: 120px;">新旧程度</th>
+		                <th style="width: 120px;">联系人</th>
+		                <th>描述</th>
+		                <th style="width:80px;" >状态</th>
+		                <th style="width: 80px;">操作</th>
+		            </tr>
+        		</thead>
+        		<tbody>
+		            {foreach name='list' item='item'}
+		            <tr>
+		                <td><input type='checkbox'  value="{$item['id']}"/></td>
+		                <td>
+		                    <a href="{:url('admin/citywide/secondgoodsdetail', array('id' => $item['id']))}">
+		                        <img src="{$item['thumb']}" style="width:72px;height:72px;padding:1px;border:1px solid #efefef;margin: 7px 0" onerror="this.src='/public/static/images/nopic.png'" />
+		                    </a>
+		                </td>
+		                <td class='full'>
+	                        <span>
+	                            <span style="display: block;width: 100%;">
+	                                {$item['title']}
+	                                <span class="text-danger">[{$item['catename']}]</span>
+	                        	</span>
+	                        </span>
+		                </td>
+		                <td>&yen;
+		                    <span data-toggle='tooltip' title=''>{$item['marketprice']}</span>
+		                </td>
+		                <td>{$item['productprice']}</td>
+		                <td>{$item['degree']}</td>		                
+		                <td>{$item['mobile']}</td>
+		                <td>{$item['description']}</td>
+		                <td  style="overflow:visible;">
+		                    <span class='label {if $item['status']==1}label-primary{else}label-default{/if}'
+									data-toggle='ajaxSwitch'
+									data-confirm = "确认是{if $item['status']==1}下架{else}上架{/if}？"
+									data-switch-refresh='true'
+									data-switch-value='{$item['status']}'
+									data-switch-value0='0|下架|label label-default|{:url('admin/citywide/secondgoodsstatus',array('status'=>1,'id'=>$item['id']))}'
+									data-switch-value1='1|上架|label label-success|{:url('admin/citywide/secondgoodsstatus',array('status'=>0,'id'=>$item['id']))}'
+		                        >
+		                        {if $item['status']==1}上架{else}下架{/if}
+		                    </span>
+		                    <br>
+		                    <span class='label {if $item['checked']==0}label-primary{else}label-warning{/if}'
+			                    data-toggle='ajaxSwitch'
+			                    data-confirm = "确认是{if $item['checked']==0}审核中{else}审核通过{/if}？"
+			                    data-switch-refresh='true'
+			                    data-switch-value='{$item['checked']}'
+			                    data-switch-value1='1|审核中|label label-warning|{:url('admin/citywide/secondgoodschecked',array('checked'=>0,'id'=>$item['id']))}'
+			                    data-switch-value0='0|通过|label label-success|{:url('admin/citywide/secondgoodschecked',array('checked'=>1,'id'=>$item['id']))}'
+		                    	>
+		                    {if $item['checked']==0}通过{else}审核中{/if}</span>
+	                    </td>
+	                    <td  style="overflow:visible;position:relative">
+                            <a  class='btn btn-op btn-operation' href="{:url('admin/citywide/secondgoodsdetail', array('id' => $item['id'],'citywidefrom'=>$goodsfrom,'page'=>$page))}" >
+                                 <span data-toggle="tooltip" data-placement="top" title="" data-original-title="详情">
+                                    <i class="icow icow-bianji2"></i>
+                                 </span>
+                            </a>
+                            <a  class='btn  btn-op btn-operation' data-toggle='ajaxRemove' href="{:url('admin/citywide/secondgoodsdelete', array('id' => $item['id']))}" data-confirm='确认彻底删除此商品？'>
+                                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                                     <i class='icow icow-shanchu1'></i>
+                                </span>
+                            </a>
+                        </td>
+                    </tr>
+	            	{/foreach}
+       			</tbody>
+        		<tfoot>
+			        <tr>
+			            <td><input type="checkbox"></td>
+			            <td colspan="4">
+			                <div class="btn-group">
+			                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch'  data-href="{:url('admin/citywide/secondgoodsstatus',array('status'=>0))}">
+			                        <i class='icow icow-xiajia3'></i> 下架</button>
+			                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/citywide/secondgoodsstatus',array('status'=>1))}">
+			                        <i class='icow icow-shangjia2'></i> 上架</button>
+			                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="如果商品存在购买记录，会无法关联到商品, 确认要彻底删除吗?" data-href="{:url('admin/citywide/secondgoodsdelete1')}">
+			                        <i class='icow icow-shanchu1'></i> 彻底删除</button>
+			                </div>
+			            </td>
+			            <td colspan="5" style="text-align: right">
+			                {$pager}
+			            </td>
+			        </tr>
+			        </tfoot>
+		    </table>
+		</div>
+	</div>
+	{else}
+	<div class="panel panel-default">
+	    <div class="panel-body empty-data">暂时没有任何商品!</div>
+	</div>
+	{/if}
+</div>
+
+{include file='_footer'}

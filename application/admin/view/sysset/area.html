@@ -1,0 +1,49 @@
+{include file='_header'}
+<div class="page-header"> 当前位置：<span class="text-primary">地址库设置</span>  </div>
+<div class="page-content">
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data" >
+        <div class="form-group">
+            <label class="col-lg control-label">地址库选择</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class="radio-inline">
+                    <input type="radio" name="data[new_area]" class="new_area" value="0" {if empty($data['new_area'])}checked{else}disabled{/if}  /> 旧版
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="data[new_area]" class="new_area" value="1" {if $data['new_area']==1}checked disabled{/if} /> 新版(数据更新并含街道信息)
+                </label>
+                <span class='help-block'>新版与旧版数据不兼容,开启后,用户地址库将被清空,并且不能再切换回旧版,请谨慎选择!</span>
+            </div>
+        </div>
+        <div class="form-group street-group" {if empty($data['new_area'])}style="display:none;"{/if}>
+            <label class="col-lg control-label">收货地址库开启街道</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class="radio-inline">
+                    <input type="radio" name="data[address_street]" value="1" {if $data['address_street']==1}checked{/if} /> 是
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="data[address_street]" value="0" {if empty($data['address_street'])}checked{/if} /> 否
+                </label>
+            </div>
+        </div>
+        <div class="form-group"></div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"  />
+            </div>
+        </div>
+    </form>
+</div>
+<script language="javascript">
+    $(function () {
+        $('.new_area').click(function () {
+            var type = $(".new_area:checked").val();
+            if (type == '1') {
+                $('.street-group').show();
+            } else {
+                $('.street-group').hide();
+            }
+        });
+    })
+</script>
+{include file='_footer'}

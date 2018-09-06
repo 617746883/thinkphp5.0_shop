@@ -1,0 +1,210 @@
+{include file='_header'}
+<style>
+    .newgoodsflag{
+        width: 18px;height: 16px;
+        background-color: #ff0000;
+        color: #fff;
+        text-align: center;
+        position: relative;
+        bottom: 40px;
+        left: 22px;
+        z-index:99;
+        font-size: 12px;
+    }
+</style>
+<div class="page-heading"> 
+    <span class='pull-right'>
+        <a class='btn btn-primary btn-sm' href="{:url('merch/goods/add')}"><i class='fa fa-plus'></i> 添加商品</a>
+    </span>
+    <h2>商品管理</h2>
+</div>
+<form action="" method="get" class="form-horizontal form-search" role="form">
+    <input type="hidden" name="goodsfrom" value="{$goodsfrom}" />
+    <div class="page-toolbar row m-b-sm m-t-sm">
+        <div class="col-sm-4">
+            <div class="input-group-btn">
+                <button class="btn btn-default btn-sm"  type="button" data-toggle='refresh'><i class='fa fa-refresh'></i></button>
+                {if $goodsfrom=='sale'}
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch'  data-href="{:url('merch/goods/status',array('status'=>0))}"><i class='fa fa-circle-o'></i> 下架</button>
+                {/if}
+                {if $goodsfrom=='stock'}
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch' data-href="{:url('merch/goods/status',array('status'=>1))}"><i class='fa fa-circle'></i> 上架</button>
+                {/if}
+                {if $goodsfrom=='cycle'}
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch-remove' data-confirm="如果商品存在购买记录，会无法关联到商品, 确认要彻底删除吗?" data-href="{:url('merch/goods/delete1')}"><i class='fa fa-remove'></i> 彻底删除</button>
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch-remove' data-confirm="确认要恢复?" data-href="{:url('merch/goods/restore')}"><i class='fa fa-reply'></i> 恢复到仓库</button>
+                {else}
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch-remove' data-confirm="确认要删除吗?" data-href="{:url('merch/goods/delete')}"><i class='fa fa-trash'></i> 删除</button>
+                {/if}
+            </div> 
+        </div>	
+        <div class="col-sm-8 pull-right">
+            <select name="cate" class='form-control input-sm select-sm select2' style="width:200px;" data-placeholder="商品分类">
+                <option value="" {if empty($cate)}selected{/if} >商品分类</option>
+                {foreach name='category' item='c'}
+                <option value="{$c['id']}" {if $cate==$c['id']}selected{/if} >{$c['name']}</option>
+                {/foreach}
+            </select>
+            <div class="input-group">				 
+                <input type="text" class="input-sm form-control" name='keyword' value="{$keyword}" placeholder="ID/名称/编号/条码"> <span class="input-group-btn">              		
+                <button class="btn btn-sm btn-primary" type="submit"> 搜索</button> </span>
+            </div>
+
+        </div>
+    </div>
+</form>
+{if count($list)>0}
+<table class="table table-hover table-responsive"> 
+    <thead class="navbar-inner">
+        <tr>
+            <th style="width:25px;"><input type='checkbox' /></th>
+            <th style="width:60px;text-align:center;">排序</th>
+            <th style="width:60px;">商品</th>
+            <th style="">&nbsp;</th>
+            <th style="width:90px;" >价格</th>
+            <th style="width:70px;" >库存</th>
+            <th style="width:80px;" >销量</th>
+            {if $goodsfrom!='cycle'}
+            <th style="width:80px;" >状态</th>
+            {/if}
+            <th style="width:80px;" >操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {foreach name='list' item='item'}
+        <tr>
+            <td>
+                <input type='checkbox'  value="{$item['id']}"/>
+            </td>
+            <td style='text-align:center;'>
+                <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('merch/goods/change',array('type'=>'displayorder','id'=>$item['id']))}" >{$item['displayorder']}</a>
+            </td>
+            <td>
+                <img src="{$item['thumb']}" class="imgg" style="width:40px;height:40px;padding:1px;border:1px solid #ccc;"  />
+                {if !empty($item['newgoods'])}
+                <!--新-->
+                <div class="newgoodsflag">新</div>
+                {/if}
+            </td>
+            <td class='full' style="overflow-x: hidden">
+                {if !empty($category[$item['pcate']])}
+                	<span class="text-danger">[{$category[$item['pcate']]['name']}]</span>
+                {/if}
+                {if !empty($category[$item['ccate']])}
+                	<span class="text-info">[{$category[$item['ccate']]['name']}]</span>
+                {/if}
+                {if !empty($category[$item['tcate']]) && intval($shopset['catlevel'])==3}
+                	<span class="text-info">[{$category[$item['tcate']]['name']}]</span>
+                {/if}
+                <br/>
+                <a href='javascript:;' data-toggle='ajaxEdit' data-edit='textarea'  data-href="{:url('merch/goods/change',array('type'=>'title','id'=>$item['id']))}" >{$item['title']}</a>
+            </td>
+            <td>
+                {if $item['hasoption']==1}
+                <span data-toggle='tooltip' title='多规格不支持快速修改'>{$item['marketprice']}</span>
+                {else}
+                <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('merch/goods/change',array('type'=>'marketprice','id'=>$item['id']))}" >{$item['marketprice']}</a>
+                {/if}
+            </td>
+            <td>
+                {if !empty($item['hoteldaystock'])}
+                    <span data-toggle='tooltip' title='民宿类商品显示每日库存'>{$item['hoteldaystock']}/日</span>
+                {elseif $item['hasoption']==1}
+                    <span data-toggle='tooltip' title='多规格不支持快速修改'>{$item['total']}</span>
+                {else}
+                    <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('merch/goods/change',array('type'=>'total','id'=>$item['id']))}" >{$item['total']}</a>
+                {/if}
+            </td>
+            <td>{$item['salesreal']}</td>
+            {if $goodsfrom!='cycle'}
+            <td  style="overflow:visible;">
+                {if $item['status']==2}<span class="label label-danger">赠品</span>{else}
+                <span class='label {if $item['status']==1}label-success{else}label-default{/if}' 
+                      data-toggle='ajaxSwitch' 
+                      data-confirm = "确认是{if $item['status']==1}下架{else}上架{/if}？"
+                      data-switch-refresh='true'
+                      data-switch-value='{$item['status']}'
+                      data-switch-value0='0|下架|label label-default|{:url('merch/goods/status',array('status'=>1,'id'=>$item['id']))}'  
+                      data-switch-value1='1|上架|label label-success|{:url('merch/goods/status',array('status'=>0,'id'=>$item['id']))}'  
+                      >
+                      {if $item['status']==1}上架{else}下架{/if}</span>
+                {/if}
+                <br>
+                <span class='label {if $item['checked']==0}label-success{else}label-warning{/if}'>
+                {if $item['checked']==0}通过{else}审核中{/if}</span>
+            </td>
+            {/if}
+            <td  style="overflow:visible;position:relative">
+                <a  class='btn btn-default btn-sm' href="{:url('merch/goods/edit', array('id' => $item['id'],'goodsfrom'=>$goodsfrom,'page'=>$page))}" title="编辑"><i class='fa fa-edit'></i> </a>
+                {if $goodsfrom=='cycle'}
+                <a  class='btn btn-default btn-sm' data-toggle='ajaxRemove' href="{:url('merch/goods/restore', array('id' => $item['id']))}" data-confirm='确认要恢复?'><i class='fa fa-reply'></i> </a>
+                <a  class='btn btn-default btn-sm' data-toggle='ajaxRemove' href="{:url('merch/goods/delete1', array('id' => $item['id']))}" data-confirm='如果此商品存在购买记录，会无法关联到商品, 确认要彻底删除吗?？'><i class='fa fa-remove'></i> </a>
+                {else}
+                <a  class='btn btn-default btn-sm' data-toggle='ajaxRemove' href="{:url('merch/goods/delete', array('id' => $item['id']))}" data-confirm='确认删除此商品？'><i class='fa fa-trash'></i> </a>
+                {/if}
+            </td>
+        </tr>
+        <tr>
+            <td colspan='4' style='text-align: left;border-top:none;padding:5px 0;' class='aops'>
+            {if !empty($item['merchname']) && $item['merchid'] > 0}
+            <span class="text-default" style="margin-left: 95px;">商户名称:</span><span class="text-info">{$item['merchname']}</span>
+            {/if}
+            </td>
+
+            <td colspan='{if $goodsfrom=='cycle'}4{else}5{/if}' style='text-align: right;border-top:none;padding:5px 0;' class='aops'>
+                <a class='{if $item['isnew']==1}text-danger{else}text-default{/if}'  
+               data-toggle='ajaxSwitch' 
+               data-switch-value='{$item['isnew']}'
+               data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'new', 'data'=>1,'id'=>$item['id']))}'  
+               data-switch-value1='1||text-danger|{:url('merch/goods/property',array('type'=>'new','data'=>0,'id'=>$item['id']))}'  
+               >新品</a>
+                <a class='{if $item['ishot']==1}text-danger{else}text-default{/if}'  
+                   data-toggle='ajaxSwitch' 
+                   data-switch-value='{$item['ishot']}'
+                   data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'hot', 'data'=>1,'id'=>$item['id']))}'  
+                   data-switch-value1='1||text-danger|{:url('merch/goods/property',array('type'=>'hot','data'=>0,'id'=>$item['id']))}'  
+                   >热卖</a>
+                 <a class='{if $item['isrecommand']==1}text-danger{else}text-default{/if}'  
+                    data-toggle='ajaxSwitch' 
+                    data-switch-value='{$item['isrecommand']}'
+                    data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'recommand', 'data'=>1,'id'=>$item['id']))}'  
+                    data-switch-value1='1||text-danger|{:url('merch/goods/property',array('type'=>'recommand','data'=>0,'id'=>$item['id']))}'  
+                    >推荐</a>
+                  <a class='{if $item['isdiscount']==1}text-danger{else}text-default{/if}'  
+                     data-toggle='ajaxSwitch' 
+                     data-switch-value='{$item['isdiscount']}'
+                     data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'discount', 'data'=>1,'id'=>$item['id']))}'  
+                     data-switch-value1='1||text-danger|{:url('merch/goods/property',array('type'=>'discount','data'=>0,'id'=>$item['id']))}'  
+                     >促销</a>
+                   <a class='{if $item['issendfree']==1}text-danger{else}text-default{/if}'  
+                      data-toggle='ajaxSwitch' 
+                      data-switch-value='{$item['issendfree']}'
+                      data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'sendfree', 'data'=>1,'id'=>$item['id']))}'  
+                      data-switch-value1='1||text-danger|{:url('merch/goods/property',array('type'=>'sendfree','data'=>0,'id'=>$item['id']))}'  
+                      >包邮</a>
+                    <a class='{if $item['istime']==1}text-danger{else}text-default{/if}'  
+                       data-toggle='ajaxSwitch' 
+                       data-switch-value='{$item['istime']}'
+                       data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'time', 'data'=>1,'id'=>$item['id']))}'  
+                       data-switch-value1='1||text-danger|{:url('merch/goods/property',array('type'=>'time','data'=>0,'id'=>$item['id']))}' 
+                       >限时卖</a>
+                     <a class='{if $item['isnodiscount']==1}text-danger{else}text-default{/if}'  
+                        data-toggle='ajaxSwitch' 
+                        data-switch-value='{$item['isnodiscount']}'
+                        data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'nodiscount', 'data'=>1,'id'=>$item['id']))}'  
+                        data-switch-value1='1||text-danger|{:url('merch/goods/property',array('type'=>'nodiscount','data'=>0,'id'=>$item['id']))}'  
+                        >不参与折扣</a>
+			</td>
+        </tr>
+        {/foreach}
+		</tbody>
+	</table>
+	{$pager}
+	{else}
+	<div class='panel panel-default'>
+	  <div class='panel-body' style='text-align: center;padding:30px;'>
+	      暂时没有任何商品!
+	  </div>
+	</div>
+	{/if}
+{include file='_footer'}

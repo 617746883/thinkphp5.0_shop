@@ -1,0 +1,64 @@
+{include file='_header'}
+
+<div class="page-header">
+    当前位置：<span class="text-primary">物流信息接口</span>
+</div>
+<div class="page-content">
+    <div class="alert alert-primary">
+        <p>提示：内置物流接口可能不稳定，您可申请/购买快递100正式接口(根据需求)</p>
+        <p>类型：商城内置接口(可能不稳定); 免费接口(需要申请,相对稳定); 企业接口(收费,稳定性高)</p>
+    </div>
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <div class="form-group">
+            <label class="col-lg control-label">接口类型</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class="radio-inline"><input type="radio" class="toggle" data-show="" data-hide="type" name="isopen" value="0" {if empty($data['isopen'])}checked="checked"{/if} /> 商城内置接口</label>
+                <label class="radio-inline"><input type="radio" class="toggle" data-show="type1" data-hide="type" name="isopen" value="1" {if $data['isopen']==1}checked="checked"{/if} /> 免费接口</label>
+                <label class="radio-inline"><input type="radio" class="toggle" data-show="type2" data-hide="type" name="isopen" value="2" {if $data['isopen']==2}checked="checked"{/if} /> 企业接口</label>
+            </div>
+        </div>
+        <div class="form-group type type1 type2" {if empty($data['isopen'])}style="display: none"{/if}>
+            <label class="col-lg control-label" style="padding-top: 0;">授权密匙<br>(Key)</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="apikey" class="form-control" value="{$data['apikey']}"/>
+            </div>
+        </div>
+        <div class="form-group type type2" {if $data['isopen']<2}style="display: none"{/if}>
+            <label class="col-lg control-label" style="padding-top: 0;">公司编号<br>(Customer)</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="customer" class="form-control" value="{$data['customer']}"/>
+            </div>
+        </div>
+        <div class="form-group type type1 type2" {if empty($data['isopen'])}style="display: none"{/if}>
+            <label class="col-lg control-label">数据缓存时间</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="input-group">
+                    <input type="text" name="cache" class="form-control" value="{$data['cache']}"/>
+                    <span class="input-group-addon">分钟</span>
+                </div>
+                <div class="help-block">正式接口可能存在次数限制问题, 设置缓存时间后在指定时间内只读取缓存并不调用接口(数据可能会延迟)</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"/>
+            </div>
+        </div>  
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(".toggle").unbind('click').click(function () {
+        var hide = $(this).data('hide');
+        var show = $(this).data('show');
+        if(hide){
+            $("."+hide).hide();
+        }
+        if(show){
+            $("."+show).show();
+        }
+    });
+</script>
+
+{include file='_footer'}     

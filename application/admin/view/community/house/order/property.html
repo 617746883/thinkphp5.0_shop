@@ -1,0 +1,121 @@
+    <form action="{:url('admin/community/houseorder')}" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <div class="form-group">
+            <input type="hidden" id="houseid" name="houseid" value="{$houseid}" />
+            <label class="col-lg control-label">选择年份</label>
+            <div class="col-sm-9 col-xs-12">
+               <select name="times" id="times" class="select form-control select-group" style="width:130px;display:inline;"/>
+                {foreach name='year_array' item='vo'}
+                <option value="{$vo}" {if $timestart==$vo }selected{/if}>{$vo}</option>
+               {/foreach}
+               </select>
+               <input type="submit" value="更改年份" class="btn btn-primary"/>
+            </div>
+        </div>
+    </form>
+    <form action="{:url('admin/community/houseorderedit')}" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <div class="region-goods-details row">
+            <input type="hidden" name="id" value="{$list2['id']}" />
+            <input type="hidden" name="houseid" value="{$houseid}" />
+            <input type="hidden" name="nian" value="{$timestart}" />
+            <div class="form-group">
+                <label class="col-lg control-label">基础费用</label>
+                <div class="col-sm-9 col-xs-12">
+                    <input type="text" name='basicmoney' value="{$list2['basicmoney']}" class="form-control" />
+                </div>
+            </div>
+            <label class="col-lg control-label must">参数</label>
+             <div class="region-goods-right col-sm-10">
+                 <table class="table ">
+                     <thead>
+                     <tr>
+                         <td style='width:150px;'>物业费详情</td>
+                         <td>物业费明细(元)<small>拖动行可进行排序</small></td>
+                         <th style='width:50px;'></th>
+                         <th style='width:100px;'></th>
+                     </tr>
+                     </thead>
+                     <tbody id="param-items">
+                     {foreach name='params' item='p'}
+                     <tr>
+                         <td>
+                             <input name="param_title[]" type="text" class="form-control param_title" value="{$p['title']}"/>
+                             <input name="param_id[]" type="hidden" class="form-control" value="{$p['id']}"/>
+                         </td>
+                         <td>
+                             <input name="param_value[]" type="text" class="form-control param_value" value="{$p['value']}"/>
+                         </td>
+                         <td>
+                             <a href="javascript:;" class='btn btn-default btn-sm' onclick="deleteParam(this)" title="删除"><i class='fa fa-remove'></i></a>
+                         </td>
+                         <td>
+                             <a href="javascript:;" class='btn btn-default btn-sm'  title="拖动排序"><i class='icow icow-tuodong' style="margin-right: 5px;font-size:12px;"></i>拖动排序</a>
+                         </td>
+                     </tr>
+                     {/foreach}
+                     </tbody>
+                     <tbody>
+                     <tr>
+                         <td colspan="4">
+                             <a href="javascript:;" id='add-param' onclick="addParam()" class="btn btn-default"  title="添加参数"><i class='fa fa-plus'></i> 添加参数</a>
+                         </td>
+                     </tr>
+                     </tbody>                     
+                 </table>
+             </div>
+             <div class="form-group">
+                <label class="col-lg control-label">备注</label>
+                <div class="col-sm-9 col-xs-12">
+                    <textarea name="desc" id="t1" class="form-control richtext"  rows="5" >{$list2['desc']}</textarea>
+                </div>
+            </div>
+             <div class="form-group">
+                <label class="col-lg control-label">是否缴费</label>
+                <div class="col-sm-9 col-xs-12">
+                    <label class='radio-inline'>
+                        <input type='radio' name="status" value='1' {if $list2[status]==1}checked{/if} /> 待完成
+                    </label>
+                    <label class='radio-inline'>
+                        <input type='radio' name="status" value='0' {if $list2[status]==0}checked{/if} /> 未缴费
+                    </label>
+                    <label class='radio-inline'>
+                        <input type='radio' name="status" value='2' {if $list2[status]==2}checked{/if} /> 已完成
+                    </label>
+                </div>
+            </div>
+        </div>
+        <input type="submit" value="提交"  class="btn btn-primary"/>
+    </form>
+<script language='javascript'>
+    /**
+ * 获取多级联动的商品分类
+ */
+    $(function() {
+        require(['jquery.ui'],function(){
+          $("#param-items").sortable();
+        });
+        $("#chkoption").click(function() {
+            var obj = $(this);
+            if (obj.get(0).checked) {
+                $("#tboption").show();
+                $(".trp").hide();
+            }
+            else {
+                $("#tboption").hide();
+                $(".trp").show();
+            }
+        });
+    })
+    function addParam() {
+        var url = "{:url('admin/community/tpl',array('tpl'=>'param'))}";
+        $.ajax({
+            "url": url,
+            success: function(data) {
+                $('#param-items').append(data);
+            }
+        });
+        return;
+    }
+    function deleteParam(o) {
+        $(o).parent().parent().remove();
+    }
+</script>

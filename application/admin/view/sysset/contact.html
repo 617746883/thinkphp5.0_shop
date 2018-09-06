@@ -1,0 +1,51 @@
+{include file='_header'}
+<script type="text/javascript" src="/public/static/js/dist/area/cascade.js"></script>
+<div class="page-header">
+    当前位置：<span class="text-primary">联系方式</span>
+</div>
+  <div class="page-content">
+      <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data" >
+          <div class="form-group">
+              <label class="col-lg control-label">客服电话</label>
+              <div class="col-sm-9 col-xs-12">
+                  <input type="text" name="data[phone]" class="form-control" value="{$data['phone']}" />
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg control-label">所在城市</label>
+              <div class="col-sm-9 col-xs-12">
+                    <select id="sel-provance" name='data[province]' onchange="selectCity();" class="form-control" style='width:200px;display: inline-block' >
+                      <option value="" selected="true">省/直辖市</option>
+                    </select>
+                    <select id="sel-city" name='data[city]'  onchange="selectcounty(0)" class="form-control" style='width:200px;display: inline-block' >
+                      <option value="" selected="true">请选择</option>
+                    </select>
+                    <select id="sel-area" name="sel-area" onChange="selectstreet(0)" class="select form-control select-group" style="width:130px;display:none;">
+                        <option value="" selected="true">请选择</option>
+                    </select>
+                    <input type="hidden" name="province" id="province" value="{$data['province']}" />
+                    <input type="hidden" name="city" id="city" value="{$data['city']}" />
+                    <input type="hidden" name="area" id="area" value="{$data['area']}" />
+                    <input type="hidden" name="chose_province_code" id="chose_province_code" value="{$data['provincecode']}" />
+                    <input type="hidden" name="chose_city_code" id="chose_city_code" value="{$data['citycode']}" />
+                    <input type="hidden" name="chose_area_code" id="chose_area_code" value="{$data['areacode']}" />
+                    <script language='javascript'>
+                        cascdeInit("1","0","{$data['provincecode']}","{$data['citycode']}","0");
+                    </script>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg control-label">所在地址</label>
+              <div class="col-sm-9 col-xs-12">
+                  <input type="text" name="data[address]" class="form-control" value="{$data['address']}"/>
+              </div>
+          </div>
+          <div class="form-group">
+              <label class="col-lg control-label"></label>
+              <div class="col-sm-9 col-xs-12">
+                  <input type="submit"  value="提交" class="btn btn-primary"  />
+              </div>
+          </div>
+      </form>
+  </div>
+{include file='_footer'}     

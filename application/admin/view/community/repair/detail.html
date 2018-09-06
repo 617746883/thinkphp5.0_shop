@@ -1,0 +1,121 @@
+{include file='_header'}
+<style>
+    .checkbox-inline{
+        display: block;
+    }    
+    .btns a i{
+        display: inline-block;
+        width: 100%;
+        height: 20px;
+        background: #f95959;
+    }
+    .btn-color {
+        width: 25px;
+        height: 25px;
+        border: 1px solid #fff;
+        margin: 2px;
+        padding: 0;
+    }
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary"><small>维修详情</small></span>
+</div>
+<div class="page-content">
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$item['id']}"/>
+        <div class="form-group">
+            <label class="col-lg control-label">业务编号：</label>
+            <div class="col-sm-9 col-xs-12" style="padding-top: 7px;">
+               <div class='form-control-static'>{$item['id']}</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">会员</label>
+            <div class="col-sm-9 col-xs-12">
+                <img class="radius50" src="{$item['avatar']}" style='width:50px;height:50px;padding:1px;border:1px solid #ccc' onerror="this.src='/public/static/images/noface.png'"/>
+                {$item['nickname']}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label ">维修户号:</label>
+            <div class="col-sm-9 col-xs-12" style="padding-top: 7px;">
+                <p>{$item['housesn']}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">所在小区:</label>
+            <p>{$item['communityname']}</p> 
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">所属楼栋:</label>
+            <div class="col-sm-9 col-xs-12" style="padding-top: 7px;">
+            <p>{$item['buildingname']}</p> 
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">门牌号:</label>
+            <div class="col-sm-9 col-xs-12" style="padding-top: 7px;">
+            <p>{$item['housename']}</p>  
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">维修描述:</label>
+            <div class="col-sm-9 col-xs-12" style="padding-top: 7px;">
+             <p>{$item['description']}</p>   
+            </div>
+        </div>
+        <div class="form-group">
+        <label class="col-lg control-label">报修图片</label>
+            <div class="input-group multi-img-details ui-sortable" style="max-width: 1000px;">
+                {foreach name='piclist' item='vo'}
+                <div class="multi-item">
+                    <img src="{$vo}" onerror="this.src='/public/static/images/nopic.png'; this.title='图片未找到.'" class="img-responsive img-thumbnail" style="max-width: 100px;max-height: 100px;">
+                </div>
+                {/foreach}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">联系电话:</label>
+            <div class="col-sm-9 col-xs-12" style="padding-top: 7px;">
+             <p>{$item['mobile']}</p>   
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">报修时间:</label>
+            <div class="col-sm-9 col-xs-12" style="padding-top: 7px;">
+             <p>{:date('Y-m-d H:i',$item['bookingtime'])}</p>   
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">创建时间:</label>
+            <div class="col-sm-9 col-xs-12" style="padding-top: 7px;">
+             <p>{:date('Y-m-d H:i',$item['createtime'])}</p>   
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">当前状态:</label>
+            <div class="col-sm-9 col-xs-12">
+                {if $item['status'] == 1}<p>待处理</p>   {elseif $item['status'] == 2}<p>处理中</p>   {elseif $item['status'] == 3}<p>已处理完成</p>   {elseif $item['status'] == -1}<p>关闭</p>   {/if}
+            </div>
+        </div>
+        {if $item['status'] == 1}
+        <div class="form-group-title">处理操作</div>
+        <div class="form-group col-sm-12" style="padding-bottom: 100px;">       
+            <button type="button" class="btn btn-primary" data-confirm="此预约改为处理中?" data-toggle='ajaxPost' href="{:url('admin/community/repairop', array('id' => $item['id'],'ops' => 'make'))}">处理中</button>
+            <button type="button" class="btn btn-danger" data-confirm="确认已完成?" data-toggle='ajaxPost' href="{:url('admin/community/repairop', array('id' => $item['id'],'ops' => 'finish'))}">已完成</button>  
+            <button type="button" class="btn btn-default" data-confirm="确认要关闭?" data-toggle='ajaxPost' href="{:url('admin/community/repairop', array('id' => $item['id'],'ops' => 'close'))}">关闭</button>  
+        </div> 
+        {elseif $item['status'] == 2}
+        <div class="form-group-title">处理操作</div>
+            <button type="button" class="btn btn-danger" data-confirm="确认要关闭?" data-toggle='ajaxPost' href="{:url('admin/community/repairop', array('id' => $item['id'],'ops' => 'finish'))}">已完成</button>  
+        {/if}
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"/>
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div>
+    </form>
+</div>
+{include file='_footer'}

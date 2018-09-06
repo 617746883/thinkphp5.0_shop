@@ -1,0 +1,179 @@
+{include file='_header'}
+<div class="page-header">当前位置：<span class="text-primary">交易设置</span></div>
+<div class="page-content">
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data" >
+        <div class='form-group-title'>线下核销设置</div>
+        <div class="form-group">
+            <label class="col-lg control-label">是否填写联系人</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio radio-inline'>
+                    <input type='radio' value='0' name='data[set_realname]'  {if $data['set_realname']==0}checked{/if} /> 显示
+                </label>
+                <label class='radio radio-inline'>
+                    <input type='radio' value='1' name='data[set_realname]' {if $data['set_realname']==1}checked{/if} /> 隐藏
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">是否填写联系方式</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio radio-inline'>
+                    <input type='radio' value='0' name='data[set_mobile]'  {if $data['set_mobile']==0}checked{/if} /> 显示
+                </label>
+                <label class='radio radio-inline'>
+                    <input type='radio' value='1' name='data[set_mobile]' {if $data['set_mobile']==1}checked{/if} /> 隐藏
+                </label>
+            </div>
+        </div>
+        <div class='form-group-title'>自动关闭未付款订单</div>
+        <div class="form-group">
+            <label class="col-lg control-label">下单几天后</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="input-group fixsingle-input-group">
+                    <input type="text" name="data[closeorder]" class="form-control" value="{$data['closeorder']}" />
+                    <div class="input-group-addon">天</div>
+                </div>
+                <span class='help-block'>订单下单未付款，n天后自动关闭，空为不自动关闭</span>
+            </div>
+        </div>
+        <div class='form-group-title'>未付款订单关闭前发送推送信息</div>
+        <div class="form-group ">
+            <label class="col-lg control-label">订单关闭前</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="input-group fixsingle-input-group">
+                    <input type="text" name="data[willcloseorder]" class="form-control" value="{$data['willcloseorder']}" />
+                    <div class="input-group-addon">分钟</div>
+                </div>
+                <span class='help-block'>订单下单未付款自动关闭前多少分钟发送推送消息，0或空为默认30分钟。需要前往消息提醒设置中开启对应推送模块</span>
+            </div>
+        </div>
+        <div class='form-group-title'>库存预警推送通知</div>
+        <div class="form-group">
+            <label class="col-lg control-label">库存少于</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="input-group">
+                    <input type="text" name="data[stockwarn]" class="form-control" value="{$data['stockwarn']}" />
+                    <div class="input-group-addon">件</div>
+                </div>
+                <span class='help-block'>库存低于多少件后,每当减少库存时会为卖家推送一次库存警报,默认为5件</span>
+            </div>
+        </div>
+        <div class='form-group-title'>自动收货</div>
+        <div class="form-group">
+            <label class="col-lg control-label">发货几天后</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="input-group fixsingle-input-group">
+                    <input type="text" name="data[receive]" class="form-control" value="{$data['receive']}" />
+                    <div class="input-group-addon">天</div>
+                </div>
+                <span class='help-block'>订单发货后，用户收货的天数，如果在期间未确认收货，系统自动完成收货，空为不自动收货</span>
+            </div>
+        </div>
+        <div class='form-group-title' style="display: none;">交易增强</div>
+        <div class="form-group" style="display: none;">
+            <label class="col-lg control-label">开启交易增强功能</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio radio-inline'>
+                    <input type='radio' value='0' name='data[shop_strengthen]'  {if $data['shop_strengthen']==0}checked{/if} /> 开启
+                </label>
+                <label class='radio radio-inline'>
+                    <input type='radio' value='1' name='data[shop_strengthen]' {if $data['shop_strengthen']==1}checked{/if} /> 关闭
+                </label>
+                <span class='help-block'>开启后进入商城首页时会自动弹出未支付订单提示, 在创建订单页后退时会询问是否放弃付款</span>
+            </div>
+        </div>
+        <div class='form-group-title'>退款申请</div>
+        <div class="form-group">
+            <label class="col-lg control-label">完成订单几天后</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="input-group fixsingle-input-group">
+                    <input type="text" name="data[refunddays]" class="form-control" value="{$data['refunddays']}" />
+                    <div class="input-group-addon">天</div>
+                </div>
+                <span class='help-block'>订单完成后 ，用户在x天内可以发起退款申请，设置0天不允许完成订单退款</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">退款说明</label>
+            <div class="col-sm-5 col-xs-12">
+                <textarea  name="data[refundcontent]" class="form-control" value="{$data['refundcontent']}" rows="5">{$data['refundcontent']}</textarea>
+                <span class='help-block'>用户在申请退款页面的说明</span>
+            </div>
+        </div>
+        <div class='form-group-title'>余额积分设置</div>
+        <div class="form-group">
+            <label class="col-lg control-label">文字</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class='input-group fixmore-input-group'>
+                    <span class='input-group-addon'>积分=</span>
+                    <input type="text" name="data[credittext]" class="form-control" value="{$data['credittext']?$data['credittext']:'积分'}" />
+                    <span class='input-group-addon'>余额=</span>
+                    <input type="text" name="data[moneytext]" class="form-control" value="{$data['moneytext']?$data['moneytext']:'余额'}" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group recharge-group">
+            <label class="col-lg control-label">会员积分上限</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="input-group fixsingle-input-group">
+                    <input type="number" name="data[maxcredit]" class="form-control" value="{$data['maxcredit']}" />
+                    <div class="input-group-addon">积分</div>
+                </div>
+                <span class='help-block text-danger'>会员最高积分，0为不限制(会员积分大于等于此值时将无法继续增加，后台手动充值不限制，已持有积分不限制)</span>
+            </div>
+        </div>
+        <div class='form-group-title'>评价</div>
+        <div class="form-group">
+            <label class="col-lg control-label">订单评价</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'><input type='radio' name='data[closecomment]' value='0' {if empty($data['closecomment'])}checked{/if} /> 允许</label>
+                <label class='radio-inline'><input type='radio' name='data[closecomment]' value='1' {if $data['closecomment']=='1'}checked{/if}  /> 不允许</label>
+                <span class='help-block'>是否允许用户对订单进行评价</span>
+            </div>
+        </div>
+        <div class="form-group" style="display: none;">
+            <label class="col-lg control-label">显示评价 </label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'><input type='radio' name='data[closecommentshow]' value='0' {if empty($data['closecommentshow'])}checked{/if}/> 显示</label>
+                <label class='radio-inline'><input type='radio' name='data[closecommentshow]' value='1' {if $data['closecommentshow']=='1'}checked{/if} /> 关闭</label>
+                <span class='help-block'>是否允许商品详情页面显示评价</span>
+            </div>
+        </div>
+        <div class="form-group" style="display: none;">
+            <label class="col-lg control-label">评价免审核 </label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'><input type='radio' name='data[commentchecked]' value='1' {if $data['commentchecked']=='1'}checked{/if} /> 是</label>
+                <label class='radio-inline'><input type='radio' name='data[commentchecked]' value='0' {if empty($data['commentchecked'])}checked{/if}/> 否</label>
+                <span class='help-block'>用户发表的评价是否免审核</span>
+            </div>
+        </div>
+        <div class='form-group-title'>限时购名称</div>
+        <div class='panel-body'>
+            <div class="form-group">
+                <label class="col-lg control-label">限时购名称</label>
+                <div class="col-sm-9 col-xs-12">
+                    <input  name="data[istimetext]" class="form-control"  value="{$data['istimetext']?$data['istimetext']:'限时购'}" />
+                    <span class='help-block'>商品详情页面限时购名称前缀 ,默认为"限时购" ,商品可单独设置</span>
+                </div>
+            </div>
+        </div>
+        <div class='form-group-title'>商城不配送区域</div>
+        <div class="form-group">
+            <label class="col-lg control-label">不配送区域</label>
+            <div class="col-sm-9 col-xs-12">
+                <div id="areas" class="form-control-static">{$data[nodispatchareas]}</div>
+                <a href="javascript:;" class="btn btn-default" onclick="selectAreas()">选择地区</a>
+                <input type="hidden" id='selectedareas' name="data[nodispatchareas]" value="{$data[nodispatchareas]}" />
+                <input type="hidden" id='selectedareas_code' name="data[nodispatchareas_code]" value="{$data[nodispatchareas_code]}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"  />
+            </div>
+        </div>
+    </form>
+</div>
+{include file='shop/selectareasNew'}
+{include file='_footer'}     

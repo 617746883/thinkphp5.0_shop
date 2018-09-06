@@ -1,0 +1,61 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">团ID :</label>
+            <div class="col-sm-9 col-xs-12">
+                <p class="form-control-static">{$teaminfo['teamid']}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">需要人数 :</label>
+            <div class="col-sm-9 col-xs-12">
+                <p class="form-control-static">{$teaminfo['groupnum']}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">缺少人数 :</label>
+            <div class="col-sm-9 col-xs-12">
+                <p class="form-control-static">{php echo ($teaminfo['groupnum'] - $total);}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">团状态:</label>
+            <div class="col-sm-9 col-xs-12">
+                <p class="form-control-static">
+                    {if $teaminfo['success']== 0}<span class="label label-info">拼团中</span>{/if}
+                    {if $teaminfo['success']== 1}<span class="label label-success">拼团成功</span>{/if}
+                    {if $teaminfo['success']== -1}<span class="label label-warning">拼团失败</span>{/if}
+                </p><!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-getgoods2">修改团状态</button>-->
+            </div>
+        </div>
+    </div>
+    <!--修改团状态-->
+    <!--<div id="modal-getgoods2" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="width:600px;margin:0px auto;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                    <h3>修改团状态</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-xs-10 col-sm-3 col-md-3 control-label">团状态</label>
+                        <div class="col-xs-12 col-sm-9 col-md-8 col-lg-8">
+                            <select class="form-control" name="thestatus" id="express">
+                              <option value="">团状态</option>
+                              <option value="1" >组团失败</option>
+                              <option value="2" >组团成功</option>
+                              </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary span2" name="editstatus" value="yes" onclick="return confirm('此操作也将修改整个团所有订单的状态！确认？');">确认修改</button>
+                        <a href="#" class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>-->
+    <!--修改团状态-->
+</div>

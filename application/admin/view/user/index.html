@@ -1,0 +1,142 @@
+{include file='_header'}
+ 
+<div class="page-header">
+    <span>当前位置：<span class="text-primary">我的信息</small></span></span>
+
+</div>
+<div class="page-content">
+    <div class="page-sub-toolbar">
+        <span class=''>
+            <!-- <a class="btn btn-primary btn-sm" href="{:url('admin/perm/useradd')}">添加新操作员</a> -->
+        </span>
+    </div>
+    <form id="dataform" action="" method="post" class="form-horizontal form-validate" >
+        <input type="hidden" name="id" value="{$admin_info['id']}" />
+        <div class="form-group">
+            <label class="col-lg control-label must">用户名</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="username" class="form-control" value="{$admin_info['username']}" {if !empty($admin_info)}readonly{/if} data-rule-required=true autocomplete="off" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label must">密码</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="password" name="password" class="form-control" value="" autocomplete="off" {if empty($admin_info['password'])}data-rule-required='true' {/if}/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">头像</label>
+            <div class="col-sm-9 col-xs-12">
+                {:tpl_form_field_image2('avatar', $admin_info['avatar'])}
+                <span class='help-block'>建议尺寸:640 * 350 , 请将所有图片尺寸保持一致</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">备注</label>
+            <div class="col-sm-9 col-xs-12">
+                <textarea name="remark" class="form-control richtext" readonly rows="5">{$admin_info['remark']}</textarea>
+            </div>
+        </div>
+        <!-- <div class="form-group">
+            <label class="col-lg control-label">有效期限</label>
+            {:tpl_form_field_daterange('saletime', array('starttime'=>date('Y-m-d H:i', !empty($admin_info['starttime'])?$admin_info['starttime']:time()),'endtime'=>date('Y-m-d H:i', !empty($admin_info['endtime'])?$admin_info['endtime']:strtotime('7 days'))),true);}
+        </div> -->
+        <!-- <div class="form-group">
+            <label class="col-lg control-label">所属角色</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type='hidden' id='userid' name='roleid' value="{$role['id']}" />
+                <div class='input-group'>
+                    <input type="text" name="user" maxlength="30" value="{$role['rolename']}" id="user" class="form-control" readonly />
+                    <div class='input-group-btn'>
+                        <button class="btn btn-default" type="button" onclick="popwin = $('#modal-module-menus1').modal();">选择角色</button>
+                        <button class="btn btn-danger" type="button" onclick="$('#userid').val('');$('#user').val('');">清除选择</button>
+                    </div>
+                </div>
+                <span class='help-block'>如果您选择了角色，则此用户本身就继承了此角色的所有权限</span>
+                <div id="modal-module-menus1"  class="modal fade" tabindex="-1">
+                    <div class="modal-dialog" style='width: 920px;'>
+                        <div class="modal-content">
+                            <div class="modal-header"><button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button><h3>选择角色</h3></div>
+                            <div class="modal-body" >
+                                <div class="row">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="keyword" value="" id="search-kwd1" placeholder="请输入角色名称" />
+                                        <span class='input-group-btn'><button type="button" class="btn btn-default" onclick="search_users();">搜索</button></span>
+                                    </div>
+                                </div>
+                                <div id="module-menus1" style="padding-top:5px;"></div>
+                            </div>
+                            <div class="modal-footer"><a href="#" class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</a></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <!-- <div class="form-group">
+            <label class="col-lg control-label">操作员状态</label>
+            <div class="col-sm-10  col-xs-12">
+                <label class='radio-inline'>
+                    <input type='radio' name='status' value=1' {if $admin_info['status']==1}checked{/if} /> 启用
+                </label>
+                <label class='radio-inline'>
+                    <input type='radio' name='status' value=0' {if $admin_info['status']==0}checked{/if} /> 禁用
+                </label>
+            </div>
+        </div> -->
+        <div class="form-group"></div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary" />
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div>
+    </form>
+</div>
+<script language='javascript'>
+    function search_users() {
+        $("#module-menus1").html("正在搜索....")
+        $.get('{:url("perm/role/query")}', {
+            keyword: $.trim($('#search-kwd1').val())
+        }, function(dat){
+            $('#module-menus1').html(dat);
+        });
+    }
+    function select_role(o) {
+        $("#userid").val(o.id);
+        $("#user").val( o.rolename );
+        var perms = o.perms2.split(',');
+
+
+        $(':checkbox').removeAttr('disabled').removeAttr('checked').each(function(){
+
+            var _this = $(this);
+            var perm = '';
+            if( _this.data('group') ){
+                perm+=_this.data('group');
+            }
+            if( _this.data('parent') ){
+                if (_this.data('parent') != 'text') {
+                    perm += "." + _this.data('parent');
+                }
+            }
+            if( _this.data('son') ){
+                if (_this.data('son') != 'text') {
+                    perm += "." + _this.data('son');
+                }
+            }
+            if( _this.data('grandson') ){
+                if (_this.data('grandson') != 'text') {
+                    perm += "." + _this.data('grandson');
+                }
+            }
+            if( $.arrayIndexOf(perms,perm)!=-1){
+                $(this).attr('disabled',true).get(0).checked =true;
+            }
+
+        });
+        $(".close").click();
+    }
+</script>
+{include file='_footer'}

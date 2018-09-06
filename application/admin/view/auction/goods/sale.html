@@ -1,0 +1,124 @@
+{if !empty(count($list))}
+<div class="page-table-header" style="border-top: none">
+    <input type="checkbox">
+    <div class="btn-group">
+        {if $type=='store'}
+        <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/auction/goodsstatus',array('status'=>1))}">
+            <i class='icow icow-shangjia2'></i> 上架
+        </button>
+        {/if}
+        {if $type=='sale' || empty($type)}
+        <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/auction/goodsstatus',array('status'=>0))}">
+            <i class='icow icow-xiajia3'></i> 下架
+        </button>
+        {/if}
+        {if $type=='recycle'}
+        <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要恢复?" data-href="{:url('admin/auction/goodsrestore')}">
+            <i class='icow icow-huifu1'></i> 恢复到仓库
+        </button>
+        <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="如果商品存在购买记录，会无法关联到商品, 确认要彻底删除吗?" data-href="{:url('admin/auction/goodsdelete1')}">
+            <i class='icow icow-shanchu5'></i> 彻底删除
+        </button>
+        {else}
+        <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除吗?" data-href="{:url('admin/auction/goodsdelete')}">
+            <i class='icow icow-shanchu1'></i> 删除
+        </button>
+        {/if}
+    </div>
+</div>
+<table class="table table-hover table-responsive">
+<thead>
+<tr>
+    <th style="width:25px;"></th>
+    <th style="width:50px;">排序</th>
+    <th style="width:70px;">商品标题</th>
+    <th style="width:200px;">&nbsp;</th>
+    <th>团购价</th>
+    <th>单购价</th>
+    <th>库存</th>
+    <th>销量</th>
+    <th>状态</th>
+    <th style="text-align: center;width: 65px;">操作</th>
+</tr>
+</thead>
+<tbody>
+{foreach name='list' item='row'}
+<tr>
+    <td><input type='checkbox' value="{$row['id']}"/></td>
+    <td>
+        <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('admin/auction/goodsproperty',array('type'=>'displayorder','id'=>$row['id']))}">{$row['displayorder']}</a>
+    </td>
+    <td><img src="{$row['thumb']}" style="width:40px;height:40px;padding:1px;border:1px solid #ccc;" onerror="this.src='../addons/ewei_shopv2/static/images/nopic.png'"/>
+    </td>
+    <td>
+        {$row['title']}
+        <br/>
+        <span class='text-primary'>[{$row['name']}]</span>
+    </td>
+    <td>{$row['auctionprice']}</td>
+    <td >{if $row['singleprice']}{$row['singleprice']}{else}--{/if}</td>
+    <td>{$row['total']}</td>
+    <td>
+        {$row['sales']}
+    </td>
+    <td >
+        <span class='label {if $row['status']==1}label-primary{else}label-default{/if}'
+        data-toggle='ajaxSwitch'
+        data-switch-value='{$row['status']}'
+        data-switch-value0='0|下架|label label-default|{:url('admin/auction/goodsproperty',array('type'=>'status', 'value'=>1,'id'=>$row['id']))}'
+        data-switch-value1='1|上架|label label-primary|{:url('admin/auction/goodsproperty',array('type'=>'status', 'value'=>0,'id'=>$row['id']))}'
+        >{if $row['status']==1}上架{else}下架{/if}</span>
+    </td>
+    <td >
+        <a class='btn btn-default btn-sm btn-op btn-operation' href="{:url('admin/auction/goodsedit',array('id' => $row['id']));}">
+            <span data-toggle="tooltip" data-placement="top" title="" data-original-title="编辑">
+                    <i class='icow icow-bianji2'></i>
+           </span>
+        </a>
+        <a class='btn btn-default btn-sm btn-op btn-operation' data-toggle='ajaxRemove' href="{:url('admin/auction/goodsdelete',array('id' => $row['id']));}" data-confirm="确定要删除该商品吗？">
+            <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                 <i class='icow icow-shanchu1'></i>
+            </span>
+        </a>
+    </td>
+</tr>
+{/foreach}
+</tbody>
+<tfoot>
+    <tr>
+        <td><input type="checkbox"></td>
+        <td colspan="3">
+            <div class="btn-group">
+                {if $type=='store'}
+                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/auction/goodsstatus',array('status'=>1))}">
+                    <i class='icow icow-shangjia2'></i> 上架
+                </button>
+                {/if}
+                {if $type=='sale' || empty($type)}
+                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/auction/goodsstatus',array('status'=>0))}">
+                    <i class='icow icow-xiajia3'></i> 下架
+                </button>
+                {/if}
+                {if $type=='recycle'}
+                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要恢复?" data-href="{:url('admin/auction/goodsrestore')}">
+                    <i class='icow icow-huifu1'></i> 恢复到仓库
+                </button>
+                <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="如果商品存在购买记录，会无法关联到商品, 确认要彻底删除吗?" data-href="{:url('admin/auction/goodsdelete1')}">
+                    <i class='icow icow-shanchu5'></i> 彻底删除
+                </button>
+                {else}
+                <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除吗?" data-href="{:url('admin/auction/goodsdelete')}">
+                    <i class='icow icow-shanchu1'></i> 删除
+                </button>
+                {/if}
+            </div>
+        </td>
+        <td colspan="6" class="text-right">{$pager}</td>
+    </tr>
+</tfoot>
+</table>
+{else}
+<div class='panel panel-default'>
+    <div class='panel-body' style='text-align: center;padding:30px;'>暂时没有任何商品</div>
+</div>
+{/if}

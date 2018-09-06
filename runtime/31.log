@@ -1,0 +1,496 @@
+---------------------------------------------------------------
+[ 2018-07-31T11:07:18+08:00 ] 116.52.235.253 POST /apiv1/order/confirm
+[ info ] test.doncheng.cn/apiv1/order/confirm [运行时间：0.081471s][吞吐率：12.27req/s] [内存消耗：5,993.13kb] [文件加载：65]
+[ info ] [ LANG ] /www/web/test/public_html/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'apiv1',
+    1 => 'order',
+    2 => 'confirm',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'test.doncheng.cn',
+  'system-version' => '11.4.1',
+  'x-timestamp' => '1533006438',
+  'accept' => '*/*',
+  'device-id' => 'E969F39C-A2DA-459D-93B3-1CB092979CC4',
+  'client-version' => '1.0',
+  'device-type' => 'iOS',
+  'accept-encoding' => 'gzip;q=1.0, compress;q=0.5',
+  'accept-language' => 'zh-Hans-CN;q=1.0',
+  'token' => '3adc39dc12b1f8abc24ad83cade89d9a',
+  'content-type' => 'application/x-www-form-urlencoded; charset=utf-8',
+  'content-length' => '18',
+  'user-agent' => 'SmoSky/1.0 (com.tianrun.city; build:1; iOS 11.4.1) Alamofire/4.7.3',
+  'connection' => 'keep-alive',
+)
+[ info ] [ PARAM ] array (
+  'goodsid' => '16',
+  'total' => '1',
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ CACHE ] INIT File
+[ info ] [ RUN ] app\apiv1\controller\Order->confirm[ /www/web/test/public_html/application/apiv1/controller/Order.php ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.000358s ] mysql:host=127.0.0.1;dbname=test;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_sysset` [ RunTime:0.000911s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000241s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_member` [ RunTime:0.000933s ]
+[ sql ] [ SQL ] SELECT `id`,`expirestime`,`token`,`status`,`isblack` FROM `suliss_member` WHERE  `token` = '3adc39dc12b1f8abc24ad83cade89d9a' LIMIT 1 [ RunTime:0.000339s ]
+[ sql ] [ SQL ] UPDATE `suliss_member`  SET `expirestime`=1533611238  WHERE  `id` = 1 [ RunTime:0.000334s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000216s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_member` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000382s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_member` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000285s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_member_level` [ RunTime:0.000813s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_member_level` WHERE  `id` = 3 LIMIT 1 [ RunTime:0.000239s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000217s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000200s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_goods` [ RunTime:0.002110s ]
+[ sql ] [ SQL ] SELECT id as goodsid,`type`,`title`,`weight`,`issendfree`,`isnodiscount`,`ispresell`,`presellprice`,`thumb`,`marketprice`,`liveprice`,`islive`,`storeids`,`isverify`,`deduct`,`hasoption`,`preselltimeend`,`presellsendstatrttime`,`presellsendtime`,`presellsendtype`,`manydeduct`,`virtual`,`maxbuy`,`usermaxbuy`,`discounts`,total as stock,`deduct2`,`showlevels`,`ednum`,`edmoney`,`edareas`,`edareas_code`,`unite_total`,`diyformtype`,`diyformid`,`diymode`,`dispatchtype`,`dispatchid`,`dispatchprice`,`cates`,`minbuy`,`isdiscount`,`isdiscount_time`,`isdiscount_discounts`,`isfullback`,`virtualsend`,`invoice`,`needfollow`,`followtip`,`followurl`,`merchid`,`checked`,`merchsale`,`buyagain`,`buyagain_islong`,`buyagain_condition`,`buyagain_sale`,`threen` FROM `suliss_shop_goods` WHERE  `id` = 16 LIMIT 1 [ RunTime:0.000735s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_member_level` WHERE  `id` = 3 [ RunTime:0.000252s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000244s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_dispatch` [ RunTime:0.000838s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_dispatch` WHERE  `isdefault` = 1  AND `merchid` = 0  AND `enabled` = 1 LIMIT 1 [ RunTime:0.000286s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000210s ]
+[ sql ] [ SQL ] SELECT `id`,`dispatchname` FROM `suliss_shop_dispatch` WHERE  `merchid` = 0  AND `isdefault` = 1  AND `enabled` = 1 ORDER BY `isdefault` DESC LIMIT 1 [ RunTime:0.000275s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000206s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_dispatch` WHERE  `isdefault` = 1  AND `merchid` = 0  AND `enabled` = 1 LIMIT 1 [ RunTime:0.000270s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000205s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_member_address` [ RunTime:0.000716s ]
+[ sql ] [ SQL ] SELECT `id`,`mid`,`realname`,`mobile`,`province`,`city`,`area`,`street`,`address` FROM `suliss_shop_member_address` WHERE  `mid` = 1  AND `deleted` = 0  AND `isdefault` = 1 LIMIT 1 [ RunTime:0.000258s ]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:1027]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:1042]
+[ error ] [8]未定义变量: taskcut[/www/web/test/public_html/application/apiv1/controller/Order.php:1184]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:1184]
+[ error ] [8]未定义数组索引: discount[/www/web/test/public_html/application/common/model/Order.php:133]
+[ error ] [8]未定义数组索引: ggprice[/www/web/test/public_html/application/apiv1/controller/Order.php:1198]
+[ error ] [8]未定义数组下标: 0[/www/web/test/public_html/application/apiv1/controller/Order.php:1199]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:1203]
+[ error ] [8]未定义变量: _SESSION[/www/web/test/public_html/application/apiv1/controller/Order.php:1203]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:1244]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:1253]
+[ error ] [8]未定义变量: saleset[/www/web/test/public_html/application/apiv1/controller/Order.php:1340]
+[ error ] [8]未定义数组下标: 16[/www/web/test/public_html/application/common/model/Order.php:649]
+[ error ] [8]未定义数组下标: 16[/www/web/test/public_html/application/common/model/Order.php:650]
+[ error ] [8]未定义变量: saleset[/www/web/test/public_html/application/apiv1/controller/Order.php:1415]
+[ error ] [8]未定义数组下标: 16[/www/web/test/public_html/application/common/model/Order.php:649]
+[ error ] [8]未定义数组下标: 16[/www/web/test/public_html/application/common/model/Order.php:650]
+---------------------------------------------------------------
+[ 2018-07-31T11:07:20+08:00 ] 116.52.235.253 POST /apiv1/order/create
+[ info ] test.doncheng.cn/apiv1/order/create [运行时间：0.108468s][吞吐率：9.22req/s] [内存消耗：6,281.45kb] [文件加载：66]
+[ info ] [ LANG ] /www/web/test/public_html/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'apiv1',
+    1 => 'order',
+    2 => 'create',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'test.doncheng.cn',
+  'system-version' => '11.4.1',
+  'x-timestamp' => '1533006439',
+  'accept' => '*/*',
+  'device-id' => 'E969F39C-A2DA-459D-93B3-1CB092979CC4',
+  'client-version' => '1.0',
+  'device-type' => 'iOS',
+  'accept-encoding' => 'gzip;q=1.0, compress;q=0.5',
+  'accept-language' => 'zh-Hans-CN;q=1.0',
+  'token' => '3adc39dc12b1f8abc24ad83cade89d9a',
+  'content-type' => 'application/x-www-form-urlencoded; charset=utf-8',
+  'content-length' => '180',
+  'user-agent' => 'SmoSky/1.0 (com.tianrun.city; build:1; iOS 11.4.1) Alamofire/4.7.3',
+  'connection' => 'keep-alive',
+)
+[ info ] [ PARAM ] array (
+  'fromcart' => '0',
+  'goods' => '[{"optionid":"","total":"1","goodsid":"16"}]',
+  'paytype' => '1',
+  'remark' => '[{"remark":"","merchid":"0"}]',
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ CACHE ] INIT File
+[ info ] [ RUN ] app\apiv1\controller\Order->create[ /www/web/test/public_html/application/apiv1/controller/Order.php ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.000415s ] mysql:host=127.0.0.1;dbname=test;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_sysset` [ RunTime:0.000949s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000314s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_member` [ RunTime:0.000980s ]
+[ sql ] [ SQL ] SELECT `id`,`expirestime`,`token`,`status`,`isblack` FROM `suliss_member` WHERE  `token` = '3adc39dc12b1f8abc24ad83cade89d9a' LIMIT 1 [ RunTime:0.000386s ]
+[ sql ] [ SQL ] UPDATE `suliss_member`  SET `expirestime`=1533611240  WHERE  `id` = 1 [ RunTime:0.000370s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_member` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000413s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000235s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_member` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000295s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_member_level` [ RunTime:0.000813s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_member_level` WHERE  `id` = 3 LIMIT 1 [ RunTime:0.000267s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_goods` [ RunTime:0.002315s ]
+[ sql ] [ SQL ] SELECT `type`,`intervalfloor`,`intervalprice` FROM `suliss_shop_goods` WHERE  `id` = 16 LIMIT 1 [ RunTime:0.000463s ]
+[ sql ] [ SQL ] SELECT id as goodsid,`title`,`type`,`intervalfloor`,`intervalprice`,`weight`,`total`,`issendfree`,`isnodiscount`,`thumb`,`marketprice`,`liveprice`,`cash`,`isverify`,`verifytype`,`goodssn`,`productsn`,`sales`,`istime`,`timestart`,`timeend`,`hasoption`,`isendtime`,`usetime`,`endtime`,`ispresell`,`presellprice`,`preselltimeend`,`usermaxbuy`,`minbuy`,`maxbuy`,`unit`,`buylevels`,`buygroups`,`deleted`,`unite_total`,`status`,`deduct`,`manydeduct`,`virtual`,`discounts`,`deduct2`,`ednum`,`edmoney`,`edareas`,`edareas_code`,`diyformtype`,`diyformid`,`diymode`,`dispatchtype`,`dispatchid`,`dispatchprice`,`merchid`,`merchsale`,`cates`,`isdiscount`,`isdiscount_time`,`isdiscount_discounts`,`virtualsend`,`buyagain`,`buyagain_islong`,`buyagain_condition`,`buyagain_sale`,`verifygoodslimittype`,`verifygoodslimitdate` FROM `suliss_shop_goods` WHERE  `id` = 16 LIMIT 1 [ RunTime:0.000618s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_member_level` WHERE  `id` = 3 [ RunTime:0.000339s ]
+[ sql ] [ SQL ] SELECT `id`,`expirestime`,`token`,`status`,`isblack` FROM `suliss_member` WHERE  `token` = '3adc39dc12b1f8abc24ad83cade89d9a' LIMIT 1 [ RunTime:0.000351s ]
+[ sql ] [ SQL ] UPDATE `suliss_member`  SET `expirestime`=1533611240  WHERE  `id` = 1 [ RunTime:0.000311s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order` [ RunTime:0.001909s ]
+[ sql ] [ SQL ] SELECT COUNT(*) AS tp_count FROM `suliss_shop_order` WHERE  `ordersn` = '20180731110720163324' LIMIT 1 [ RunTime:0.000447s ]
+[ sql ] [ SQL ] INSERT INTO `suliss_shop_order` (`ismerch` , `parentid` , `mid` , `ordersn` , `price` , `oldprice` , `grprice` , `taskdiscountprice` , `lotterydiscountprice` , `discountprice` , `isdiscountprice` , `merchisdiscountprice` , `cash` , `status` , `remark` , `addressid` , `goodsprice` , `dispatchprice` , `dispatchtype` , `dispatchid` , `storeid` , `carrier` , `createtime` , `olddispatchprice` , `contype` , `couponid` , `couponmerchid` , `paytype` , `deductprice` , `deductcredit` , `deductcredit2` , `deductenough` , `merchdeductenough` , `couponprice` , `merchshow` , `buyagainprice` , `ispackage` , `packageid` , `seckilldiscountprice` , `quickid` , `officcode` , `merchid` , `isparent` , `transid` , `isverify` , `verifytype` , `verifyendtime` , `verifycode` , `verifycodes` , `verifyinfo` , `virtual` , `isvirtual` , `isvirtualsend` , `invoicename` , `coupongoodprice`) VALUES (0 , 0 , 1 , 'SH20180731110720163324' , 0.01 , 0.01 , 0.01 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , '' , 0 , 0.01 , 0 , 0 , 0 , 0 , 'a:0:{}' , 1533006440 , 0 , NULL , NULL , 0 , 1 , 0 , 0 , 0 , 0 , NULL , 0 , 1 , 0 , 0 , 0 , 0 , 0 , '0' , 0 , 0 , '' , 0 , 0 , 0 , '' , '' , 'a:0:{}' , 0 , 1 , 0 , '' , 0) [ RunTime:0.000793s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order_goods` [ RunTime:0.001236s ]
+[ sql ] [ SQL ] INSERT INTO `suliss_shop_order_goods` (`merchid` , `merchsale` , `orderid` , `goodsid` , `price` , `total` , `optionid` , `createtime` , `optionname` , `goodssn` , `productsn` , `realprice` , `oldprice` , `isdiscountprice` , `mid`) VALUES (0 , 0 , 143 , 16 , 0.01 , 1 , 0 , 1533006440 , '' , '' , '' , 0.01 , 0.01 , 0 , 1) [ RunTime:0.000521s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000221s ]
+[ sql ] [ SQL ] SELECT `id`,`mid`,`price` FROM `suliss_shop_order` WHERE  `id` = 143 LIMIT 1 [ RunTime:0.000431s ]
+[ sql ] [ SQL ] SELECT `id`,`ordersn`,`price`,`mid`,`dispatchtype`,`addressid`,`carrier`,`status`,`isparent`,`paytype`,`isnewstore`,`storeid`,`istrade` FROM `suliss_shop_order` WHERE  `id` = 143 LIMIT 1 [ RunTime:0.000432s ]
+[ sql ] [ SQL ] SELECT `og`.`goodsid`,`og`.`total`,`g`.`totalcnf`,`og`.`realprice`,`g`.`credit`,`og`.`optionid`,g.total as goodstotal,`g`.`sales`,`g`.`salesreal`,`g`.`type` FROM `suliss_shop_order_goods` `og` LEFT JOIN `suliss_shop_goods` `g` ON `g`.`id`=`og`.`goodsid` WHERE  (   og.orderid= 143 ) [ RunTime:0.000596s ]
+[ sql ] [ SQL ] SELECT total as goodstotal FROM `suliss_shop_goods` WHERE  `id` = 16 LIMIT 1 [ RunTime:0.000315s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000219s ]
+[ sql ] [ SQL ] UPDATE `suliss_shop_goods`  SET `total`=974  WHERE  `id` = 16 [ RunTime:0.000352s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000264s ]
+[ sql ] [ SQL ] SELECT `ordersn`,`createtime`,`couponid` FROM `suliss_shop_order` WHERE  `id` = 143  AND `status` >= 0 LIMIT 1 [ RunTime:0.000369s ]
+[ error ] [8]未定义数组下标: 16[/www/web/test/public_html/application/apiv1/controller/Order.php:2238]
+[ error ] [8]未定义数组索引: total[/www/web/test/public_html/application/apiv1/controller/Order.php:2238]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:2307]
+[ error ] [8]未定义变量: rank[/www/web/test/public_html/application/apiv1/controller/Order.php:2311]
+[ error ] [8]未定义变量: log_id[/www/web/test/public_html/application/apiv1/controller/Order.php:2311]
+[ error ] [8]未定义变量: join_id[/www/web/test/public_html/application/apiv1/controller/Order.php:2311]
+[ error ] [8]未定义变量: task_goods[/www/web/test/public_html/application/common/model/Goods.php:650]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:2349]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:2497]
+[ error ] [8]未定义数组索引: discount[/www/web/test/public_html/application/common/model/Order.php:133]
+[ error ] [8]未定义数组索引: ggprice[/www/web/test/public_html/application/apiv1/controller/Order.php:2549]
+[ error ] [8]未定义数组下标: 0[/www/web/test/public_html/application/apiv1/controller/Order.php:2549]
+[ error ] [8]未定义数组索引: ggprice[/www/web/test/public_html/application/apiv1/controller/Order.php:2549]
+[ error ] [8]未定义数组索引: ggprice[/www/web/test/public_html/application/apiv1/controller/Order.php:2552]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:2583]
+[ error ] [8]未定义变量: open_redis[/www/web/test/public_html/application/apiv1/controller/Order.php:2592]
+[ error ] [8]未定义变量: allow_sale[/www/web/test/public_html/application/apiv1/controller/Order.php:2636]
+[ error ] [8]未定义变量: saleset[/www/web/test/public_html/application/apiv1/controller/Order.php:2649]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:2666]
+[ error ] [8]未定义变量: saleset[/www/web/test/public_html/application/apiv1/controller/Order.php:2734]
+[ error ] [8]未定义变量: sale_plugin[/www/web/test/public_html/application/apiv1/controller/Order.php:2742]
+[ error ] [8]未定义变量: taskgoodsprice[/www/web/test/public_html/application/apiv1/controller/Order.php:2884]
+[ error ] [8]未定义变量: merch_enough_total[/www/web/test/public_html/application/apiv1/controller/Order.php:2933]
+[ error ] [8]未定义数组索引: optionid[/www/web/test/public_html/application/apiv1/controller/Order.php:3001]
+[ error ] [8]未定义数组索引: optiontitle[/www/web/test/public_html/application/apiv1/controller/Order.php:3003]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:3024]
+[ error ] [8]未定义数组索引: seckillinfo[/www/web/test/public_html/application/apiv1/controller/Order.php:3031]
+[ error ] [8]未定义数组索引: isopensendtask[/www/web/test/public_html/application/common/model/Coupon.php:328]
+[ error ] [8]未定义数组索引: isopengoodssendtask[/www/web/test/public_html/application/common/model/Coupon.php:340]
+[ error ] [8]未定义数组索引: credit1[/www/web/test/public_html/application/common/model/Order.php:411]
+---------------------------------------------------------------
+[ 2018-07-31T11:07:20+08:00 ] 116.52.235.253 GET /apiv1/order/pay/orderid/143.html
+[ info ] test.doncheng.cn/apiv1/order/pay/orderid/143.html [运行时间：0.556383s][吞吐率：1.80req/s] [内存消耗：5,919.80kb] [文件加载：63]
+[ info ] [ LANG ] /www/web/test/public_html/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'apiv1',
+    1 => 'order',
+    2 => 'pay',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'test.doncheng.cn',
+  'x-timestamp' => '1533006439',
+  'accept' => '*/*',
+  'device-id' => 'E969F39C-A2DA-459D-93B3-1CB092979CC4',
+  'client-version' => '1.0',
+  'device-type' => 'iOS',
+  'accept-encoding' => 'gzip;q=1.0, compress;q=0.5',
+  'accept-language' => 'zh-Hans-CN;q=1.0',
+  'token' => '3adc39dc12b1f8abc24ad83cade89d9a',
+  'system-version' => '11.4.1',
+  'user-agent' => 'SmoSky/1.0 (com.tianrun.city; build:1; iOS 11.4.1) Alamofire/4.7.3',
+  'connection' => 'keep-alive',
+)
+[ info ] [ PARAM ] array (
+  'orderid' => '143',
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ CACHE ] INIT File
+[ info ] [ RUN ] app\apiv1\controller\Order->pay[ /www/web/test/public_html/application/apiv1/controller/Order.php ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.000400s ] mysql:host=127.0.0.1;dbname=test;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_sysset` [ RunTime:0.000844s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000273s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_member` [ RunTime:0.000931s ]
+[ sql ] [ SQL ] SELECT `id`,`expirestime`,`token`,`status`,`isblack` FROM `suliss_member` WHERE  `token` = '3adc39dc12b1f8abc24ad83cade89d9a' LIMIT 1 [ RunTime:0.000318s ]
+[ sql ] [ SQL ] UPDATE `suliss_member`  SET `expirestime`=1533611240  WHERE  `id` = 1 [ RunTime:0.000313s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_member` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000337s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order` [ RunTime:0.001623s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_order` WHERE  `id` = 143  AND `mid` = 1 LIMIT 1 [ RunTime:0.000758s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_goods` [ RunTime:0.002380s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_goods` `g` LEFT JOIN `suliss_shop_order_goods` `og` ON `g`.`id`=`og`.`goodsid` WHERE  (  og.orderid = 143 ) [ RunTime:0.001335s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_core_paylog` [ RunTime:0.000892s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_core_paylog` WHERE  `module` = 'shop'  AND `tid` = 'SH20180731110720163324' LIMIT 1 [ RunTime:0.000495s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order_goods` [ RunTime:0.001173s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_order_goods` WHERE  `orderid` = 143  AND `seckill` = 1 [ RunTime:0.000513s ]
+[ sql ] [ SQL ] INSERT INTO `suliss_shop_core_paylog` (`mid` , `module` , `tid` , `fee` , `status`) VALUES (1 , 'shop' , 'SH20180731110720163324' , 0.01 , 0) [ RunTime:0.000350s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000219s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000202s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000244s ]
+---------------------------------------------------------------
+[ 2018-07-31T11:07:21+08:00 ] 116.52.235.253 GET /apiv1/order/orderdetail?orderid=143
+[ info ] test.doncheng.cn/apiv1/order/orderdetail?orderid=143 [运行时间：0.071187s][吞吐率：14.05req/s] [内存消耗：5,429.86kb] [文件加载：63]
+[ info ] [ LANG ] /www/web/test/public_html/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'apiv1',
+    1 => 'order',
+    2 => 'orderdetail',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'test.doncheng.cn',
+  'x-timestamp' => '1533006441',
+  'accept' => '*/*',
+  'device-id' => 'E969F39C-A2DA-459D-93B3-1CB092979CC4',
+  'client-version' => '1.0',
+  'device-type' => 'iOS',
+  'accept-encoding' => 'gzip;q=1.0, compress;q=0.5',
+  'accept-language' => 'zh-Hans-CN;q=1.0',
+  'token' => '3adc39dc12b1f8abc24ad83cade89d9a',
+  'system-version' => '11.4.1',
+  'user-agent' => 'SmoSky/1.0 (com.tianrun.city; build:1; iOS 11.4.1) Alamofire/4.7.3',
+  'connection' => 'keep-alive',
+)
+[ info ] [ PARAM ] array (
+  'orderid' => '143',
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ CACHE ] INIT File
+[ info ] [ RUN ] app\apiv1\controller\Order->orderdetail[ /www/web/test/public_html/application/apiv1/controller/Order.php ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.000362s ] mysql:host=127.0.0.1;dbname=test;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_sysset` [ RunTime:0.000873s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000259s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_member` [ RunTime:0.000956s ]
+[ sql ] [ SQL ] SELECT `id`,`expirestime`,`token`,`status`,`isblack` FROM `suliss_member` WHERE  `token` = '3adc39dc12b1f8abc24ad83cade89d9a' LIMIT 1 [ RunTime:0.000291s ]
+[ sql ] [ SQL ] UPDATE `suliss_member`  SET `expirestime`=1533611241  WHERE  `id` = 1 [ RunTime:0.000395s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order` [ RunTime:0.001612s ]
+[ sql ] [ SQL ] SELECT `id`,`ordersn`,`price`,`goodsprice`,`paytype`,`discountprice`,`status`,`dispatchprice`,`addressid`,`carrier`,`merchid`,`isverify`,`dispatchtype`,`verifyinfo`,`merchshow`,`verified`,`verifycode`,`address`,`userdeleted`,`isparent`,`storeid`,`virtual_str`,`finishtime`,`createtime`,`paytime`,`sendtime`,`canceltime`,`refundstate`,`refundid`,`refundtime`,`express`,`expresssn`,`iscomment` FROM `suliss_shop_order` WHERE  `id` = 143  AND `mid` = 1 LIMIT 1 [ RunTime:0.000528s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000258s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order_goods` [ RunTime:0.001172s ]
+[ sql ] [ SQL ] SELECT `og`.`goodsid`,og.price as marketprice,`g`.`title`,`g`.`thumb`,`og`.`total`,`g`.`credit`,`og`.`optionid`,og.optionname as optiontitle,`g`.`isverify`,`g`.`storeids` FROM `suliss_shop_order_goods` `og` LEFT JOIN `suliss_shop_goods` `g` ON `g`.`id`=`og`.`goodsid` WHERE  (   og.orderid=143 ) [ RunTime:0.000475s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000216s ]
+[ error ] [8]未定义数组索引: port[/www/web/test/public_html/application/functions.php:1787]
+[ error ] [8]未定义数组下标: 0[/www/web/test/public_html/application/apiv1/controller/Order.php:664]
+---------------------------------------------------------------
+[ 2018-07-31T11:07:27+08:00 ] 101.226.103.69 POST /payment/wechat/notify
+[ info ] test.doncheng.cn/payment/wechat/notify [运行时间：0.044847s][吞吐率：22.30req/s] [内存消耗：3,977.27kb] [文件加载：48]
+[ info ] [ LANG ] /www/web/test/public_html/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'payment',
+    1 => 'wechat',
+    2 => 'notify',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'accept' => '*/*',
+  'connection' => 'Keep-Alive',
+  'pragma' => 'no-cache',
+  'content-length' => '784',
+  'host' => 'test.doncheng.cn',
+  'user-agent' => 'Mozilla/4.0',
+  'content-type' => 'text/xml',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ RUN ] app\payment\controller\Wechat->notify[ /www/web/test/public_html/application/payment/controller/Wechat.php ]
+[ info ] [ DB ] INIT mysql
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.000407s ] mysql:host=127.0.0.1;dbname=test;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_sysset` [ RunTime:0.000927s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000248s ]
+[ log ] 测试日志信息
+---------------------------------------------------------------
+[ 2018-07-31T11:07:29+08:00 ] 116.52.235.253 GET /apiv1/order/orderdetail?orderid=143
+[ info ] test.doncheng.cn/apiv1/order/orderdetail?orderid=143 [运行时间：0.130438s][吞吐率：7.67req/s] [内存消耗：5,429.86kb] [文件加载：63]
+[ info ] [ LANG ] /www/web/test/public_html/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'apiv1',
+    1 => 'order',
+    2 => 'orderdetail',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'test.doncheng.cn',
+  'x-timestamp' => '1533006449',
+  'accept' => '*/*',
+  'device-id' => 'E969F39C-A2DA-459D-93B3-1CB092979CC4',
+  'client-version' => '1.0',
+  'device-type' => 'iOS',
+  'accept-encoding' => 'gzip;q=1.0, compress;q=0.5',
+  'accept-language' => 'zh-Hans-CN;q=1.0',
+  'token' => '3adc39dc12b1f8abc24ad83cade89d9a',
+  'system-version' => '11.4.1',
+  'user-agent' => 'SmoSky/1.0 (com.tianrun.city; build:1; iOS 11.4.1) Alamofire/4.7.3',
+  'connection' => 'keep-alive',
+)
+[ info ] [ PARAM ] array (
+  'orderid' => '143',
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ CACHE ] INIT File
+[ info ] [ RUN ] app\apiv1\controller\Order->orderdetail[ /www/web/test/public_html/application/apiv1/controller/Order.php ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.002675s ] mysql:host=127.0.0.1;dbname=test;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_sysset` [ RunTime:0.000930s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.004268s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_member` [ RunTime:0.000974s ]
+[ sql ] [ SQL ] SELECT `id`,`expirestime`,`token`,`status`,`isblack` FROM `suliss_member` WHERE  `token` = '3adc39dc12b1f8abc24ad83cade89d9a' LIMIT 1 [ RunTime:0.002228s ]
+[ sql ] [ SQL ] UPDATE `suliss_member`  SET `expirestime`=1533611249  WHERE  `id` = 1 [ RunTime:0.000325s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order` [ RunTime:0.002111s ]
+[ sql ] [ SQL ] SELECT `id`,`ordersn`,`price`,`goodsprice`,`paytype`,`discountprice`,`status`,`dispatchprice`,`addressid`,`carrier`,`merchid`,`isverify`,`dispatchtype`,`verifyinfo`,`merchshow`,`verified`,`verifycode`,`address`,`userdeleted`,`isparent`,`storeid`,`virtual_str`,`finishtime`,`createtime`,`paytime`,`sendtime`,`canceltime`,`refundstate`,`refundid`,`refundtime`,`express`,`expresssn`,`iscomment` FROM `suliss_shop_order` WHERE  `id` = 143  AND `mid` = 1 LIMIT 1 [ RunTime:0.000886s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000634s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order_goods` [ RunTime:0.003613s ]
+[ sql ] [ SQL ] SELECT `og`.`goodsid`,og.price as marketprice,`g`.`title`,`g`.`thumb`,`og`.`total`,`g`.`credit`,`og`.`optionid`,og.optionname as optiontitle,`g`.`isverify`,`g`.`storeids` FROM `suliss_shop_order_goods` `og` LEFT JOIN `suliss_shop_goods` `g` ON `g`.`id`=`og`.`goodsid` WHERE  (   og.orderid=143 ) [ RunTime:0.003280s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.003020s ]
+[ error ] [8]未定义数组索引: port[/www/web/test/public_html/application/functions.php:1787]
+[ error ] [8]未定义数组下标: 0[/www/web/test/public_html/application/apiv1/controller/Order.php:664]
+---------------------------------------------------------------
+[ 2018-07-31T11:07:29+08:00 ] 116.52.235.253 GET /apiv1/order/orderdetail?orderid=143
+[ info ] test.doncheng.cn/apiv1/order/orderdetail?orderid=143 [运行时间：0.171503s][吞吐率：5.83req/s] [内存消耗：5,429.87kb] [文件加载：63]
+[ info ] [ LANG ] /www/web/test/public_html/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'apiv1',
+    1 => 'order',
+    2 => 'orderdetail',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'test.doncheng.cn',
+  'x-timestamp' => '1533006449',
+  'accept' => '*/*',
+  'device-id' => 'E969F39C-A2DA-459D-93B3-1CB092979CC4',
+  'client-version' => '1.0',
+  'device-type' => 'iOS',
+  'accept-encoding' => 'gzip;q=1.0, compress;q=0.5',
+  'accept-language' => 'zh-Hans-CN;q=1.0',
+  'token' => '3adc39dc12b1f8abc24ad83cade89d9a',
+  'system-version' => '11.4.1',
+  'user-agent' => 'SmoSky/1.0 (com.tianrun.city; build:1; iOS 11.4.1) Alamofire/4.7.3',
+  'connection' => 'keep-alive',
+)
+[ info ] [ PARAM ] array (
+  'orderid' => '143',
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ CACHE ] INIT File
+[ info ] [ RUN ] app\apiv1\controller\Order->orderdetail[ /www/web/test/public_html/application/apiv1/controller/Order.php ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.000328s ] mysql:host=127.0.0.1;dbname=test;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_sysset` [ RunTime:0.001784s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000644s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_member` [ RunTime:0.000922s ]
+[ sql ] [ SQL ] SELECT `id`,`expirestime`,`token`,`status`,`isblack` FROM `suliss_member` WHERE  `token` = '3adc39dc12b1f8abc24ad83cade89d9a' LIMIT 1 [ RunTime:0.001037s ]
+[ sql ] [ SQL ] UPDATE `suliss_member`  SET `expirestime`=1533611249  WHERE  `id` = 1 [ RunTime:0.001246s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order` [ RunTime:0.001577s ]
+[ sql ] [ SQL ] SELECT `id`,`ordersn`,`price`,`goodsprice`,`paytype`,`discountprice`,`status`,`dispatchprice`,`addressid`,`carrier`,`merchid`,`isverify`,`dispatchtype`,`verifyinfo`,`merchshow`,`verified`,`verifycode`,`address`,`userdeleted`,`isparent`,`storeid`,`virtual_str`,`finishtime`,`createtime`,`paytime`,`sendtime`,`canceltime`,`refundstate`,`refundid`,`refundtime`,`express`,`expresssn`,`iscomment` FROM `suliss_shop_order` WHERE  `id` = 143  AND `mid` = 1 LIMIT 1 [ RunTime:0.004617s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000245s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order_goods` [ RunTime:0.001573s ]
+[ sql ] [ SQL ] SELECT `og`.`goodsid`,og.price as marketprice,`g`.`title`,`g`.`thumb`,`og`.`total`,`g`.`credit`,`og`.`optionid`,og.optionname as optiontitle,`g`.`isverify`,`g`.`storeids` FROM `suliss_shop_order_goods` `og` LEFT JOIN `suliss_shop_goods` `g` ON `g`.`id`=`og`.`goodsid` WHERE  (   og.orderid=143 ) [ RunTime:0.002505s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000212s ]
+[ error ] [8]未定义数组索引: port[/www/web/test/public_html/application/functions.php:1787]
+[ error ] [8]未定义数组下标: 0[/www/web/test/public_html/application/apiv1/controller/Order.php:664]
+---------------------------------------------------------------
+[ 2018-07-31T11:07:29+08:00 ] 116.52.235.253 GET /apiv1/order/orderdetail?orderid=143
+[ info ] test.doncheng.cn/apiv1/order/orderdetail?orderid=143 [运行时间：0.174125s][吞吐率：5.74req/s] [内存消耗：5,429.87kb] [文件加载：63]
+[ info ] [ LANG ] /www/web/test/public_html/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'apiv1',
+    1 => 'order',
+    2 => 'orderdetail',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'test.doncheng.cn',
+  'x-timestamp' => '1533006449',
+  'accept' => '*/*',
+  'device-id' => 'E969F39C-A2DA-459D-93B3-1CB092979CC4',
+  'client-version' => '1.0',
+  'device-type' => 'iOS',
+  'accept-encoding' => 'gzip;q=1.0, compress;q=0.5',
+  'accept-language' => 'zh-Hans-CN;q=1.0',
+  'token' => '3adc39dc12b1f8abc24ad83cade89d9a',
+  'system-version' => '11.4.1',
+  'user-agent' => 'SmoSky/1.0 (com.tianrun.city; build:1; iOS 11.4.1) Alamofire/4.7.3',
+  'connection' => 'keep-alive',
+)
+[ info ] [ PARAM ] array (
+  'orderid' => '143',
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ CACHE ] INIT File
+[ info ] [ RUN ] app\apiv1\controller\Order->orderdetail[ /www/web/test/public_html/application/apiv1/controller/Order.php ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.001075s ] mysql:host=127.0.0.1;dbname=test;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_sysset` [ RunTime:0.002243s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000236s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_member` [ RunTime:0.001188s ]
+[ sql ] [ SQL ] SELECT `id`,`expirestime`,`token`,`status`,`isblack` FROM `suliss_member` WHERE  `token` = '3adc39dc12b1f8abc24ad83cade89d9a' LIMIT 1 [ RunTime:0.000292s ]
+[ sql ] [ SQL ] UPDATE `suliss_member`  SET `expirestime`=1533611249  WHERE  `id` = 1 [ RunTime:0.004363s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order` [ RunTime:0.001565s ]
+[ sql ] [ SQL ] SELECT `id`,`ordersn`,`price`,`goodsprice`,`paytype`,`discountprice`,`status`,`dispatchprice`,`addressid`,`carrier`,`merchid`,`isverify`,`dispatchtype`,`verifyinfo`,`merchshow`,`verified`,`verifycode`,`address`,`userdeleted`,`isparent`,`storeid`,`virtual_str`,`finishtime`,`createtime`,`paytime`,`sendtime`,`canceltime`,`refundstate`,`refundid`,`refundtime`,`express`,`expresssn`,`iscomment` FROM `suliss_shop_order` WHERE  `id` = 143  AND `mid` = 1 LIMIT 1 [ RunTime:0.001594s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.001761s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_order_goods` [ RunTime:0.001707s ]
+[ sql ] [ SQL ] SELECT `og`.`goodsid`,og.price as marketprice,`g`.`title`,`g`.`thumb`,`og`.`total`,`g`.`credit`,`og`.`optionid`,og.optionname as optiontitle,`g`.`isverify`,`g`.`storeids` FROM `suliss_shop_order_goods` `og` LEFT JOIN `suliss_shop_goods` `g` ON `g`.`id`=`og`.`goodsid` WHERE  (   og.orderid=143 ) [ RunTime:0.001483s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000213s ]
+[ error ] [8]未定义数组索引: port[/www/web/test/public_html/application/functions.php:1787]
+[ error ] [8]未定义数组下标: 0[/www/web/test/public_html/application/apiv1/controller/Order.php:664]
+---------------------------------------------------------------
+[ 2018-07-31T11:07:29+08:00 ] 116.52.235.253 GET /apiv1/goods/recommendlist
+[ info ] test.doncheng.cn/apiv1/goods/recommendlist [运行时间：0.053807s][吞吐率：18.58req/s] [内存消耗：4,407.23kb] [文件加载：57]
+[ info ] [ LANG ] /www/web/test/public_html/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'apiv1',
+    1 => 'goods',
+    2 => 'recommendlist',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'test.doncheng.cn',
+  'x-timestamp' => '1533006449',
+  'accept' => '*/*',
+  'device-id' => 'E969F39C-A2DA-459D-93B3-1CB092979CC4',
+  'client-version' => '1.0',
+  'device-type' => 'iOS',
+  'accept-encoding' => 'gzip;q=1.0, compress;q=0.5',
+  'accept-language' => 'zh-Hans-CN;q=1.0',
+  'token' => '3adc39dc12b1f8abc24ad83cade89d9a',
+  'system-version' => '11.4.1',
+  'user-agent' => 'SmoSky/1.0 (com.tianrun.city; build:1; iOS 11.4.1) Alamofire/4.7.3',
+  'connection' => 'keep-alive',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ CACHE ] INIT File
+[ info ] [ RUN ] app\apiv1\controller\Goods->recommendlist[ /www/web/test/public_html/application/apiv1/controller/Goods.php ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.000326s ] mysql:host=127.0.0.1;dbname=test;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_shop_sysset` [ RunTime:0.000815s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000252s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `suliss_member` [ RunTime:0.000944s ]
+[ sql ] [ SQL ] SELECT `id` FROM `suliss_member` WHERE  `token` = '3adc39dc12b1f8abc24ad83cade89d9a' LIMIT 1 [ RunTime:0.000409s ]
+[ sql ] [ SQL ] SELECT * FROM `suliss_shop_sysset` LIMIT 1 [ RunTime:0.000227s ]
+[ sql ] [ SQL ] SELECT t1.id,t1.title,t1.subtitle,t1.thumb,t1.marketprice,t1.productprice,t1.minprice,t1.maxprice,t1.isdiscount,t1.isdiscount_time,t1.sales,t1.salesreal,t1.total,t1.description,t1.`type`,t1.ispresell,t1.merchid,t1.labelname,t1.quality,t1.seven,t1.repair FROM `suliss_shop_goods` AS t1 JOIN (SELECT ROUND(RAND() * ((SELECT MAX(id) FROM `suliss_shop_goods`)-(SELECT MIN(id) FROM `suliss_shop_goods`))) AS id) AS t2 WHERE t1.id >= t2.id AND t1.deleted = 0 and t1.status = 1  ORDER BY t1.id desc LIMIT 3 [ RunTime:0.000612s ]

@@ -1,0 +1,97 @@
+{include file='_header'}
+
+<div class="page-header">
+    当前位置：
+    <span class="text-primary">
+        {if !empty($item['id'])}编辑{else}添加{/if}标签组 <small>{if !empty($item['id'])}修改【{$item['label']}】{/if}</small>
+    </span>
+</div>
+<div class="page-content">
+    <div class="page-sub-toolbar">
+        <span class=''>
+        <a class="btn btn-primary btn-sm" href="{:url('admin/goods/labeladd')}">添加新标签组</a>
+	</span>
+    </div>
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data" >
+        <div class="form-group">
+            <label class="col-lg control-label">排序</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="displayorder" class="form-control" value="{$item['displayorder']}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label must">标签组名称</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="label" class="form-control" value="{$item['label']}" data-rule-required="true" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">标签</label>
+            <div class="col-sm-9 col-xs-12">
+                <table class="table table-responsive" style="margin:0;">
+                    <tbody id='tbody-items' style="border-top:none;">
+                    {foreach name='labelname' item='row'}
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control" name="labelname[]" value="{$row}" >
+                        </td>
+                        <td style="width: 45px;">
+                            <a href="javascript:void(0);" class="btn btn-default btn-del btn-op btn-operation" data-confirm="确认删除此标签?">
+                                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                                  <i class="icow icow-shanchu1"></i>
+                                </span>
+                            </a>
+                        </td>
+                    </tr>
+                    {/foreach}
+                    </tbody>
+                </table>
+                <input name="button" type="button" class="btn btn-default" value="添加标签" onclick='addCategory()'>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">是否启用</label>
+            <div class="col-sm-9 col-xs-12" id="param-items">
+                <label class="radio-inline">
+                    <input type="radio" name='status' value="1" {if $item['status']==1}checked{/if} /> 是
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name='status' value="0" {if empty($item['status'])}checked{/if} /> 否
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"  />
+               <a href="{:url('admin/goods/label')}" style='margin-left:10px;' value="返回列表" class="btn btn-default">返回列表</a>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    require(['jquery.ui'],function(){
+        $('#tbody-items').sortable();
+    })
+
+    function addCategory(){
+        var html ='<tr>';
+        html+='<td style="width:200px;">';
+        html+='<input type="text" class="form-control" name="labelname[]" value="">';
+        html+='</td>';
+
+        html+='<td></td></tr>';;
+        $('#tbody-items').append(html);
+    }
+    $(function(){
+        $(".btn-del").on("click",function(){
+            var $btntr = $(this).parents('tr');
+            console.log($btntr);
+            tip.confirm('确认删除此标签?',function() {
+                $btntr.remove();
+            });
+        });
+    });
+</script>
+
+{include file='_footer'}

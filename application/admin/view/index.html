@@ -1,0 +1,451 @@
+{include file='_header'}
+<div class="page-header">当前位置：<span class="text-primary">首页</span></div>
+
+<style>
+    .tab-content>.tab-pane {margin-top: 10px;}
+    .tab-content>.tab-pane>.fui-list-group {border-bottom: 0;}
+</style>
+<div class="page-content transparent">
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="ibox h300">
+                <div class="ibox-title">
+                    <h5><i class="icow icow-shop"></i>商城信息</h5>
+                    <ul >
+                        <a href="{:url('admin/sysset/index')}" class="text-primary">修改</a>
+                    </ul>
+                </div>
+                <div class="ibox-content">
+                    <ul class="fui-cell-group">
+                        <li class="fui-cell">商城名称：<span class="text">{$shop_data['name']}</span></li>
+                        <li class="fui-cell">商城介绍：<span class="text">{$shop_data['description']}</span></li>
+                        <li class="fui-cell">使用应用：<span class='text-no'>5</span>个 <a href="{:url('admin/plugins/index')}" class="text-primary">查看</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="ibox h300">
+                <div class="ibox-content  no-border">
+                    <ul class="fui-list-group">
+                        <li class="fui-list">
+                            <a href="{:url('admin/goods/out')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-info icow-goodsL"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="goods_totals">-</h5>
+                                    <p>已售罄商品</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="fui-list">
+                            <a href="{:url('admin/order/olist1')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-green icow-fahuo"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="order_status1">-</h5>
+                                    <p>{if $is_openmerch==1}自营{/if}待发货订单</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="fui-list">
+                            <a href="{:url('admin/order/refund4')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-primary icow-tuihuo"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="order_status4">-</h5>
+                                    <p>{if $is_openmerch==1}自营{/if}维权中订单</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="fui-list">
+                            <a href="{:url('admin/finance/withdraw',array('status'=>0))}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-warning icow-shenhe"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="finance_total">-</h5>
+                                    <p>待审核提现</p>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="ibox" style="position: relative;">
+                <div class="ibox-title">
+                    <h5><i class="icow">&#xe622;</i>订单概述</h5>
+                    <ul class="nav nav-tabs" id="orderinfo">
+                        <li class="active"><a data-toggle="tab"  href="#order_count_0">今日</a></li>
+                        <li><a data-toggle="tab" href="#order_count_1">昨日</a></li>
+                        <li><a data-toggle="tab" href="#order_count_7">最近七日</a></li>
+                        <li><a data-toggle="tab" href="#order_count_30">本月</a></li>
+                    </ul>
+                </div>
+                <div class="ibox-content">
+                    <div class="tab-content" style="height: auto;">
+                        <div class="tab-pane active" id="order_count_0">
+                            <div class="fui-list-group">
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_count_0">-</h4>
+                                        成交量(件)
+                                    </div>
+                                </div>
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_price_0">-</h4>
+                                        成交额(元)
+                                    </div>
+                                </div>
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_avg_0">-</h4>
+                                        人均消费(元)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="order_count_1">
+                            <div class="fui-list-group">
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_count_1">-</h4>
+                                        成交量(件)
+                                    </div>
+                                </div>
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_price_1">-</h4>
+                                        成交额(元)
+                                    </div>
+                                </div>
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_avg_1">-</h4>
+                                        人均消费(元)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="order_count_7">
+                            <div class="fui-list-group">
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_count_7">-</h4>
+                                        成交量(件)
+                                    </div>
+                                </div>
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_price_7">-</h4>
+                                        成交额(元)
+                                    </div>
+                                </div>
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_avg_7">-</h4>
+                                        人均消费(元)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="order_count_30">
+                            <div class="fui-list-group">
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_count_30">-</h4>
+                                        成交量(件)
+                                    </div>
+                                </div>
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_price_30">-</h4>
+                                        成交额(元)
+                                    </div>
+                                </div>
+                                <div class="fui-list no-padding">
+                                    <div class="fui-list-inner">
+                                        <h4 class="text-warning order_avg_30">-</h4>
+                                        人均消费(元)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ibox">
+                <div class="ibox-content" style="border: 0;">
+                    <div class="row relative">
+                        <div class="ibox-loading" id="echarts-line-chart-loading"></div>
+                        <div class="col-md-12">
+                            <div class="" id="echarts-line-chart" style="height:156px; margin-top: 8px"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ibox h300">
+                <div class="ibox-title">
+                    <h5><i class="icow">&#xe615;</i>商品销量排行</h5>
+                    <ul class="nav nav-tabs" id="sale">
+                        <li class="active"><a data-toggle="tab" href="#goods_rank_0">今日</a></li>
+                        <li><a data-toggle="tab" href="#goods_rank_1">昨日</a></li>
+                        <li><a data-toggle="tab" href="#goods_rank_7">最近七日</a></li>
+                        <li><a href="{:url('admin/statistics/goods_rank')}">更多</a></li>
+                    </ul>
+                </div>
+                <div class="ibox-content">
+                    <div class="tab-content relative">
+                        <div class="ibox-loading" id="goods-rank-loading"></div>
+                        <div class="tab-pane active" id="goods_rank_0">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th width="40px">排名</th>
+                                    <th width="">商品名称</th>
+                                    <th width="20%">成交数量</th>
+                                    <th width="20%">成交金额</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="goods_rank_1">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th width="40px">排名</th>
+                                    <th width="">商品名称</th>
+                                    <th width="20%">成交数量</th>
+                                    <th width="20%">成交金额</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="goods_rank_7">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th width="40px">排名</th>
+                                    <th width="">商品名称</th>
+                                    <th width="20%">成交数量</th>
+                                    <th width="20%">成交金额</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    myrequire(['echarts'], function () {
+        var hasLineChart = $("#echarts-line-chart").length>0;
+        if(hasLineChart){
+            var lineChart = echarts.init(document.getElementById("echarts-line-chart"));
+        }
+        window.onresize = function () {
+            if(hasLineChart) {
+                lineChart.resize();
+            }
+        };
+        $.ajax({
+            type: "GET",
+            url: "{:url('admin/order/ajaxgettotals', array('merch' => -1))}",
+            dataType: "json",
+            success: function (data) {
+                var res = data.result;
+                $(".order_status1").text(res.status1);
+                $(".order_status4").text(res.status4);
+                $.ajax({
+                    type: "GET",
+                    url: "{:url('admin/shop/ajax')}",
+                    dataType: "json",
+                    success: function (data) {
+                        var res = data.result;
+                        $(".goods_totals").text(res.goods_totals);
+                        $(".finance_total").text(res.finance_total);
+                    }
+                });
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "{:url('admin/order/ajaxorder')}",
+            dataType: "json",
+            success: function (data) {
+                var json = data.result;
+                $(".order_count_0").text(json.order0.count);
+                $(".order_price_0").text(json.order0.price);
+                $(".order_avg_0").text(json.order0.avg);
+
+                $(".order_count_1").text(json.order1.count);
+                $(".order_price_1").text(json.order1.price);
+                $(".order_avg_1").text(json.order1.avg);
+
+                $(".order_count_7").text(json.order7.count);
+                $(".order_price_7").text(json.order7.price);
+                $(".order_avg_7").text(json.order7.avg);
+
+                $(".order_count_30").text(json.order30.count);
+                $(".order_price_30").text(json.order30.price);
+                $(".order_avg_30").text(json.order30.avg);
+
+                $.ajax({
+                    type: "GET",
+                    async: false,
+                    url: "{:url('admin/order/ajaxtransaction')}",
+                    dataType: "json",
+                    success: function (json) {
+                        var lineoption = {
+                            title: {
+                                text: '近七日交易走势',
+                                top: '100',
+                                textStyle: {
+                                    fontWeight: 'normal',
+                                    fontSize: 12,
+                                    color: '#404040',
+                                    fontFamily: 'Microsoft YaHei UI',
+                                }
+                            },
+                            tooltip: {
+                                trigger: 'axis'
+                            },
+                            legend: {
+                                data: ['成交额', '成交量']
+                            },
+                            grid: {
+                                x: 50,
+                                x2: 50,
+                                y2: 30
+                            },
+                            calculable: true,
+                            xAxis: [
+                                {
+                                    type: 'category',
+                                    boundaryGap: false,
+                                    data: json.price_key,
+                                    axisLine: {
+                                        lineStyle: {
+                                            width: '0'
+                                        }
+                                    },
+                                },
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'value',
+                                    axisLine: {
+                                        lineStyle: {
+                                            width: '0'
+                                        }
+                                    },
+                                    axisLabel: {
+                                        formatter: '{value}'
+                                    }
+                                }
+                            ],
+                            series: [
+                                {
+                                    name: '成交额',
+                                    type: 'line',
+                                    data: json.price_value,
+                                    markPoint: {
+                                        data: [
+                                            {
+                                                type: 'max',
+                                                name: '最大值'
+                                            },
+                                            {
+                                                type: 'min', name: '最小值'
+                                            }
+                                        ]
+                                    },
+                                    markLine: {
+                                        data: [
+                                            {type: 'average', name: '平均值'}
+                                        ]
+                                    },
+                                    itemStyle: {
+                                        normal: {
+                                            color: '#30af84'
+                                        }
+                                    }
+                                },
+                                {
+                                    name: '成交量',
+                                    type: 'line',
+                                    data: json.count_value,
+                                    markLine: {
+                                        data: [
+                                            {type: 'average', name: '平均值'}
+                                        ]
+                                    },
+                                    itemStyle: {
+                                        normal: {
+                                            color: '#44abf7'
+                                        }
+                                    }
+                                }
+                            ]
+                        };
+                        if(hasLineChart) {
+                            lineChart.setOption(lineoption);
+                            lineChart.resize();
+                        }
+                        $("#echarts-line-chart-loading").hide();
+                        $("#echarts-line-chart").show();
+                    }
+                });
+            }
+        });
+
+        var goodsUrl = "{:url('admin/goods/edit')}?id=";
+        $.ajax({
+            type: "GET",
+            url: "{:url('admin/shop/ajaxgoods')}",
+            dataType: "json",
+            success: function (data) {
+                if(data.status==1 && !$.isEmptyObject(data.result.obj)){
+                    $.each(data.result.obj, function (id, obj) {
+                        $("#"+id+" tbody").empty();
+                        if($.isEmptyObject(obj)){
+                            var html = '<tfoot><tr><td colspan="4" style="line-height: 250px; text-align: center;">暂无数据</td></tr></tfoot>';
+                            $("#"+id+" table").append(html).find("thead").hide();
+                        }else{
+                            $.each(obj, function (index, goods) {
+                                var index = index+1, title = goods.title||'空', url = goodsUrl+goods.id;
+                                var html = '<tr><td>'+index+'</td><td><a href="'+url+'">'+title+'</a></td><td>'+goods.count+'</td><td class="text-warning">'+goods.money+'</td></tr>';
+                                $("#"+id+" tbody").append(html);
+                            });
+                        }
+                    })
+                }
+                $("#goods-rank-loading").hide();
+            }
+        });
+    });
+</script>
+{include file='_footer'}

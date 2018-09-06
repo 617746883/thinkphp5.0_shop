@@ -1,0 +1,106 @@
+{include file='_header'}
+ 
+<div class="page-header">
+    当前位置：<span class="text-primary">幻灯片管理</span>
+</div>
+<div class="page-content">
+    <form action="" method="get">
+        <div class="page-toolbar">
+            <div class="col-sm-6">
+                <a class='btn btn-primary btn-sm' href="{:url('admin/citywide/lifebanneradd')}"><i class='fa fa-plus'></i> 添加幻灯片</a>
+            </div>
+            <div class="col-sm-6 pull-right">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name="enabled" class='form-control input-sm select-md'>
+                            <option value="" {if $enabled == ''} selected{/if}>状态</option>
+                            <option value="1" {if $enabled == '1'} selected{/if}>显示</option>
+                            <option value="0" {if $enabled == '0'} selected{/if}>隐藏</option>
+                        </select>
+                    </div>
+                        <input type="text" class="input-sm form-control" name='keyword' value="{$_GET['keyword']}" placeholder="幻灯片名称/地址/电话"> <span class="input-group-btn">
+                     <button class="btn btn-primary" type="submit"> 搜索</button> </span>
+                </div>
+            </div>
+        </div>
+    </form> 
+    {if count($list)>0}
+        <form action="" method="post">
+            <div class="page-table-header">
+                <input type='checkbox' />
+                <div class="btn-group">
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/citywide/lifebannerstatus',array('enabled'=>1))}"><i class='icow icow-xianshi'></i> 显示</button>
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('admin/citywide/lifebannerstatus',array('enabled'=>0))}"><i class='icow icow-yincang'></i> 隐藏</button>
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/citywide/lifebannerdelete')}"><i class='icow icow-shanchu1'></i> 删除</button>
+                </div>
+            </div>
+            <table class="table table-responsive table-hover" >
+                <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:25px;"></th>
+                        <th style="width: 180px;">标题</th>
+                        <th>图片地址</th>
+                        <th></th>
+                        <th style='width:60px'>状态</th>
+                        <th style="width: 65px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name='list' item='row'}
+                        <tr>
+                            <td>
+                                <input type='checkbox'   value="{$row['id']}"/>
+                            </td>
+                            <td>{$row['bannername']}</td>
+                            <td>{$row['thumb']}</td>
+                            <td></td>
+                            <td>
+                                <span class='label {if $row['enabled']==1}label-primary{else}label-default{/if}'
+                                        data-toggle='ajaxSwitch'
+                                        data-switch-value='{$row['enabled']}'
+                                        data-switch-value0='0|隐藏|label label-default|{:url('admin/citywide/lifebannerstatus',array('enabled'=>1,'id'=>$row['id']))}'
+                                        data-switch-value1='1|显示|label label-primary|{:url('admin/citywide/lifebannerstatus',array('enabled'=>0,'id'=>$row['id']))}' >
+                                    {if $row['enabled']==1}显示{else}隐藏{/if}
+                                </span>
+                            </td>
+                            <td style="text-align:left;">
+                                <a href="{:url('admin/citywide/lifebanneredit', array('id' => $row['id']))}" class="btn btn-op btn-operation" >
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="修改">
+                                        <i class='icow icow-bianji2'></i>
+                                    </span>
+                                </a>
+                                <a data-toggle='ajaxRemove' href="{:url('admin/citywide/lifebannerdelete', array('id' => $row['id']))}"class="btn btn-op btn-operation" data-confirm='确认要删除此幻灯片吗?'>
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="删除">
+                                       <i class='icow icow-shanchu1'></i>
+                                    </span>
+                                </a>
+                            </td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td colspan="3">
+                        <div class="btn-group">
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/citywide/lifebannerstatus',array('enabled'=>1))}"><i class='icow icow-xianshi'></i> 显示</button>
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('admin/citywide/lifebannerstatus',array('enabled'=>0))}"><i class='icow icow-yincang'></i> 隐藏</button>
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/citywide/lifebannerdelete')}"><i class='icow icow-shanchu1'></i> 删除</button>
+                        </div>
+                    </td>
+                    <td colspan="2" style="text-align: right">
+                        {$pager}
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </form>
+{else}
+<div class='panel panel-default'>
+	<div class='panel-body' style='text-align: center;padding:30px;'>
+		暂时没有任何幻灯片!
+	</div>
+</div>
+{/if}
+</div>
+{include file='_footer'}

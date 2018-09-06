@@ -1,0 +1,233 @@
+{include file='_header'}
+<style type="text/css">
+    .label-weight{font-weight:normal;text-align: left;padding:0;}
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">{if $goods['type']==1}抽奖{else}兑换{/if}记录详细信息</span>
+</div>
+<div class="page-content">
+    <form class='form-horizontal'>
+        <div class="form-group">
+            <label class="col-lg control-label">类型</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class='form-control-static'>
+                    {if $goods['type']==1}
+                        <span class='label label-danger'>抽奖</span>
+                    {else}
+                        <span class='label label-primary'>兑换</span>
+                    {/if}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">商品</label>
+            <div class="col-sm-9 col-xs-12">
+                <img src="{$goods['thumb']}" style="width:30px;height:30px;padding:1px;border:1px solid #ccc" onerror="this.src='/public/static/images/nopic.png'" /> {$goods['title']}
+            </div>
+        </div>
+        {if $log['optionid']}
+        <div class="form-group">
+            <label class="col-lg control-label">规格</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class='form-control-static'>{$goods['optiontitle']}</div>
+            </div>
+        </div>
+        {/if}
+        <div class="form-group">
+            <label class="col-lg control-label">粉丝</label>
+                <div class="col-sm-9 col-xs-12">
+                <img src="{$member['avatar']}" style="width:30px;height:30px;padding:1px;border:1px solid #ccc" onerror="this.src='/public/static/images/noface.png'"/> {$member['nickname']}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">消耗</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class='form-control-static'>
+                {if $goods['credit']>0}-{$goods['credit']}积分<br/>{/if}
+                {if $goods['money'] > 0} -{:number_format($goods['money'],2)}现金<br />{/if}
+                <!--{if $log['dispatch'] > 0}{/if}-->
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">参与时间</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class='form-control-static'>{:date('Y-m-d H:i:s',$log['createtime'])}</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">状态</label>
+            <div class="col-sm-9 col-xs-12">
+                 <div class='form-control-static'>
+                     {if $goods['goodstype']==0}
+                         {if $goods['isverify']==1}
+                             {if $log['status'] ==2}<span class='label label-warning'>待核销</span>{/if}
+                             {if $set['isreply'] == 1}
+                                 {if $log['status'] ==3 && $log['iscomment'] == 0 }<span class='label label-default'>等待评价</span>{/if}
+                                 {if $log['status'] ==3 && $log['iscomment'] == 1 }<span class='label label-success'>追加评价</span>{/if}
+                                 {if $log['status'] ==3 && $log['iscomment'] == 2 }<span class='label label-danger'>已完成</span>{/if}
+                             {else}
+                                {if $log['status'] ==3}<span class='label label-danger'>已完成</span>{/if}
+                             {/if}
+                         {else}
+                             {if $log['status'] ==2 && $log['addressid'] == 0 }<span class='label label-warning'>{if $goods['type']==0}已兑换{else}已中奖{/if}</span>{/if}
+                             {if $log['status'] ==2 && $log['addressid'] > 0 && $log['time_send'] == 0}<span class='label label-default'>待发货</span>{/if}
+                             {if $log['status'] ==3 && $log['time_send'] > 0 && $log['time_finish'] ==0 }<span class='label label-success'>已发货</span>{/if}
+                             {if $set['isreply'] == 1}
+                                 {if $log['status'] ==3 && $log['time_finish'] > 0 && $log['iscomment'] == 0 }<span class='label label-default'>等待评价</span>{/if}
+                                 {if $log['status'] ==3 && $log['time_finish'] > 0 && $log['iscomment'] == 1 }<span class='label label-success'>追加评价</span>{/if}
+                                 {if $log['status'] ==3 && $log['time_finish'] > 0 && $log['iscomment'] == 2 }<span class='label label-danger'>已完成</span>{/if}
+                             {else}
+                                {if $log['status'] ==3 && $log['time_finish'] > 0}<span class='label label-danger'>已完成</span>{/if}
+                             {/if}
+                         {/if}
+                     {elseif $goods['goodstype']==1}
+                         {if $set['isreply'] == 1}
+                             {if $log['status'] ==3 && $log['iscomment'] == 0 }<span class='label label-default'>等待评价</span>{/if}
+                             {if $log['status'] ==3 && $log['iscomment'] == 1 }<span class='label label-success'>追加评价</span>{/if}
+                             {if $log['status'] ==3 && $log['iscomment'] == 2 }<span class='label label-danger'>已发放</span>{/if}
+                         {else}
+                            {if $log['status'] ==3}<span class='label label-danger'>已发放</span>{/if}
+                         {/if}
+                     {elseif $goods['goodstype']==2}
+                         {if $set['isreply'] == 1}
+                             {if $log['status'] ==3 && $log['iscomment'] == 0 }<span class='label label-default'>等待评价</span>{/if}
+                             {if $log['status'] ==3 && $log['iscomment'] == 1 }<span class='label label-success'>追加评价</span>{/if}
+                             {if $log['status'] ==3 && $log['iscomment'] == 2 }<span class='label label-danger'>已发放</span>{/if}
+                         {else}
+                            {if $log['status'] ==3 }<span class='label label-danger'>已发放{/if}
+                         {/if}
+                     {elseif $goods['goodstype']==3}
+                         {if $set['isreply'] == 1}
+                             {if $log['status'] ==3 && $log['iscomment'] == 0 }<span class='label label-success'>等待评价</span>{/if}
+                             {if $log['status'] ==3 && $log['iscomment'] == 1 }<span class='label label-success'>追加评价</span>{/if}
+                             {if $log['status'] ==3 && $log['iscomment'] == 2 }<span class='label label-danger'>已发放</span>{/if}
+                         {else}
+                            {if $log['status'] ==3}<span class='label label-danger'>已发放</span>{/if}
+                         {/if}
+                     {/if}
+                 </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">支付状态</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class='form-control-static'>
+                    {if $log['paytype']==-1}
+                        <span class='label label-default'>无需支付</span>
+                    {else}
+                        {if $log['paytype']==0}
+                            {if $log['paystatus']==0}
+                            <span class='label label-default'>余额未支付</span>
+                            {else}
+                            <span class='label label-warning'>余额已支付</span>
+                            {/if}
+                        {elseif $log['paytype']==1}
+                            {if $log['paystatus']==0}
+                            <span class='label label-default'>微信未支付</span>
+                            {else}
+                            <span class='label label-warning'>微信已支付</span>
+                            {/if}
+                        {elseif $log['paytype']==2}
+                            {if $log['paystatus']==0}
+                            <span class='label label-default'>支付宝未支付</span>
+                            {else}
+                            <span class='label label-warning'>支付宝已支付</span>
+                            {/if}
+                        {/if}
+                    {/if}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">运费支付状态</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class='form-control-static'>
+                    {if $log['dispatchstatus']==-1}
+                        <span class='label label-default'>无需支付</span>
+                    {elseif $log['dispatchstatus']==0}
+                        <span class='label label-default'>未支付</span>
+                    {elseif $log['dispatchstatus']==1}
+                        <span class='label label-success'>已支付</span>
+                    {/if}
+                </div>
+            </div>
+        </div>
+      {if $goods['isverify']==1}
+        {if empty($log['storeid'])}
+         <div class="form-group">
+                <label class="col-lg control-label"></label>
+                <div class="col-sm-9 col-xs-12">
+                    <div class='form-control-static'>还未填写联系人及选择兑换门店</div>
+                </div>
+            </div>
+        {else}
+            <div class="form-group">
+                <label class="col-lg control-label">兑换人信息</label>
+                <div class="col-sm-9 col-xs-12">
+                    <div class='form-control-static'>
+                        <label class="col-lg label-weight">兑换人：</label>{$log['realname']} / {$log['mobile']}
+                    </div>
+                    <div class='form-control-static'>
+                        <label class="col-lg label-weight">兑换门店：</label>{$store['storename']} / {$store['address']}
+                    </div>
+                </div>
+            </div>
+
+         {/if}
+        {else}
+
+            {if !empty($address['realname'])}
+            <div class="form-group">
+                <label class="col-lg control-label">收件人信息</label>
+                <div class="col-sm-9 col-xs-12">
+                    <div class='form-control-static'>
+                        <label class="col-lg label-weight">收件人：</label>{$address['realname']} / {$address['mobile']}
+                    </div>
+                    <div class='form-control-static'>
+                        <label class="col-lg label-weight">收货地址：</label>{$address['province']}{$address['city']}{$address['area']} {$address['address']}
+                    </div>
+                </div>
+            </div>
+                {if !empty($log['expresssn'])}
+                <div class="form-group">
+                    <label class="col-lg control-label">物流信息</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <div class='form-control-static'>
+                            <label class="col-lg label-weight">快递公司：</label>{$log['expresscom']}
+                        </div>
+                        <div class='form-control-static'>
+                            <label class="col-lg label-weight">快递单号：</label>{$log['expresssn']}
+                            <a class='op' data-toggle="ajaxModal" href="{:webUrl('util/express', array('id' => $log['id'],'express'=>$log['express'],'expresssn'=>$log['expresssn']))}">查看物流</a>
+                        </div>
+                        <div class='form-control-static'>
+                            <label class="col-lg label-weight">发货时间：</label>{:date('Y-m-d H:i:s', $log['time_send'])}
+                        </div>
+                    </div>
+                </div>
+                {/if}
+            {else}
+                <div class="form-group">
+                  <label class="col-lg control-label"></label>
+                  <div class="col-sm-9 col-xs-12">
+                      <div class='form-control-static'>还未选择地址</div>
+                  </div>
+              </div>
+            {/if}
+        {/if}
+
+
+          <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                 {ifp 'creditshop.log.doexchange'}
+                    {if $log['canexchange']}
+                            <a class='btn btn-primary' data-toggle='ajaxModal' href="{:webUrl('creditshop/log/doexchange',array('id' => $log['id'],'type'=>$goods['type']));}" title='确认兑换' >确认兑换</a>
+                    {/if}
+                {/if}
+            <input type="button" class="btn btn-default" name="submit" onclick="history.go(-1)" value="返回列表"  {ifp 'creditshop.log.doexchange'}{if $log['canexchange']}style='margin-left:10px;'{/if}{/if}  />
+            </div>
+        </div>
+    </form>
+</div>
+{include file='_footer'}

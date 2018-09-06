@@ -1,0 +1,71 @@
+{include file='_header'}
+<div class="page-header">
+    当前位置：<span class="text-primary">{if !empty($item['id'])}编辑{else}添加{/if}{$fei}单{$y}年{$m}月<small>{if !empty($item['id'])}修改【{$item['id']}】{$y}年{$m}月{/if}</small></span>
+</div>
+<div class="page-content">
+    <form  action="" method="post" id="form" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <input type="hidden" name="houseid" value="{$houseid}" />
+        <input type="hidden" name="fei" {if $fei=='water'} value="water" {elseif $fei=='electricity'} value="electricity" {/if}/>
+        <div class="form-group">
+            <label class="col-lg control-label">编号</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="id" readonly="readonly"  class="form-control" value="{$item['id']}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">{$fei}单价{if $fei=='water'}(元/m³){elseif $fei=='electricity'}(元/度){/if}</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" {if $fei=='water'}name='water_m' value="{$item['water_m']}" {elseif $fei=='electricity'}name='electricity_o' value="{$item['electricity_o']}"  {/if} class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">{$fei}{if $fei=='water'}用水总数m³{elseif $fei=='electricity'}用电总数{/if}</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" {if $fei=='water'} name='water' value="{$item['water']}"{elseif $fei=='electricity'}name='electricity' value="{$item['electricity']}" {/if}  class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">费用开始时间</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="date" disabled="disabled" name="timestart" {if  empty($item['timestart'])} value="{:date("Y-m-d",$sjstart)}"{else} disabled="disabled" value = "{:date("Y-m-d",$item['timestart'])}" {/if} class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">费用结束时间</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="date"  disabled="disabled" name="timeend" {if  empty($item['timeend'])} value="{:date("Y-m-d",$sjend)}" {else} disabled="disabled" value = "{:date("Y-m-d",$item['timeend'])}" {/if} class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">备注</label>
+            <div class="col-sm-9 col-xs-12">
+                <textarea name="desc" id="t1" class="form-control richtext"  rows="5" ></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">是否缴费</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'>
+                    <input type='radio' name="status" value='1' {if $item[status]==1}checked{/if} /> 待完成
+                </label>
+                <label class='radio-inline'>
+                    <input type='radio' name="status" value='0' {if $item[status]==0}checked{/if} /> 未缴费
+                </label>
+                <label class='radio-inline'>
+                    <input type='radio' name="status" value='2' {if $item[status]==2}checked{/if} /> 已完成
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交"  class="btn btn-primary"/>
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+document.getElementById("t1").value="{$item['desc']}";
+</script>
+{include file='_footer'}
