@@ -11,27 +11,10 @@ use think\Session;
 use think\Controller;
 class Index extends Base
 {
-    public $merchid = 0;
-    public $merch = array();
-
-    public function __construct() {
-        parent::__construct();
-        if(Session::has('merch')) {
-            $merch = Session::get('merch');      
-            $this->merch = $merch;
-            $this->merchid = $merch['id'];
-        }      
-    }
-
     public function index()
-    {
-        if(empty($this->merch) && $this->merchid == 0)
-        {
-            $this->redirect(url('merch/login/index'));
-        }
-        
+    {        
         $shop_data = model('common')->getSysset('shop');
-        $merch_data = model('common')->getPluginset('store');
+        $merch_data = model('common')->getPluginset('merch');
         $merch = $this->merch;
         if ($merch_data['is_openmerch']) {
             $is_openmerch = 1;

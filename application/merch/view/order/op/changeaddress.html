@@ -2,8 +2,8 @@
 <style type='text/css'>
     .select-group {height: 28px;padding-top:2px;}
 </style>
-<form class="form-horizontal form-validate" action="{:url('merch/order/op',array('ops'=>'changeaddress','id'=>$item['id']))}" method="post" enctype="multipart/form-data">
-	<input type='hidden' name='id' value='{$id}' />
+<form class="form-horizontal form-validate" action="{:url('admin/order/op',array('ops'=>'changeaddress','id'=>$item['id']))}" method="post" enctype="multipart/form-data">
+	<input type='hidden' name='id' value='{$item['id']}' />
 
 	<div class="modal-dialog">
            <div class="modal-content">

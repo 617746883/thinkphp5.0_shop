@@ -1,0 +1,24 @@
+<div style='max-height:500px;overflow:auto;min-width:850px;'>
+<table class="table table-hover" style="min-width:850px;">
+    <thead>
+        <th>店员</th>
+        <th>信息</th>
+        <th>门店</th>
+    </thead>
+    <tbody>   
+        {foreach name='ds' item='row'}
+        <tr>
+            <td><img src='{php echo tomedia($row['avatar'])}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' /> {$row['nickname']}</td>
+            <td>{$row['realname']}/{$row['mobile']}</td>
+            <td>{if empty($row['storename'])}全店核销{else}{$row['storename']}{/if}</td>
+            <td style="width:80px;"><a href="javascript:;" onclick='biz.selector.set(this,{:json_encode($row);})'>选择</a></td>
+        </tr>
+        {/foreach}
+        {if count($ds)<=0}
+        <tr> 
+            <td colspan='4' align='center'>未找到店员, 点击<a href="{:url('merch/shop/add')}" target='_blank'>【新增店员】</a></td>
+        </tr>
+        {/if}
+    </tbody>
+</table>
+</div>

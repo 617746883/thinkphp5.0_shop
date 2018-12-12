@@ -38,6 +38,12 @@ class Order extends Base
 		return $listdata;
 	}
 
+	public function olist6()
+	{
+		$listdata = $this->listdata(6);
+		return $listdata;
+	}
+
 	public function olist_1()
 	{
 		$listdata = $this->listdata(-1);
@@ -57,7 +63,7 @@ class Order extends Base
 			$starttime = strtotime('-1 month');
 			$endtime = time();
 		}
-		$merch_data = model('common')->getPluginset('store');
+		$merch_data = model('common')->getPluginset('merch');
 		if ($merch_data['is_openmerch']) {
 			$is_openmerch = 1;
 		}
@@ -100,7 +106,7 @@ class Order extends Base
 				$condition .= " AND (verifycode='" . $keyword . "' or locate('" . $keyword . "',o.verifycodes)>0)";
 			} else if ($searchfield == 'store') {
 				$condition .= " AND (locate('" . $keyword . "',store.merchname)>0)";
-				$sqlcondition = ' left join ' . tablename('ewei_shop_store') . ' store on store.id = o.verifystoreid and store.uniacid=o.uniacid';
+				$sqlcondition = ' left join ' . tablename('shop_store') . ' store on store.id = o.verifystoreid and store.uniacid=o.uniacid';
 			}
 		}
 		$statuscondition = '';
@@ -118,6 +124,8 @@ class Order extends Base
 				$statuscondition = ' AND o.status = 0 and o.paytype<>3';
 			} else if ($status == '2') {
 				$statuscondition = ' AND ( o.status = 2 or (o.status=1 and o.sendtype>0) )';
+			} else if ($status == '6') {
+				$statuscondition = ' AND o.isverify = 1 ';
 			} else {
 				$statuscondition = ' AND o.status = ' . intval($status);
 			}
@@ -128,7 +136,7 @@ class Order extends Base
 			->join('member m','m.id=o.mid','left')
 			->join('shop_member_address a','a.id=o.addressid','left')
 			->join('shop_dispatch d','d.id = o.dispatchid','left')
-			->join('shop_saler s','s.mid = o.verifyopenid','left')
+			->join('shop_saler s','s.mid = o.verifyoperatorid','left')
 			->join('member sm','sm.id = s.mid','left')
 			->where($condition . $statuscondition)
 			->field('o.* , a.realname as arealname,a.mobile as amobile,a.province as aprovince ,a.city as acity , a.area as aarea, a.street as astreet,a.address as aaddress,d.dispatchname,m.nickname,m.id as mid,m.realname as mrealname,m.mobile as mmobile,sm.id as salerid,sm.nickname as salernickname,s.salername,r.rtype,r.status as rstatus,o.sendtype')
@@ -160,7 +168,7 @@ class Order extends Base
 		$is_merchname = 0;
 
 		if ($merch_plugin) {
-			$merch_user = model('store')->getListUser($list, 'merch_user');
+			$merch_user = model('merch')->getListUser($list, 'merch_user');
 
 			if (!empty($merch_user)) {
 				$is_merchname = 1;
@@ -440,7 +448,7 @@ class Order extends Base
 
 		$total = $t['count'];
 		$totalmoney = $t['sumprice'];
-		$this->assign(['list'=>$list,'pager'=>$pager,'searchfield'=>$searchfield,'r_type'=>$r_type,'starttime'=>$starttime,'endtime'=>$endtime,'is_openmerch'=>$is_openmerch,'keyword'=>$keyword,'searchtime'=>$searchtime,'paytype'=>$paytype]);
+		$this->assign(['list'=>$list,'pager'=>$pager,'searchfield'=>$searchfield,'r_type'=>$r_type,'starttime'=>$starttime,'endtime'=>$endtime,'is_openmerch'=>$is_openmerch,'keyword'=>$keyword,'searchtime'=>$searchtime,'paytype'=>$paytype,'act'=>strtolower(Request::instance()->action())]);
 		return $this->fetch('order/list');
 	}
 
@@ -513,14 +521,14 @@ class Order extends Base
 		$coupon = model('coupon')->getCouponByDataID($item['couponid']);
 		$verifyinfo = iunserializer($item['verifyinfo']);
 
-		if (!empty($item['verifyopenid'])) {
-			$saler = model('member')->getMember($item['verifyopenid']);
+		if (!empty($item['verifyoperatorid'])) {
+			$saler = model('member')->getMember($item['verifyoperatorid']);
 
 			if (empty($item['merchid'])) {
-				$saler['salername'] = Db::name('shop_saler')->where('mid',$item['verifyopenid'])->value('salername');
+				$saler['salername'] = Db::name('shop_saler')->where('mid',$item['verifyoperatorid'])->value('salername');
 			}
 			else {
-				$saler['salername'] = Db::name('shop_saler')->where('mid',$item['verifyopenid'])->value('salername');
+				$saler['salername'] = Db::name('shop_saler')->where('mid',$item['verifyoperatorid'])->value('salername');
 			}
 		}
 
@@ -549,13 +557,13 @@ class Order extends Base
 								$v['storename'] = '总店';
 							}
 
-							$v['nickname'] = Db::name('member')->where('id',$v['verifyopenid'])->value('nickname');
+							$v['nickname'] = Db::name('member')->where('id',$v['verifyoperatorid'])->value('nickname');
 
 							if (empty($item['merchid'])) {
-								$v['salername'] = Db::name('shop_saler')->where('mid',$v['verifyopenid'])->value('salername');
+								$v['salername'] = Db::name('shop_saler')->where('mid',$v['verifyoperatorid'])->value('salername');
 							}
 							else {
-								$v['salername'] = Db::name('shop_saler')->where('mid',$v['verifyopenid'])->value('salername');
+								$v['salername'] = Db::name('shop_saler')->where('mid',$v['verifyoperatorid'])->value('salername');
 							}
 						}
 					}
@@ -913,7 +921,7 @@ class Order extends Base
 			if ($item['isverify'] == 1) {
 				$d['verified'] = 1;
 				$d['verifytime'] = $time;
-				$d['verifyopenid'] = '';
+				$d['verifyoperatorid'] = '';
 			}
 
 			Db::name('shop_order')->where('id',$item['id'])->update($d);
@@ -968,7 +976,7 @@ class Order extends Base
 				$data = array('sendtype' => 0 < $item['sendtype'] ? $item['sendtype'] : intval(input('sendtype')), 'express' => trim(input('express')), 'expresscom' => trim(input('expresscom')), 'expresssn' => trim(input('expresssn')), 'sendtime' => $time);
 				$data['express']=Db::name('shop_express')->where('name',$data['expresscom'])->value('express');
 				if ((intval(input('sendtype')) == 1) || (0 < $item['sendtype'])) {
-					if (empty(input('ordergoodsid'))) {
+					if (empty(input('ordergoodsid/a'))) {
 						show_json(0, '请选择发货商品！');
 					}
 
@@ -976,7 +984,7 @@ class Order extends Base
 					$ogoods = Db::name('shop_order_goods')->where('orderid',$item['id'])->field('sendtype')->order('sendtype','desc')->select();
 					$senddata = array('sendtype' => $ogoods[0]['sendtype'] + 1, 'sendtime' => $data['sendtime']);
 					$data['sendtype'] = $ogoods[0]['sendtype'] + 1;
-					$goodsid = input('ordergoodsid');
+					$goodsid = input('ordergoodsid/a');
 
 					foreach ($goodsid as $key => $value) {
 						Db::name('shop_order_goods')->where('id',$value)->update($data);
@@ -988,8 +996,7 @@ class Order extends Base
 						$senddata['status'] = 2;
 					}
 					Db::name('shop_order')->where('id',$item['id'])->update($senddata);
-				}
-				else {
+				} else {
 					$data['status'] = 2;
 					Db::name('shop_order')->where('id',$item['id'])->update($data);
 				}
@@ -1201,10 +1208,31 @@ class Order extends Base
 					show_json(1);
 				}
 			}
-			$this->assign(['item'=>$item,'new_area'=>$new_area,'address_street'=>$address_street,'user'=>$user,'id'=>$id]);
+			$this->assign(['item'=>$item,'new_area'=>$new_area,'address_street'=>$address_street,'user'=>$user,'id'=>$id,'edit_flag'=>$edit_flag]);
 			echo $this->fetch('order/op/changeaddress');
 		}
 	}
+
+	/**
+     * ajax return 七日交易记录.近7日交易时间,交易金额,交易数量
+     */
+	// public function ajaxtransaction()
+	// {
+	// 	$orderPrice = $this->selectOrderPrice(7);
+	// 	$transaction = $this->selectTransaction($orderPrice['fetchall'], 7);
+
+	// 	if (empty($transaction)) {
+	// 		$i = 7;
+
+	// 		while (1 <= $i) {
+	// 			$transaction['price'][date('Y-m-d', time() - ($i * 3600 * 24))] = 0;
+	// 			$transaction['count'][date('Y-m-d', time() - ($i * 3600 * 24))] = 0;
+	// 			--$i;
+	// 		}
+	// 	}
+
+	// 	echo json_encode(array('price_key' => array_keys($transaction['price']), 'price_value' => array_values($transaction['price']), 'count_value' => array_values($transaction['count'])));
+	// }
 
 	/**
      * ajax return 七日交易记录.近7日交易时间,交易金额,交易数量
@@ -1218,13 +1246,40 @@ class Order extends Base
 			$i = 7;
 
 			while (1 <= $i) {
-				$transaction['price'][date('Y-m-d', time() - ($i * 3600 * 24))] = 0;
-				$transaction['count'][date('Y-m-d', time() - ($i * 3600 * 24))] = 0;
+				$transaction['price'][date('Y-m-d', time() - $i * 3600 * 24)] = 0;
+				$transaction['count'][date('Y-m-d', time() - $i * 3600 * 24)] = 0;
 				--$i;
 			}
 		}
+		else {
+			foreach ($transaction['price'] as &$item) {
+				$item = round($item, 2);
+			}
 
-		echo json_encode(array('price_key' => array_keys($transaction['price']), 'price_value' => array_values($transaction['price']), 'count_value' => array_values($transaction['count'])));
+			unset($item);
+		}
+
+		$allorderPrice = $this->selectOrderPrice(7, true);
+		$alltransaction = $this->selectTransaction($allorderPrice['fetchall'], 7, true);
+
+		if (empty($alltransaction)) {
+			$i = 7;
+
+			while (1 <= $i) {
+				$alltransaction['price'][date('Y-m-d', time() - $i * 3600 * 24)] = 0;
+				$alltransaction['count'][date('Y-m-d', time() - $i * 3600 * 24)] = 0;
+				--$i;
+			}
+		}
+		else {
+			foreach ($alltransaction['price'] as &$item) {
+				$item = round($item, 2);
+			}
+
+			unset($item);
+		}
+
+		echo json_encode(array('price_key' => array_keys($transaction['price']), 'price_value' => array_values($transaction['price']), 'count_value' => array_values($transaction['count']), 'allprice_value' => array_values($alltransaction['price']), 'allcount_value' => array_values($alltransaction['count'])));
 	}
 
 	/**
@@ -1232,27 +1287,93 @@ class Order extends Base
      * @param int $day 查询天数
      * @return bool
      */
-	protected function selectOrderPrice($day = 0)
+	// protected function selectOrderPrice($day = 0)
+	// {
+	// 	$day = (int) $day;
+
+	// 	if ($day != 0) {
+	// 		$createtime1 = strtotime(date('Y-m-d', time() - ($day * 3600 * 24)));
+	// 		$createtime2 = strtotime(date('Y-m-d', time()));
+	// 	}
+	// 	else {
+	// 		$createtime1 = strtotime(date('Y-m-d', time()));
+	// 		$createtime2 = strtotime(date('Y-m-d', time() + (3600 * 24)));
+	// 	}
+		
+	// 	$pdo_res = Db::name('shop_order')->where('ismr=0 and isparent=0 and (status > 0 or ( status=0 and paytype=3)) and deleted=0 ')->where('createtime','between',[$createtime1,$createtime2])->field('id,price,createtime')->select();
+	// 	$price = 0;
+
+	// 	foreach ($pdo_res as $arr) {
+	// 		$price += $arr['price'];
+	// 	}
+
+	// 	$result = array('price' => round($price, 1), 'count' => count($pdo_res), 'fetchall' => $pdo_res);
+	// 	return $result;
+	// }
+
+	/**
+     * 查询订单金额
+     * @param int $day 查询天数
+     * @param bool $is_all 是否是全部订单
+     * @param bool $is_avg 是否是查询付款平均数
+     * @return bool
+     */
+	protected function selectOrderPrice($day = 0, $is_all = false, $is_avg = false)
 	{
 		$day = (int) $day;
 
 		if ($day != 0) {
-			$createtime1 = strtotime(date('Y-m-d', time() - ($day * 3600 * 24)));
-			$createtime2 = strtotime(date('Y-m-d', time()));
-		}
-		else {
+			if ($day == 30) {
+				$yest = date('Y-m-d');
+				$createtime1 = strtotime(date('Y-m-d', strtotime('-30 day')));
+				$createtime2 = strtotime($yest . ' 23:59:59');
+			} else if ($day == 7) {
+				$yest = date('Y-m-d');
+				$createtime1 = strtotime(date('Y-m-d', strtotime('-7 day')));
+				$createtime2 = strtotime($yest . ' 23:59:59');
+			} else {
+				$yesterday = strtotime('-1 day');
+				$yy = date('Y', $yesterday);
+				$ym = date('m', $yesterday);
+				$yd = date('d', $yesterday);
+				$createtime1 = strtotime($yy . '-' . $ym . '-' . $yd . ' 00:00:00');
+				$createtime2 = strtotime($yy . '-' . $ym . '-' . $yd . ' 23:59:59');
+			}
+		} else {
 			$createtime1 = strtotime(date('Y-m-d', time()));
-			$createtime2 = strtotime(date('Y-m-d', time() + (3600 * 24)));
+			$createtime2 = strtotime(date('Y-m-d', time())) + 3600 * 24 - 1;
 		}
-		
-		$pdo_res = Db::name('shop_order')->where('ismr=0 and isparent=0 and (status > 0 or ( status=0 and paytype=3)) and deleted=0 ')->where('createtime','between',[$createtime1,$createtime2])->field('id,price,createtime')->select();
+
+		$time = 'paytime';
+		$where = ' and (( status > 0 and (paytime between ' . $createtime1 . ' and ' . $createtime2 . ')) or ((createtime between ' . $createtime1 . ' and ' . $createtime2 . ' ) and status>=0 and paytype=3))';
+
+		if (!empty($is_all)) {
+			$time = 'createtime';
+			$where = ' and createtime between ' . $createtime1 . ' and ' . $createtime2 . '';
+		}
+
+		if (!empty($is_avg)) {
+			$time = 'paytime';
+			$where = ' and (status >0 and (paytime between ' . $createtime1 . ' and ' . $createtime2 . '))';
+		}
+
+		$sql = 'select id,price,mid,' . $time . ' from ' . tablename('shop_order') . ' where ismr = 0 and isparent = 0 and deleted=0 ' . $where;
+		$pdo_res = Db::query($sql);
 		$price = 0;
+		$avg = 0;
+		$member = array();
 
 		foreach ($pdo_res as $arr) {
 			$price += $arr['price'];
+			$member[] = $arr['mid'];
 		}
 
-		$result = array('price' => round($price, 1), 'count' => count($pdo_res), 'fetchall' => $pdo_res);
+		if (!empty($is_avg)) {
+			$member_num = count(array_unique($member));
+			$avg = empty($member_num) ? 0 : round($price / $member_num, 2);
+		}
+
+		$result = array('price' => $price, 'count' => count($pdo_res), 'avg' => $avg, 'fetchall' => $pdo_res);
 		return $result;
 	}
 
@@ -1302,19 +1423,32 @@ class Order extends Base
 		return $orderPrice;
 	}
 
+	// public function ajaxorder()
+	// {
+	// 	$order0 = $this->order(0);
+	// 	$order1 = $this->order(1);
+	// 	$order7 = $this->order(7);
+	// 	$order30 = $this->order(30);
+	// 	$order7['price'] = $order7['price'] + $order0['price'];
+	// 	$order7['count'] = $order7['count'] + $order0['count'];
+	// 	$order7['avg'] = empty($order7['count']) ? 0 : round($order7['price'] / $order7['count'], 1);
+	// 	$order30['price'] = $order30['price'] + $order0['price'];
+	// 	$order30['count'] = $order30['count'] + $order0['count'];
+	// 	$order30['avg'] = empty($order30['count']) ? 0 : round($order30['price'] / $order30['count'], 1);
+	// 	show_json(1, array('order0' => $order0, 'order1' => $order1, 'order7' => $order7, 'order30' => $order30));
+	// }
+
 	public function ajaxorder()
 	{
-		$order0 = $this->order(0);
-		$order1 = $this->order(1);
-		$order7 = $this->order(7);
-		$order30 = $this->order(30);
-		$order7['price'] = $order7['price'] + $order0['price'];
-		$order7['count'] = $order7['count'] + $order0['count'];
-		$order7['avg'] = empty($order7['count']) ? 0 : round($order7['price'] / $order7['count'], 1);
-		$order30['price'] = $order30['price'] + $order0['price'];
-		$order30['count'] = $order30['count'] + $order0['count'];
-		$order30['avg'] = empty($order30['count']) ? 0 : round($order30['price'] / $order30['count'], 1);
-		show_json(1, array('order0' => $order0, 'order1' => $order1, 'order7' => $order7, 'order30' => $order30));
+		$day = (int) $_GET['day'];
+		$order = $this->selectOrderPrice($day);
+		unset($order['fetchall']);
+		$allorder = $this->selectOrderPrice($day, true);
+		unset($allorder['fetchall']);
+		$avg = $this->selectOrderPrice($day, true, true);
+		unset($allorder['fetchall']);
+		$orders = array('order_count' => $order['count'], 'order_price' => number_format($order['price'], 2), 'allorder_count' => $allorder['count'], 'allorder_price' => number_format($allorder['price'], 2), 'avg' => number_format($avg['avg'], 2));
+		show_json(1, array('order' => $orders));
 	}
 
 	public function ajaxgettotals() 
@@ -1344,7 +1478,7 @@ class Order extends Base
 			$starttime = strtotime('-1 month');
 			$endtime = time();
 		}
-		$merch_data = model('common')->getPluginset('store');
+		$merch_data = model('common')->getPluginset('merch');
 		if ($merch_data['is_openmerch']) {
 			$is_openmerch = 1;
 		} else {
@@ -1426,7 +1560,7 @@ class Order extends Base
 		$is_merchname = 0;
 
 		if ($merch_plugin) {
-			$merch_user = model('store')->getListUser($list, 'merch_user');
+			$merch_user = model('merch')->getListUser($list, 'merch_user');
 
 			if (!empty($merch_user)) {
 				$is_merchname = 1;

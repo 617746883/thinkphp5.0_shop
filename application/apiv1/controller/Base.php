@@ -3,12 +3,10 @@ namespace app\apiv1\controller;
 use think\Controller;
 use think\Db;
 use think\Request;
-// 指定允许其他域名访问  
-header('Access-Control-Allow-Origin:*');  
-// 响应类型  
-header('Access-Control-Allow-Methods:*');  
-// 响应头设置  
-header('Access-Control-Allow-Headers:*');
+header("Access-Control-Allow-Origin: http://localhost:8000"); # 跨域处理
+header('Access-Control-Allow-Methods:POST,GET,OPTIONS'); // 允许请求的类型
+header('Access-Control-Allow-Credentials: true'); // 设置是否允许发送 cookies
+header('Access-Control-Allow-Headers: Content-Type,Content-Length,Accept-Encoding,X-Requested-with,token'); // 设置允许自定义请求头的字段
 
 class Base extends Controller
 {
@@ -16,7 +14,7 @@ class Base extends Controller
      * 允许访问的请求类型
      * @var string
      */
-    public $restMethodList = 'get|post';
+    public $restMethodList = 'get|post|options';
 
 	/**
 	 * 析构函数，初始化操作
@@ -29,11 +27,11 @@ class Base extends Controller
     	$this->request = $request;
         // $this->init();    //检查资源类型
         $headerinfo = $request->header();
-		$token = $this->request->header('token');
         $shopset = model('common')->getSysset();
         if($shopset['shop']['close'] == 1) {
             $this->result(0,'商城已关闭',array('closedetail'=>$shopset['shop']['closedetail'],'closeurl'=>$shopset['shop']['closeurl']));
         }
+        $this->headerinfo = $headerinfo;
         $this->shopset = $shopset;
 	}
 

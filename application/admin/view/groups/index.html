@@ -24,7 +24,7 @@
 </style>
 <div class="page-header">
     当前位置：
-    <span class="text-primary">团购概述</span>
+    <span class="text-primary">拼团概述</span>
 </div>
 <div class="page-content">
     <div class="form-group-title">拼团</div>
@@ -36,7 +36,7 @@
                 </div>
                 <div class="summary flex">
                     <div class="flex1 flex column">
-                        <div class=" groups_pointer" onclick="javascript:window.location.href='{:url('admin/groups/teamsuccess')}'">
+                        <div class=" groups_pointer" onclick="javascript:window.location.href='{:url('admin/groups/team', array('type' => success))}'">
                             数量
                         </div>
                         <h2 class=" no-margins team-success-count">--</h2>
@@ -53,11 +53,13 @@
                 <div class="summary flex">
 
                     <div class="flex1 flex column">
-                        <div class="col-md-12 text-center groups_pointer" onclick="javascript:window.location.href='{:url('admin/groups/teaming')}'">
+                        <div class="col-md-12 text-center groups_pointer" onclick="javascript:window.location.href='{:url('admin/groups/team', array('type' => ing))}'">
                             数量
                         </div>
-                        <h2 class="no-margins team-ing-count">--</h2>
+                            <h2 class="no-margins team-ing-count">--</h2>
+
                     </div>
+
                 </div>
             </div>
         </div>
@@ -186,11 +188,12 @@
                         <tr>
                             <td class="tc"><span class="label label-warning">待发货</span>
                             </td>
-                            <td class="tc">{:date('Y-m-d H:i',$value['createtime'])}</td>
+                            <td class="tc">{php echo date('Y-m-d H:i',$value['createtime'])}</td>
                             <td class="text-navy tc">¥ {$value['price']}</td>
-                            <td>{!empty($value['realname']) ? $value['realname'] : $value['nickname']}</td>
+                            <td>{php echo !empty($value['realname']) ? $value['realname'] : $value['nickname']}</td>
                             <td class="tc">
-                            <a href="{:url('admin/groups/detail',array('orderid'=>$value['id']))}" class="btn btn-xs btn-primary">查看详情</a></td>
+                                <a href="{:url('admin/groups/orderdetail',array('orderid'=>$value['id']))}" class="btn btn-xs btn-primary">查看详情</a>
+                            </td>
                         </tr>
                         {/foreach}
                         </tbody>

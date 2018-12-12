@@ -11,11 +11,10 @@ class Order extends Base
 {
 	protected function merchData()
 	{
-		$merch_data = model('common')->getPluginset('store');
+		$merch_data = model('common')->getPluginset('merch');
 		if ($merch_data['is_openmerch']) {
 			$is_openmerch = 1;
-		}
-		 else {
+		} else {
 			$is_openmerch = 0;
 		}
 
@@ -69,12 +68,10 @@ class Order extends Base
 		} else {
 			$condition .= ' and userdeleted=0 ';
 		}		
-		
-		$list = Db::name('shop_order')->where($condition)->order('createtime','desc')->field('id,addressid,ordersn,price,dispatchprice,status,iscomment,isverify,verified,verifycode,verifytype,iscomment,refundid,expresscom,express,expresssn,finishtime,`virtual`,paytype,expresssn,refundstate,dispatchtype,verifyinfo,merchid,isparent,userdeleted,createtime')->page($page,$pagesize)->select();
+		$list = Db::name('shop_order')->where($condition)->order('createtime','desc')->field('id,addressid,ordersn,price,dispatchprice,status,isverify,verifyendtime,verified,verifycode,verifytype,iscomment,refundid,expresscom,express,expresssn,finishtime,`virtual`,sendtype,paytype,refundstate,dispatchtype,verifyinfo,merchid,isparent,userdeleted,createtime')->order('createtime','desc')->page($page,$pagesize)->select();
 		$refunddays = intval($shopset['trade']['refunddays']);
 		$closeorder = $shopset['trade']['closeorder'] ? intval($shopset['trade']['closeorder']) * 3600 * 24 : intval(7 * 3600 * 24);
 
-		$arr = array();
 		foreach ($list as &$row) {
 			if ($row['isparent'] == 1) {
 				$scondition = ' og.parentorderid=' . $row['id'];
@@ -83,33 +80,62 @@ class Order extends Base
 				$scondition = ' og.orderid=' . $row['id'];
 			}
 
-			$goods = Db::name('shop_order_goods')->alias('og')->join('shop_goods g','og.goodsid = g.id','left')->join('shop_goods_option op','og.optionid = op.id','left')->where($scondition)->field('og.goodsid,og.total,g.title,g.thumb,og.price as marketprice,ifnull(og.optionname,"") as optiontitle,ifnull(og.optionid,0) as optionid,ifnull(op.specs,"") as specs')->order('og.id','asc')->select();
+			$goods = Db::name('shop_order_goods')->alias('og')->join('shop_goods g','og.goodsid = g.id','left')->join('shop_goods_option op','og.optionid = op.id','left')->where($scondition)->field('og.goodsid,og.total,g.title,g.thumb,g.type,g.status,og.price as marketprice,ifnull(og.optionname,"") as optiontitle,ifnull(og.optionid,0) as optionid,ifnull(op.specs,"") as specs,g.merchid,og.sendtype,og.expresscom,og.expresssn,og.express,og.sendtime,og.finishtime,og.remarksend')->order('og.id','asc')->select();
+			$row["isonlyverifygoods"] = false;
+			foreach( $goods as &$r ) 
+			{
+				if( !empty($r["specs"]) ) {
+					$thumb = model("goods")->getSpecThumb($r["specs"]);
+					if( !empty($thumb) ) {
+						$r["thumb"] = $thumb;
+					}
+				}
+				if( $r["type"] == 5 ) {
+					$row["isonlyverifygoods"] = true;
+				}
+				if( empty($r["gtitle"]) != true ) {
+					$r["title"] = $r["gtitle"];
+				}
+			}
+			unset($r);
 			$goodstotal = Db::name('shop_order_goods')->alias('og')->join('shop_goods g','og.goodsid = g.id','left')->join('shop_goods_option op','og.optionid = op.id','left')->where($scondition)->sum('og.total');
 			$row['goods'] = set_medias($goods, 'thumb');
 			$row['goodstotal'] = $goodstotal;
 
 			switch ($row['status']) {
-				case '-1': $statusstr = '买家已取消';$status = 10;
+				case '-1': $statusstr = '已取消';$status = 10;
 				break;
 
 				case '0': if ($row['paytype'] == 3) {
-					$statusstr = '等待卖家发货';$status = 21;
+					$statusstr = '待发货';$status = 31;
 				} else {
 					if((time() - $row['createtime']) > $closeorder) {
 						$statusstr = '支付超时';$status = 22;
 					} else {
-						$statusstr = '等待买家付款';$status = 21;
+						$statusstr = '待付款';$status = 21;
 					}					
 				}
 
 				break;
 
-				case '1': if ($row['isverify'] == 1) {
-					$statusstr = '正在使用中';$status = 30;
-				} else if (empty($row['addressid'])) {
-					$statusstr = '待取货';$status = 30;
+				case '1': if( $row["isverify"] == 1 ) {
+					$statusstr = '使用中';$status = 30;
+					if( 0 < $row["verifyendtime"] && $row["verifyendtime"] < time() ) {
+						$statusstr = '已过期';$status = 31;
+					}
 				} else {
-					$statusstr = '等待卖家发货';$status = 30;
+					if( empty($row["addressid"]) ) {
+						if( !empty($row["ccard"]) ) {
+							$statusstr = '充值中';$status = 30;
+						} else {
+							$statusstr = '待取货';$status = 30;
+						}
+					} else {
+						$statusstr = '等待卖家发货';$status = 30;
+						if( 0 < $row["sendtype"] ) {
+							$statusstr = '部分发货';$status = 30;
+						}
+					}
 				}
 
 				break;
@@ -118,7 +144,7 @@ class Order extends Base
 				break;
 				case '3': if (empty($row['iscomment']) || $row['iscomment'] == 1) {
 					if ($show_status == 5) {
-						$statusstr = '交易完成';$status = 52;
+						$statusstr = '已完成';$status = 52;
 					} else {
 						if(time() - $row['finishtime'] > 2592000) {
 							$statusstr = ((empty($shopset['trade']['closecomment']) ? '交易完成' : '评价已关闭'));$status = ((empty($shopset['trade']['closecomment']) ? 52 : 51));
@@ -131,149 +157,6 @@ class Order extends Base
 				}
 				break;
 			}
-
-			// if ((0 < $row['refundstate'])) {
-			// 	$refund = Db::name('shop_order_refund')->where('id',$row['refundid'])->where('orderid',$row['id'])->order('id','desc')->find();
-			// 	if (!empty($refund)) {
-   //                  if($refund['status'] == -2) {
-   //                  	$statusstr = '客户取消' . $r_type[$refund['rtype']];
-   //                  	switch ($refund['rtype']) {
-   //                  		case '0':
-   //                  			$status = 72;
-   //                  			break;
-                    		
-   //                  		case '1':
-   //                  			$status = 82;
-   //                  			break;
-                    		
-   //                  		case '2':
-   //                  			$status = 92;
-   //                  			break;
-                    		
-   //                  		default:
-   //                  			$status = 72;
-   //                  			break;
-   //                  	}
-   //                  } elseif ($refund['status'] == -1) {
-   //                  	$statusstr = '已拒绝' . $r_type[$refund['rtype']];
-   //                  	switch ($refund['rtype']) {
-   //                  		case '0':
-   //                  			$status = 71;
-   //                  			break;
-                    		
-   //                  		case '1':
-   //                  			$status = 81;
-   //                  			break;
-                    		
-   //                  		case '2':
-   //                  			$status = 91;
-   //                  			break;
-                    		
-   //                  		default:
-   //                  			$status = 71;
-   //                  			break;
-   //                  	}
-   //                  } elseif ($refund['status'] == 0) {
-   //                  	$statusstr = '等待商家处理申请';
-   //                  	switch ($refund['rtype']) {
-   //                  		case '0':
-   //                  			$status = 70;
-   //                  			break;
-                    		
-   //                  		case '1':
-   //                  			$status = 80;
-   //                  			break;
-                    		
-   //                  		case '2':
-   //                  			$status = 90;
-   //                  			break;
-                    		
-   //                  		default:
-   //                  			$status = 70;
-   //                  			break;
-   //                  	}
-   //                  } elseif ($refund['status'] == 1) {
-   //                  	$statusstr = $r_type[$refund['rtype']] . '完成';
-   //                  	switch ($refund['rtype']) {
-   //                  		case '0':
-   //                  			$status = 76;
-   //                  			break;
-                    		
-   //                  		case '1':
-   //                  			$status = 86;
-   //                  			break;
-                    		
-   //                  		case '2':
-   //                  			$status = 96;
-   //                  			break;
-                    		
-   //                  		default:
-   //                  			$status = 76;
-   //                  			break;
-   //                  	}
-   //                  } elseif ($refund['status'] == 3) {
-   //                  	$statusstr = '等待客户退回物品';
-   //                  	switch ($refund['rtype']) {
-   //                  		case '0':
-   //                  			$status = 73;
-   //                  			break;
-                    		
-   //                  		case '1':
-   //                  			$status = 83;
-   //                  			break;
-                    		
-   //                  		case '2':
-   //                  			$status = 93;
-   //                  			break;
-                    		
-   //                  		default:
-   //                  			$status = 73;
-   //                  			break;
-   //                  	}
-   //                  } elseif ($refund['status'] == 4) {
-   //                  	$statusstr = '等待商家重新发货';
-   //                  	switch ($refund['rtype']) {
-   //                  		case '0':
-   //                  			$status = 74;
-   //                  			break;
-                    		
-   //                  		case '1':
-   //                  			$status = 84;
-   //                  			break;
-                    		
-   //                  		case '2':
-   //                  			$status = 94;
-   //                  			break;
-                    		
-   //                  		default:
-   //                  			$status = 74;
-   //                  			break;
-   //                  	}
-   //                  } elseif ($refund['status'] == 5) {
-   //                  	$statusstr = '等待客户收货';
-   //                  	switch ($refund['rtype']) {
-   //                  		case '0':
-   //                  			$status = 75;
-   //                  			break;
-                    		
-   //                  		case '1':
-   //                  			$status = 85;
-   //                  			break;
-                    		
-   //                  		case '2':
-   //                  			$status = 95;
-   //                  			break;
-                    		
-   //                  		default:
-   //                  			$status = 75;
-   //                  			break;
-   //                  	}
-   //                  }					
-			// 	}
-			// }
-
-			$row['statusstr'] = $statusstr;
-			$row['status'] = $status;
 
 			$row['canrefund'] = false;
 			$canrefund = false;
@@ -306,30 +189,35 @@ class Order extends Base
 			$row['canrefund'] = $canrefund;
 			$row['canverify'] = false;
 			$canverify = false;
-			$showverify = $row['dispatchtype'] || $row['isverify'];
+			$showverify = ($row['status'] == 1) && ($row["dispatchtype"] || $row["isverify"]) && !$row["isonlyverifygoods"];
 			if ($row['isverify']) {
-				if (($row['verifytype'] == 0) || ($row['verifytype'] == 1)) {
-					$vs = iunserializer($row['verifyinfo']);
-					$verifyinfo = array( array('verifycode' => $row['verifycode'], 'verified' => ($row['verifytype'] == 0 ? $row['verified'] : $row['goods'][0]['total'] <= count($vs))) );
-					if ($row['verifytype'] == 0) {
-						$canverify = empty($row['verified']) && $showverify;
-					} else if ($row['verifytype'] == 1) {
-						$canverify = (count($vs) < $row['goods'][0]['total']) && $showverify;
-					}
-				} else {
-					$verifyinfo = iunserializer($row['verifyinfo']);
-					$last = 0;
-					foreach ($verifyinfo as $v ) {
-						if (!$v['verified']) {
-							++$last;
+				if( !$row["isonlyverifygoods"] ) {
+					if (($row['verifytype'] == 0) || ($row['verifytype'] == 1) || $row["verifytype"] == 3 ) {
+						$vs = iunserializer($row['verifyinfo']);
+						$verifyinfo = array( array('verifycode' => $row['verifycode'], 'verified' => ($row['verifytype'] == 0 ? $row['verified'] : $row['goods'][0]['total'] <= count($vs))) );
+						if ($row['verifytype'] == 0) {
+							$canverify = empty($row['verified']) && $showverify;
+						} else if ($row['verifytype'] == 1) {
+							$canverify = (count($vs) < $row['goods'][0]['total']) && $showverify;
 						}
+					} else {
+						$verifyinfo = iunserializer($row['verifyinfo']);
+						$last = 0;
+						foreach ($verifyinfo as $v ) {
+							if (!$v['verified']) {
+								++$last;
+							}
+						}
+						$canverify = (0 < $last) && $showverify;
 					}
-					$canverify = (0 < $last) && $showverify;
 				}
+				
 			} else if (!empty($row['dispatchtype'])) {
 				$canverify = ($row['status'] == 1) && $showverify;
 			}
-			$row['canverify'] = $canverify;
+			$row['canverify'] = $canverify;		
+			$row['statusstr'] = $statusstr;
+			$row['status'] = $status;
 		}
 		unset($row);
 
@@ -338,7 +226,7 @@ class Order extends Base
             if(empty($v['merchid'])) {
             	$merch = array('id'=>0,'merchname'=>$shopset['shop']['name'],'logo'=>$shopset['shop']['logo']);
             } else {
-            	$merch = Db::name('shop_store')->where('id',$v['merchid'])->field('id,logo,merchname')->find();
+            	$merch = Db::name('shop_merch')->where('id',$v['merchid'])->field('id,logo,merchname')->find();
             }
             $merch['logo'] = tomedia($merch['logo']);
             $merch['order'] = $v;
@@ -361,7 +249,7 @@ class Order extends Base
 		if (empty($orderid)) {
 			$this->result(0,'订单不存在');
 		}
-		$order = Db::name('shop_order')->where('id',$orderid)->where('mid',$mid)->field('id,ordersn,price,goodsprice,paytype,discountprice,status,dispatchprice,addressid,carrier,merchid,isverify,dispatchtype,verifyinfo,merchshow,verified,verifycode,address,userdeleted,isparent,storeid,virtual_str,finishtime,createtime,paytime,sendtime,canceltime,refundstate,refundid,refundtime,expresscom,express,expresssn,iscomment')->find();
+		$order = Db::name('shop_order')->where('id',$orderid)->where('mid',$mid)->find();
 
 		if (empty($order)) {
 			$this->result(0,'订单不存在');
@@ -373,7 +261,11 @@ class Order extends Base
 		if ($order['userdeleted'] == 2) {
 			$this->result(0,'订单已经被删除!');
 		}
-
+		$isonlyverifygoods = model("order")->checkisonlyverifygoods($order["id"]);
+		$order['isonlyverifygoods'] = $isonlyverifygoods;
+		$area_set = model("util")->get_area_config_set();
+		$new_area = intval($area_set["new_area"]);
+		$address_street = intval($area_set["address_street"]);
 		$merchdata = $this->merchData();
 		extract($merchdata);
 
@@ -384,13 +276,48 @@ class Order extends Base
 		} else {
 			$scondition = ' og.orderid=' . $orderid;
 		}
-		$goods = Db::name('shop_order_goods')->alias('og')->join('shop_goods g','g.id=og.goodsid','left')->where($scondition)->field('og.id,og.goodsid,og.price as marketprice,g.title,g.thumb,og.total,g.credit,og.optionid,og.optionname as optiontitle,g.isverify,g.storeids,og.prohibitrefund,g.cannotrefund,og.refundid,og.rstate,og.refundtime')->select();
+
+		$goods = Db::name('shop_order_goods')->alias('og')->join('shop_goods g','g.id=og.goodsid','left')->where($scondition)->field('og.id,og.goodsid,og.price as marketprice,g.title,g.thumb,g.status,og.total,g.credit,og.optionid,og.optionname as optiontitle,g.isverify,g.storeids,og.seckill,g.isfullback,og.seckill_taskid,og.prohibitrefund,g.cannotrefund,og.refundid,og.rstate,og.refundtime')->select();
+		$prohibitrefund = false;
 		foreach ($goods as &$val) {
+			if( $val["isfullback"] ) {
+				$fullbackgoods = Db::name('shop_fullback_goods')->where('goodsid = ' . $val['goodsid'])->find();
+				if( $val["optionid"] ) {
+					$option = Db::name('shop_goods_option')->where('id',$val['optionid'])->field('`day`,allfullbackprice,fullbackprice,allfullbackratio,fullbackratio,isfullback')->find();
+					$fullbackgoods["minallfullbackallprice"] = $option["allfullbackprice"];
+					$fullbackgoods["fullbackprice"] = $option["fullbackprice"];
+					$fullbackgoods["minallfullbackallratio"] = $option["allfullbackratio"];
+					$fullbackgoods["fullbackratio"] = $option["fullbackratio"];
+					$fullbackgoods["day"] = $option["day"];
+				}
+				$val["fullbackgoods"] = $fullbackgoods;
+				unset($fullbackgoods);
+				unset($option);
+			}
 			$canrefund = false;
 			if(empty($val['prohibitrefund']) && empty($val['cannotrefund'])) {
 				$canrefund = true;
+			} else {
+				$prohibitrefund = true;
 			}
 			$val['canrefund'] = $canrefund;
+		}
+		unset($val);
+		$goodsrefund = true;
+		if( !empty($goods) ) {
+			foreach( $goods as &$g ) {
+				$goodsid_array[] = $g["goodsid"];
+				if( !empty($g["optionid"]) ) {
+					$thumb = model("goods")->getOptionThumb($g["goodsid"], $g["optionid"]);
+					if( !empty($thumb) ) {
+						$g["thumb"] = $thumb;
+					}
+				}
+				if( !empty($g["cannotrefund"]) && $order["status"] == 2 ) {
+					$goodsrefund = false;
+				}
+			}
+			unset($g);
 		}
 		$goods = set_medias($goods,'thumb');
 		$address = array();
@@ -407,7 +334,7 @@ class Order extends Base
 		$merch = array();
 
 		if (0 < $merchid) {
-			$merch = Db::name('shop_store')->where('id',$merchid)->field('id,merchname,logo')->find();
+			$merch = Db::name('shop_merch')->where('id',$merchid)->field('id,merchname,logo')->find();
 		} else{
 			$merch = array('id'=>0,'merchname'=>$shopset['shop']['name'],'logo'=>$shopset['shop']['logo']);
 		}
@@ -415,11 +342,13 @@ class Order extends Base
 			$merch['logo'] = tomedia($merch['logo']);
 		}		
 
+		$stores = array();
 		$showverify = false;
 		$canverify = false;
 		$verifyinfo = false;
 		$canrefund = false;
-		$showverify = $order['dispatchtype'] || $order['isverify'];
+		$showverify = ($order['status'] == 1) && ($order['dispatchtype'] || $order['isverify']);
+		$vs = array();
 		if ($order['isverify']) {
 			$storeids = array();
 			foreach ($goods as $g ) {
@@ -427,19 +356,26 @@ class Order extends Base
 					$storeids = array_merge(explode(',', $g['storeids']), $storeids);
 				}
 			}
-			if (empty($storeids)) {
-				if (0 < $merchid) {
-					$stores = array();
+			if( empty($storeids) ) {
+				if( 0 < $merchid ) {
+					$total = Db::name('shop_store')->where(' merchid=' . $merchid . ' and status=1 and type in(2,3) ')->count();
+					$stores = Db::name('shop_store')->where(' merchid=' . $merchid . ' and status=1 and type in(2,3) ')->limit(1)->select();
 				} else {
-					$stores = array();
+					$total = Db::name('shop_store')->where(' status=1 and type in(2,3)')->count();
+					$stores = Db::name('shop_store')->where(' status=1 and type in(2,3)')->limit(1)->select();
 				}
-			} else if (0 < $merchid) {
-				$stores = array();
 			} else {
-				$stores = array();
+				if( 0 < $merchid ) {
+					$total = Db::name('shop_store')->where("id in (" . implode(",", $storeids) . ") and merchid=" . $merchid . " and status=1 and type in(2,3)")->count();
+					$stores = Db::name('shop_store')->where("id in (" . implode(",", $storeids) . ") and merchid=" . $merchid . " and status=1 and type in(2,3)")->limit(1)->select();
+				} else {
+					$total = Db::name('shop_store')->where("id in (" . implode(",", $storeids) . ") and status=1 and type in(2,3)")->count();
+					$stores = Db::name('shop_store')->where("id in (" . implode(",", $storeids) . ") and status=1 and type in(2,3)")->limit(1)->select();
+				}
 			}
-
-			if (($order['verifytype'] == 0) || ($order['verifytype'] == 1)) {
+			$stores = set_medias($stores,'logo');
+			$stores = array('list'=>$stores,'total'=>$total);
+			if (($order['verifytype'] == 0) || ($order['verifytype'] == 1) || ($order['verifytype'] == 3)) {
 				$vs = iunserializer($order['verifyinfo']);
 				$verifyinfo = array( array('verifycode' => $order['verifycode'], 'verified' => ($order['verifytype'] == 0 ? $order['verified'] : $goods[0]['total'] <= count($vs))) );
 				if ($order['verifytype'] == 0) {
@@ -459,10 +395,13 @@ class Order extends Base
 			}
 		} else if (!empty($order['dispatchtype'])) {
 			$verifyinfo = array( array('verifycode' => $order['verifycode'], 'verified' => $order['status'] == 3) );
-			$canverify = ($order['status'] == 1) && $showverify;
 		}
+		$canverify = ($order['status'] == 1) && $showverify;
+		$order['vs'] = $vs;
 		$order['canverify'] = $canverify;
 		$order['showverify'] = $showverify;
+		$order['carrier'] = iunserializer($order['carrier']);
+		$order['verifyinfo'] = $verifyinfo;
 		$order['virtual_str'] = str_replace("\n", '<br/>', $order['virtual_str']);
 		if (($order['status'] == 1) || ($order['status'] == 2)) {
 			$canrefund = true;
@@ -471,6 +410,11 @@ class Order extends Base
 					$canrefund = true;
 				} else {
 					$canrefund = false;
+					if( !$goodsrefund ) {
+						$canreturn = false;
+					} else {
+						$canreturn = true;
+					}
 				}
 			}
 		} else if ($order['status'] == 3) {
@@ -489,33 +433,55 @@ class Order extends Base
 				}
 			}
 		}
+		if( $prohibitrefund ) {
+			$canrefund = false;
+		}
+		if( !$goodsrefund && $canrefund ) {
+			$canrefund = false;
+		}
+		$haveverifygoodlog = model("order")->checkhaveverifygoodlog($orderid);
+		if( $haveverifygoodlog ) {
+			$canrefund = false;
+		}
 		$order['canrefund'] = $canrefund;
 		$order['goods'] = $goods;
 		$order['address'] = $address ? $address : (object)null;
 		
 		$closeorder = $shopset['trade']['closeorder'] ? intval($shopset['trade']['closeorder']) * 3600 * 24 : intval(7 * 3600 * 24);
 		switch ($order['status']) {
-			case '-1': $statusstr = '买家已取消';$status = 10;
+			case '-1': $statusstr = '已取消';$status = 10;
 			break;
 
 			case '0': if ($order['paytype'] == 3) {
-				$statusstr = '等待卖家发货';$status = 21;
+				$statusstr = '待发货';$status = 21;
 			} else {
 				if((time() - $order['createtime']) > $closeorder) {
 					$statusstr = '支付超时';$status = 22;
 				} else {
-					$statusstr = '等待买家付款';$status = 21;
+					$statusstr = '待付款';$status = 21;
 				}					
 			}
 
 			break;
 
 			case '1': if ($order['isverify'] == 1) {
-				$statusstr = '正在使用中';$status = 30;
-			} else if (empty($order['addressid'])) {
-				$statusstr = '待取货';$status = 30;
+				$statusstr = '使用中';$status = 30;
+				if( 0 < $order["verifyendtime"] && $order["verifyendtime"] < time() ) {
+					$statusstr = '已过期';$status = 31;
+				}
 			} else {
-				$statusstr = '等待卖家发货';$status = 30;
+				if( empty($order["addressid"]) ) {
+					if( !empty($order["ccard"]) ) {
+						$statusstr = '充值中';$status = 30;
+					} else {
+						$statusstr = '待取货';$status = 30;
+					}
+				} else {
+					$statusstr = '等待卖家发货';$status = 30;
+					if( 0 < $order["sendtype"] ) {
+						$statusstr = '部分发货';$status = 30;
+					}
+				}
 			}
 
 			break;
@@ -524,10 +490,10 @@ class Order extends Base
 			break;
 			case '3': if (empty($order['iscomment']) || $order['iscomment'] == 1) {
 				if ($show_status == 5) {
-					$statusstr = '交易完成';$status = 52;
+					$statusstr = '已完成';$status = 52;
 				} else {
 					if(time() - $order['finishtime'] > 2592000) {
-						$statusstr = ((empty($shopset['trade']['closecomment']) ? '评价已关闭' : '交易完成'));$status = ((empty($shopset['trade']['closecomment']) ? 52 : 51));
+						$statusstr = ((empty($shopset['trade']['closecomment']) ? '评价已关闭' : '已完成'));$status = ((empty($shopset['trade']['closecomment']) ? 52 : 51));
 					} else {
 						$statusstr = ((empty($shopset['trade']['closecomment']) ? '待评价' : '评价已关闭'));$status = ((empty($shopset['trade']['closecomment']) ? 50 : 51));
 					}
@@ -537,146 +503,6 @@ class Order extends Base
 			}
 			break;
 		}
-
-		// if ((0 < $order['refundstate'])) {
-		// 	$refund = Db::name('shop_order_refund')->where('id',$order['refundid'])->where('orderid',$order['id'])->find();
-		// 	if (!empty($refund)) {
-  //               if($refund['status'] == -2) {
-  //               	$statusstr = '客户取消' . $r_type[$refund['rtype']];
-  //               	switch ($refund['rtype']) {
-  //               		case '0':
-  //               			$status = 72;
-  //               			break;
-                		
-  //               		case '1':
-  //               			$status = 82;
-  //               			break;
-                		
-  //               		case '2':
-  //               			$status = 92;
-  //               			break;
-                		
-  //               		default:
-  //               			$status = 72;
-  //               			break;
-  //               	}
-  //               } elseif ($refund['status'] == -1) {
-  //               	$statusstr = '已拒绝' . $r_type[$refund['rtype']];
-  //               	switch ($refund['rtype']) {
-  //               		case '0':
-  //               			$status = 71;
-  //               			break;
-                		
-  //               		case '1':
-  //               			$status = 81;
-  //               			break;
-                		
-  //               		case '2':
-  //               			$status = 91;
-  //               			break;
-                		
-  //               		default:
-  //               			$status = 71;
-  //               			break;
-  //               	}
-  //               } elseif ($refund['status'] == 0) {
-  //               	$statusstr = '等待商家处理申请';
-  //               	switch ($refund['rtype']) {
-  //               		case '0':
-  //               			$status = 70;
-  //               			break;
-                		
-  //               		case '1':
-  //               			$status = 80;
-  //               			break;
-                		
-  //               		case '2':
-  //               			$status = 90;
-  //               			break;
-                		
-  //               		default:
-  //               			$status = 70;
-  //               			break;
-  //               	}
-  //               } elseif ($refund['status'] == 1) {
-  //               	$statusstr = $r_type[$refund['rtype']] . '完成';
-  //               	switch ($refund['rtype']) {
-  //               		case '0':
-  //               			$status = 76;
-  //               			break;
-                		
-  //               		case '1':
-  //               			$status = 86;
-  //               			break;
-                		
-  //               		case '2':
-  //               			$status = 96;
-  //               			break;
-                		
-  //               		default:
-  //               			$status = 76;
-  //               			break;
-  //               	}
-  //               } elseif ($refund['status'] == 3) {
-  //               	$statusstr = '等待客户退回物品';
-  //               	switch ($refund['rtype']) {
-  //               		case '0':
-  //               			$status = 73;
-  //               			break;
-                		
-  //               		case '1':
-  //               			$status = 83;
-  //               			break;
-                		
-  //               		case '2':
-  //               			$status = 93;
-  //               			break;
-                		
-  //               		default:
-  //               			$status = 73;
-  //               			break;
-  //               	}
-  //               } elseif ($refund['status'] == 4) {
-  //               	$statusstr = '等待商家重新发货';
-  //               	switch ($refund['rtype']) {
-  //               		case '0':
-  //               			$status = 74;
-  //               			break;
-                		
-  //               		case '1':
-  //               			$status = 84;
-  //               			break;
-                		
-  //               		case '2':
-  //               			$status = 94;
-  //               			break;
-                		
-  //               		default:
-  //               			$status = 74;
-  //               			break;
-  //               	}
-  //               } elseif ($refund['status'] == 5) {
-  //               	$statusstr = '等待客户收货';
-  //               	switch ($refund['rtype']) {
-  //               		case '0':
-  //               			$status = 75;
-  //               			break;
-                		
-  //               		case '1':
-  //               			$status = 85;
-  //               			break;
-                		
-  //               		case '2':
-  //               			$status = 95;
-  //               			break;
-                		
-  //               		default:
-  //               			$status = 75;
-  //               			break;
-  //               	}
-  //               }					
-		// 	}
-		// }
 
 		$order['statusstr'] = $statusstr;
 		$order['status'] = $status;
@@ -688,23 +514,49 @@ class Order extends Base
         if(!empty($order['dispatchprice'])) {
         	$orderprice = array_merge($orderprice,array(array('name'=>'运费','value'=>$order['dispatchprice'])));
         }
-        $orderprice = array_merge($orderprice,array(array('name'=>'订单总价','value'=>$order['price'])));
-        
+        $orderprice = array_merge($orderprice,array(array('name'=>'订单总价','value'=>$order['price'])));        
         $order['orderprice'] = $orderprice;
 
 		$expresses = array();
+		$order_goods = array();
 		if ((2 <= $order['status']) && empty($order['isvirtual']) && empty($order['isverify'])) {
 			$expresslist = model('util')->getExpressList($order['express'], $order['expresssn']);
 			if (0 < count($expresslist['list'])) {
 				$expresses = $expresslist['list'][0];
 			}
 		}
+		if( 0 < $order["sendtype"] && 1 <= $order["status"] ) {
+			$order_goods = Db::name('shop_order_goods')->where('orderid = ' . $orderid . ' and sendtype > 0')->group('sendtype')->order('sendtime','asc')->field('orderid,goodsid,sendtype,expresscom,expresssn,express,sendtime')->select();
+			$expresslist = model("util")->getExpressList($order["express"], $order["expresssn"]);
+			if( 0 < count($expresslist) ) {
+				$expresses = $expresslist[0];
+			}
+			$order["sendtime"] = $order_goods[0]["sendtime"];
+		}
 		$order['expresses'] = $expresses;
+		if( $order["canverify"] && $order["status"] != -1 && $order["status"] != 0 ) {
+			$verifycode = $order["verifycode"];
+			if( strlen($verifycode) == 8 ) {
+				$verifycode = substr($verifycode, 0, 4) . " " . substr($verifycode, 4, 4);
+			} else {
+				if( strlen($verifycode) == 9 ) {
+					$verifycode = substr($verifycode, 0, 3) . " " . substr($verifycode, 3, 3) . " " . substr($verifycode, 6, 3);
+				}
+			}
+		}
+		$order["verifycode"] = $verifycode;
+		if( !empty($order["virtual"]) && !empty($order["virtual_str"]) ) {
+			$ordervirtual = model("order")->getOrderVirtual($order);
+			$virtualtemp = Db::name('shop_virtual_type')->where('id',$order["virtual"])->field('linktext, linkurl')->find();
+		}
 		$log = array();
         if($order['status'] > 21) {
-            $log[] = array('type' => 21, 'time' => $order['createtime'], 'remark' => '订单提交成功,等待付款');
             if(!empty($order['paytime']) && $order['status'] >= 30) {
-                $log[] = array('type' => 30, 'time' => $order['paytime'], 'remark' => '买家付款成功，等待发货');
+            	if($order['canverify']) {
+            		$log[] = array('type' => 30, 'time' => $order['paytime'], 'remark' => '买家付款成功，等待核销');
+            	} else {
+            		$log[] = array('type' => 30, 'time' => $order['paytime'], 'remark' => '买家付款成功，等待发货(取货)');
+            	}
             }
             if(!empty($order['sendtime']) && $order['status'] >= 40) {
                 $log[] = array('type' => 40, 'time' => $order['sendtime'], 'remark' => '卖家已发货，待收货', 'expres' => array('expressname'=>$order['expresscom'],'express'=>$order['express'],'expresssn'=>$order['expresssn']));
@@ -712,6 +564,7 @@ class Order extends Base
             if(!empty($order['finishtime']) && $order['status'] >= 50) {
                 $log[] = array('type' => 50, 'time' => $order['finishtime'], 'remark' => '订单已签收，状态：交易成功');
             }
+            $log[] = array('type' => 21, 'time' => $order['createtime'], 'remark' => '订单提交成功,等待付款');
         } elseif($order['status'] == 21) {
             $log[0] = array('type' => 21, 'time' => $order['createtime'], 'remark' => '待付款');
         } elseif($order['status'] == 10) {
@@ -722,9 +575,55 @@ class Order extends Base
             $log[] = array('type' => $order['status'], 'time' => $order['refundtime'], 'remark' => $statusstr);
         }
         $order['log'] = $log;
+		$order['verifystores'] = $stores;
 		$merch['order'] = $order;
 		$this->result(1,'success',$merch);
 	}
+
+	/**
+	 * 订单核销适用门店
+	 * @param $orderid [订单id]
+	 * @return  [array]    $list  [门店列表]
+	 **/
+	public function stores()
+	{
+		$goodsid = intval(input('goodsid'));
+		$page = input('page/d',1);
+		$pagesize = input('pagesize/d',10);
+		if (empty($goodsid)) {
+			$this->result(0,'商品不存在');
+		}
+		$mid = $this->getMemberId();
+		$goods = Db::name('shop_goods')->where('id = ' . $goodsid)->field('isverify,storeids')->find();		
+
+		if (empty($goods)) {
+			$this->result(0,'订单不存在');
+		}
+		$storeids = array();
+
+		if ($goods['isverify'] == 2) {
+			if (!empty($goods['storeids'])) {
+				$storeids = array_merge(explode(',', $goods['storeids']), $storeids);
+			}
+			if( empty($storeids) ) {
+				if( 0 < $merchid ) {
+					$stores = Db::name('shop_store')->where(' merchid=' . $merchid . ' and status=1 and type in(2,3) ')->page($page,$pagesize)->select();
+				} else {
+					$stores = Db::name('shop_store')->where(' status=1 and type in(2,3)')->page($page,$pagesize)->select();
+				}
+			} else {
+				if( 0 < $merchid ) {
+					$stores = Db::name('shop_store')->where("id in (" . implode(",", $storeids) . ") and merchid=" . $merchid . " and status=1 and type in(2,3)")->page($page,$pagesize)->select();
+				} else {
+					$stores = Db::name('shop_store')->where("id in (" . implode(",", $storeids) . ") and status=1 and type in(2,3)")->page($page,$pagesize)->select();
+				}
+			}
+		}
+		
+		$stores = set_medias($stores,'logo');
+		$this->result(1,'success',array('list'=>$stores,'page'=>$page,'pagesize'=>$pagesize));
+	}
+
 
 	/**
 	 * 订单信息确认
@@ -740,7 +639,7 @@ class Order extends Base
 		$total = input('total/d',1);
 		$giftid = input('giftid/d');
 		$giftGood = array();
-		$packageid = input('packageid/d');
+		$packageid = intval(input('packageid'));
 		$trade = model('common')->getSysset('trade');
 		$shopset = $this->shopset;
 		$shop = $shopset['shop'];
@@ -800,10 +699,8 @@ class Order extends Base
 				$goods = Db::name('shop_member_cart')->alias('c')
 					->join('shop_goods g','c.goodsid = g.id','left')
 					->join('shop_goods_option og','c.optionid = og.id','left')
-					->where('c.mid',$mid)
-					->where('c.selected',1)
-					->where('c.deleted',0)
-					->field('c.goodsid,c.total,g.maxbuy,g.type,g.intervalfloor,g.intervalprice,g.issendfree,g.isnodiscount,g.ispresell,g.presellprice as gpprice,ifnull(og.presellprice,0) as presellprice,g.preselltimeend,g.presellsendstatrttime,g.presellsendtime,g.presellsendtype,g.weight,og.weight as optionweight,g.title,g.thumb,ifnull(og.marketprice, g.marketprice) as marketprice,ifnull(og.title,"") as optiontitle,c.optionid,g.storeids,g.isverify,g.deduct,g.manydeduct,g.virtual,og.virtual as optionvirtual,discounts,g.deduct2,g.ednum,g.edmoney,g.edareas,g.diyformtype,g.diyformid,diymode,g.dispatchtype,g.dispatchid,g.dispatchprice,g.minbuy,g.isdiscount,g.isdiscount_time,g.isdiscount_discounts,g.cates,g.virtualsend,invoice,ifnull(og.specs,""),g.merchid,g.checked,g.merchsale,g.buyagain,g.buyagain_islong,g.buyagain_condition, g.buyagain_sale, g.hasoption')
+					->where('c.mid = ' . $mid . ' and c.selected = 1 and c.deleted = 0')
+					->field('c.goodsid,c.total,g.maxbuy,g.type,g.intervalfloor,g.intervalprice,g.issendfree,g.isnodiscount,g.ispresell,g.presellprice as gpprice,ifnull(og.presellprice,0) as presellprice,g.preselltimeend,g.presellsendstatrttime,g.presellsendtime,g.presellsendtype,g.weight,og.weight as optionweight,g.title,g.thumb,ifnull(og.marketprice, g.marketprice) as marketprice,ifnull(og.title,"") as optiontitle,c.optionid,g.storeids,g.isverify,g.deduct,g.manydeduct,g.virtual,og.virtual as optionvirtual,discounts,g.deduct2,g.ednum,g.edmoney,g.edareas,g.dispatchtype,g.dispatchid,g.dispatchprice,g.minbuy,g.isdiscount,g.isdiscount_time,g.isdiscount_discounts,g.cates,g.virtualsend,invoice,ifnull(og.specs,""),g.merchid,g.checked,g.merchsale,g.buyagain,g.buyagain_islong,g.buyagain_condition, g.buyagain_sale, g.hasoption')
 					->order('c.id','desc')
 					->select();
 				if (empty($goods)) {
@@ -862,8 +759,7 @@ class Order extends Base
 							if (0 < $v['merchid']) {
 								$this->result(0,'多商户未开启');
 							}
-						}
-						else if ((0 < $v['merchid']) && ($v['checked'] == 1)) {
+						} else if ((0 < $v['merchid']) && ($v['checked'] == 1)) {
 							$this->result(0,'商品' . $v['title'] . '不能购买');
 						}
 
@@ -884,9 +780,9 @@ class Order extends Base
 				}
 				$fromcart = 1;
 			} else if(!(empty($goodsid)) && !(empty($iswholesale))) {
-				$data = Db::name('shop_goods')->where('id',$goodsid)->field('id as goodsid,type,title,weight,issendfree,isnodiscount,ispresell,presellprice,thumb,marketprice,storeids,isverify,deduct,hasoption,preselltimeend,presellsendstatrttime,presellsendtime,presellsendtype,manydeduct,`virtual`,maxbuy,usermaxbuy,discounts,total as stock,deduct2,showlevels,ednum,edmoney,edareas,edareas_code,unite_total,diyformtype,diyformid,diymode,dispatchtype,dispatchid,dispatchprice,cates,minbuy,isdiscount,isdiscount_time,isdiscount_discounts,virtualsend,invoice,needfollow,followtip,followurl,merchid,checked,merchsale,buyagain,buyagain_islong,buyagain_condition, buyagain_sale ,intervalprice ,intervalfloor')->find();
+				$data = Db::name('shop_goods')->where('id',$goodsid)->field('id as goodsid,type,title,weight,issendfree,isnodiscount,ispresell,presellprice,thumb,marketprice,storeids,isverify,deduct,hasoption,preselltimeend,presellsendstatrttime,presellsendtime,presellsendtype,manydeduct,`virtual`,maxbuy,usermaxbuy,discounts,total as stock,deduct2,showlevels,ednum,edmoney,edareas,edareas_code,unite_total,dispatchtype,dispatchid,dispatchprice,cates,minbuy,isdiscount,isdiscount_time,isdiscount_discounts,virtualsend,invoice,needfollow,followtip,followurl,merchid,checked,merchsale,buyagain,buyagain_islong,buyagain_condition, buyagain_sale ,intervalprice ,intervalfloor')->find();
 				if (empty($data) || ($data['type'] != 4)) {
-					$this->result(0,'商品信息错误!');
+					$this->result(0,'商品信息错误!!');
 				}
 				$intervalprice = iunserializer($data['intervalprice']);
 
@@ -947,8 +843,7 @@ class Order extends Base
 									$data['thumb'] = $thumb;
 								}
 							}
-						}
-						 else if (!(empty($data['hasoption']))) {
+						} else if (!(empty($data['hasoption']))) {
 							$this->result(0,'商品' . $data['title'] . '的规格不存在,请重新选择规格!');
 						}
 					}
@@ -962,15 +857,14 @@ class Order extends Base
 					}
 
 				}
-			}
-			else {
-				$data = Db::name('shop_goods')->where('id',$goodsid)->field('id as goodsid,type,title,weight,issendfree,isnodiscount,ispresell,presellprice,thumb,marketprice,liveprice,islive,storeids,isverify,deduct,hasoption,preselltimeend,presellsendstatrttime,presellsendtime,presellsendtype,manydeduct,`virtual`,maxbuy,usermaxbuy,discounts,total as stock,deduct2,showlevels,ednum,edmoney,edareas,edareas_code,unite_total,diyformtype,diyformid,diymode,dispatchtype,dispatchid,dispatchprice,cates,minbuy,isdiscount,isdiscount_time,isdiscount_discounts,isfullback,virtualsend,invoice,needfollow,followtip,followurl,merchid,checked,merchsale,buyagain,buyagain_islong,buyagain_condition, buyagain_sale,threen')->find();
+			} else {
+				$data = Db::name('shop_goods')->where('id',$goodsid)->field('id as goodsid,type,title,weight,issendfree,isnodiscount,ispresell,presellprice,thumb,marketprice,liveprice,islive,storeids,isverify,deduct,hasoption,preselltimeend,presellsendstatrttime,presellsendtime,presellsendtype,manydeduct,`virtual`,maxbuy,usermaxbuy,discounts,total as stock,deduct2,showlevels,ednum,edmoney,edareas,edareas_code,unite_total,dispatchtype,dispatchid,dispatchprice,cates,minbuy,isdiscount,isdiscount_time,isdiscount_discounts,isfullback,virtualsend,invoice,needfollow,followtip,followurl,merchid,checked,merchsale,buyagain,buyagain_islong,buyagain_condition, buyagain_sale,threen')->find();
 				if ((0 < $data['ispresell']) && (($data['preselltimeend'] == 0) || (time() < $data['preselltimeend']))) {
 					$data['marketprice'] = $data['presellprice'];
 				}
 
 				if ($data['type'] == 4) {
-					$this->result(0,'商品信息错误!');
+					$this->result(0,'暂不支持批发商品!');
 				}
 				if ($giftid) {
 					$gift = Db::name('shop_gift')->where('id',$giftid)->where('status',1)->where('starttime','<=',time())->where('endtime','>=',time())->find();
@@ -980,7 +874,6 @@ class Order extends Base
 					}
 
 					$giftGood = array();
-
 					if (!(empty($gift['giftgoodsid']))) {
 						$giftGoodsid = explode(',', $gift['giftgoodsid']);
 
@@ -988,7 +881,6 @@ class Order extends Base
 							foreach ($giftGoodsid as $key => $value ) {
 								$giftGood[$key] = Db::name('shop_goods')->where('total','>',0)->where('status',2)->where('id',$value)->where('deleted',0)->find();
 							}
-
 							$giftGood = array_filter($giftGood);
 						}
 					}
@@ -1004,8 +896,11 @@ class Order extends Base
 					$fullbackgoods = Db::name('shop_fullback_goods')->where('goodsid',$data['goodsid'])->find();
 				}
 
-				if (empty($data) || (!(empty($data['showlevels'])) && !(strexists($data['showlevels'], $member['level']))) || ((0 < $data['merchid']) && ($data['checked'] == 1)) || (($is_openmerch == 0) && (0 < $data['merchid']))) {
+				if (empty($data) || ((0 < $data['merchid']) && ($data['checked'] == 1)) || (($is_openmerch == 0) && (0 < $data['merchid']))) {
 					$this->result(0,'商品信息错误!');
+				}
+				if (!(empty($data['showlevels'])) && !(strexists($data['showlevels'], $member['level']))) {
+					$this->result(0,'您沒有购买权限!');
 				}
 
 				if ((0 < $data['minbuy']) && ($total < $data['minbuy'])) {
@@ -1014,8 +909,7 @@ class Order extends Base
 
 				$data['total'] = $total;
 				$data['optionid'] = $optionid;
-				if(!empty($data['hasoption']) && empty($optionid))
-				{
+				if(!empty($data['hasoption']) && empty($optionid)) {
 					$this->result(0,'请选择商品规格!');
 				}
 				if (!(empty($optionid))) {
@@ -1047,15 +941,13 @@ class Order extends Base
 						if (!(empty($option['weight']))) {
 							$data['weight'] = $option['weight'];
 						}
-					}
-					else if (!(empty($data['hasoption']))) {
+					} else if (!(empty($data['hasoption']))) {
 						$this->result(0,'商品' . $data['title'] . '的规格不存在,请重新选择规格!');
 					}
 				}
 				if ($giftid) {
 					$changenum = false;
-				}
-				 else {
+				} else {
 					$changenum = true;
 				}
 
@@ -1066,8 +958,7 @@ class Order extends Base
 				$goods[] = $data;
 			}
 
-			if(empty($goods))
-			{
+			if(empty($goods)) {
 				$this->result(0,'操作失败请重试！');
 			}
 
@@ -1112,8 +1003,7 @@ class Order extends Base
 					}
 
 					$g['totalmaxbuy'] = $g['total'];
-				}
-				else {
+				} else {
 					if (0 < $g['maxbuy']) {
 						if ($totalmaxbuy != -1) {
 							if ($g['maxbuy'] < $totalmaxbuy) {
@@ -1126,7 +1016,7 @@ class Order extends Base
 					}
 
 					if (0 < $g['usermaxbuy']) {
-						$order_goodscount = Db::name('shop_order_goods')->alias('og')->join('shop_order o','og.orderid=og.id','left')->where('og.goodsid',$g['goodsid'])->where('og.status','>=',0)->where('og.mid',$mid)->sum('og.total');
+						$order_goodscount = Db::name('shop_order_goods')->alias('og')->join('shop_order o','og.orderid=og.id','left')->where('og.goodsid',$g['goodsid'])->where('o.status','>=',0)->where('og.mid',$mid)->sum('og.total');
 						$last = $data['usermaxbuy'] - $order_goodscount;
 
 						if ($last <= 0) {
@@ -1180,8 +1070,8 @@ class Order extends Base
 				foreach ($merch_array as $key => $value ) {
 					if (0 < $key) {
 						$merch_id = $key;
-						$merch_array[$key]['set'] = model('store')->getSet('sale', $key);
-						$merch_array[$key]['enoughs'] = model('store')->getEnoughs($merch_array[$key]['set']);
+						$merch_array[$key]['set'] = model('merch')->getSet('sale', $key);
+						$merch_array[$key]['enoughs'] = model('merch')->getEnoughs($merch_array[$key]['set']);
 					}
 				}
 			}
@@ -1196,6 +1086,7 @@ class Order extends Base
 			$discountprice = 0;
 			$isdiscountprice = 0;
 			$deductprice2 = 0;
+			$stores = array();
 			$address = false;
 			$needaddress = false;
 			$dispatch_list = false;
@@ -1220,8 +1111,7 @@ class Order extends Base
 					$gprice = $g['ggprice'] = $g['seckillinfo']['price'] * $g['total'];
 					$seckill_payprice += $g['seckillinfo']['price'] * $g['total'];
 					$seckill_price += ($g['marketprice'] * $g['total']) - $gprice;
-				}
-				else {
+				} else {
 					$gprice = $g['marketprice'] * $g['total'];
 					$prices = model('order')->getGoodsDiscountPrice($g, $level);
 					$g['ggprice'] = $prices['price'];
@@ -1236,8 +1126,7 @@ class Order extends Base
 
 				$g['dflag'] = intval($g['ggprice'] < $gprice);
 				if (($g['seckillinfo'] && ($g['seckillinfo']['status'] == 0)) || $_SESSION['taskcut']) {
-				}
-				else if (empty($bargain_id)) {
+				} else if (empty($bargain_id)) {
 					$taskdiscountprice += $prices['taskdiscountprice'];
 					$lotterydiscountprice += $prices['lotterydiscountprice'];
 					$g['taskdiscountprice'] = $prices['taskdiscountprice'];
@@ -1262,54 +1151,83 @@ class Order extends Base
 				if ($g['ggprice'] < $gprice) {
 					$goodsprice += $gprice;
 					$g['realprice'] = $gprice;
-				}
-				else {
+				} else {
 					$goodsprice += $g['ggprice'];
 					$g['realprice'] = $g['ggprice'];
 				}
 				$total += $g['total'];
 				$weight += $g['weight'];
 
-				if(($g['type'] == 1 || $g['type'] == 4) && !$address)
-				{
+				if(($g['type'] == 1 || $g['type'] == 4) && !$address && $g['isverify'] != 2) {
 					$needaddress = true;
 				}
 
 				if (empty($bargain_id)) {
-					if ($g['seckillinfo'] && ($g['seckillinfo']['status'] == 0)) {
-						$g['deduct'] = 0;
-					}
-					 else if ((0 < floatval($g['buyagain'])) && empty($g['buyagain_sale'])) {
+					if ((0 < floatval($g['buyagain'])) && empty($g['buyagain_sale'])) {
 						if (model('goods')->canBuyAgain($g)) {
 							$g['deduct'] = 0;
 						}
 					}
-
-					if ($g['seckillinfo'] && ($g['seckillinfo']['status'] == 0)) {
+					if ($g['manydeduct']) {
+						$deductprice += $g['deduct'] * $g['total'];
+					} else {
+						$deductprice += $g['deduct'];
 					}
-					else {
-						if ($g['manydeduct']) {
-							$deductprice += $g['deduct'] * $g['total'];
-						}
-						else {
-							$deductprice += $g['deduct'];
-						}
 
-						if ($g['deduct2'] == 0) {
+					if ($g['deduct2'] == 0) {
+						$deductprice2 += $g['ggprice'];
+					} else if (0 < $g['deduct2']) {
+						if ($g['ggprice'] < $g['deduct2']) {
 							$deductprice2 += $g['ggprice'];
-						}
-						 else if (0 < $g['deduct2']) {
-							if ($g['ggprice'] < $g['deduct2']) {
-								$deductprice2 += $g['ggprice'];
-							}
-							 else {
-								$deductprice2 += $g['deduct2'];
-							}
+						} else {
+							$deductprice2 += $g['deduct2'];
 						}
 					}
 				}
 			}
 			unset($g);
+			if ($isverify) {
+				$storeids = array();
+				$merchid = 0;
+				foreach ($goods as $g ) {
+					$merchid = $g['merchid'];
+					if (!(empty($g['storeids']))) {
+						$storeids = array_merge(explode(',', $g['storeids']), $storeids);
+					}
+				}
+				$page = 1;$pagesize = 1;
+				if( empty($storeids) ) {
+					if( 0 < $merchid ) {
+						$total = Db::name('shop_store')->where(' merchid=' . $merchid . ' and status=1 and type in(2,3) ')->count();
+						$stores = Db::name('shop_store')->where(' merchid=' . $merchid . ' and status=1 and type in(2,3) ')->limit(1)->select();
+					} else {
+						$total = Db::name('shop_store')->where(' status=1 and type in(2,3)')->count();
+						$stores = Db::name('shop_store')->where(' status=1 and type in(2,3)')->limit(1)->select();
+					}
+				} else {
+					if( 0 < $merchid ) {
+						$total = Db::name('shop_store')->where("id in (" . implode(",", $storeids) . ") and merchid=" . $merchid . " and status=1 and type in(2,3)")->count();
+						$stores = Db::name('shop_store')->where("id in (" . implode(",", $storeids) . ") and merchid=" . $merchid . " and status=1 and type in(2,3)")->limit(1)->select();
+					} else {
+						$total = Db::name('shop_store')->where("id in (" . implode(",", $storeids) . ") and status=1 and type in(2,3)")->count();
+						$stores = Db::name('shop_store')->where("id in (" . implode(",", $storeids) . ") and status=1 and type in(2,3)")->limit(1)->select();
+					}
+				}
+				$stores = set_medias($stores,'logo');
+				$stores = array('list'=>$stores,'total'=>$total);
+			} else {
+				$address = Db::name('shop_member_address')->where('mid = ' . $mid . ' and deleted = 0 and isdefault = 1 ')->find();
+
+				if (!(empty($carrier_list))) {
+					$carrier = $carrier_list[0];
+				}
+
+				if (!($isvirtual) && !($isonlyverifygoods)) {
+					$dispatch_array = model('order')->getOrderDispatchPrice($goods, $member, $address, $saleset, $merch_array, 0);
+					$dispatch_price = $dispatch_array['dispatch_price'] - $dispatch_array['seckill_dispatch_price'];
+					$seckill_dispatchprice = $dispatch_array['seckill_dispatch_price'];
+				}
+			}
 		} else {
 			$g = input('goods');
 			$g = json_decode(htmlspecialchars_decode($g, ENT_QUOTES), true);
@@ -1367,7 +1285,7 @@ class Order extends Base
 				$goodsprice += $value['marketprice'];
 			}
 
-			$createInfo = array('id' => 0, 'gdid' => input('gdid/d'), 'fromcart' => 0, 'packageid' => $packageid, 'addressid' => $address['id'], 'storeid' => 0, 'couponcount' => 0, 'isvirtual' => 0, 'isverify' => 0, 'isonlyverifygoods' => 0, 'goods' => $goods, 'merchs' => 0, 'orderdiyformid' => 0, 'mustbind' => 0, 'fromquick' => intval($quickid));
+			$createInfo = array('id' => 0, 'gdid' => input('gdid/d'), 'fromcart' => 0, 'packageid' => $packageid, 'addressid' => $address['id'], 'storeid' => 0, 'couponcount' => 0, 'isvirtual' => 0, 'isverify' => 0, 'isonlyverifygoods' => 0, 'goods' => $goods, 'merchs' => 0, 'mustbind' => 0, 'fromquick' => intval($quickid));
 			$this->result('1','success',$createInfo);
 		}		
 
@@ -1397,8 +1315,7 @@ class Order extends Base
 				if (empty($k)) {
 					$arr = array('id'=>0,'merchname'=>$shopset['shop']['name'],'logo'=>tomedia($shopset['shop']['logo']));
 					$dispatch_list = Db::name('shop_dispatch')->where('merchid',0)->where('isdefault',1)->where('enabled',1)->field('id,dispatchname')->order('isdefault','desc')->find();
-				}
-				else {
+				} else {
 					$arr = Db::name('shop_store')->where('id',$k)->field('id,logo,merchname')->find();
 					$arr['logo'] = tomedia($arr['logo']);
 					$dispatch_list = Db::name('shop_dispatch')->where('merchid',$merch_user[$k]['id'])->where('isdefault',1)->where('enabled',1)->field('id,dispatchname')->order('isdefault','desc')->find();
@@ -1436,9 +1353,8 @@ class Order extends Base
 				$goods_list[0]['logo'] = tomedia($shopset['shop']['logo']);
 				$goods_list[0]['merchname'] = $shopset['shop']['name'];
 				$dispatch_list = Db::name('shop_dispatch')->where('merchid',0)->where('isdefault',1)->where('enabled',1)->field('id,dispatchname')->order('isdefault','desc')->find();
-			}
-			else {
-				$merch_data = model('store')->getListUserOne($merchid);
+			} else {
+				$merch_data = model('merch')->getListUserOne($merchid);
 				$goods_list[0]['id'] = $merch_data['id'];
 				$goods_list[0]['logo'] = tomedia($merch_data['logo']);
 				$goods_list[0]['merchname'] = $merch_data['merchname'];
@@ -1472,681 +1388,7 @@ class Order extends Base
 		$address_list = Db::name('shop_member_address')->where('mid',$mid)->where('deleted',0)->where('isdefault',1)->field('zipcode,isdefault,deleted',true)->find();
 
 		$realprice = $realprice + $dispatch_price;
-		$this->result(1,'success',array('list'=>$goods_list,'total'=>$total,'weight'=>$weight,'realprice'=>$realprice,'goodsprice'=>$goodsprice,'deductprice'=>$deductprice,'taskdiscountprice'=>$taskdiscountprice,'lotterydiscountprice'=>$lotterydiscountprice,'discountprice'=>$discountprice,'isdiscountprice'=>$isdiscountprice,'deductprice2'=>$deductprice2,'needaddress'=>$needaddress,'address'=>$needaddress ? ($address_list ? $address_list : (object)null) : (object)null,'dispatch_price'=>$dispatch_price));
-	}
-
-	/**
-	 * 计算订单
-	 * @param $mid [会员id]
-	 * @param $statusstr [订单状态]
-	 * @return  [array]    $list  [订单列表]
-	 **/
-	public function caculate()
-	{
-		$open_redis = function_exists('redis') && !(is_error(redis()));
-		$mid = $this->getMemberId();
-		$merchdata = $this->merchData();
-		extract($merchdata);
-		$merch_array = array();
-		$allow_sale = true;
-		$realprice = 0;
-		$nowsendfree = false;
-		$isverify = false;
-		$isvirtual = false;
-		$taskdiscountprice = 0;
-		$lotterydiscountprice = 0;
-		$discountprice = 0;
-		$isdiscountprice = 0;
-		$deductprice = 0;
-		$deductprice2 = 0;
-		$deductcredit2 = 0;
-		$buyagain_sale = true;
-		$isonlyverifygoods = true;
-		$buyagainprice = 0;
-		$seckill_price = 0;
-		$seckill_payprice = 0;
-		$seckill_dispatchprice = 0;
-
-		$dispatchid = input('dispatchid/d',0);
-		$totalprice = input('totalprice/f');
-		$dflag = input('dflag');
-		$addressid = input('addressid/d',0);
-		$address = Db::name('shop_member_address')->where('id',$addressid)->where('mid',$mid)->find();
-		$member = model('member')->getMember($mid);
-		$level = model('member')->getLevel($mid);
-		$weight = input('weight/f');
-		$dispatch_price = 0;
-		$deductenough_money = 0;
-		$deductenough_enough = 0;
-		if (Request::instance()->has('goods')) {
-            $goods = $_POST['goods'];
-        }
-        
-        $goodsarr = json_decode($goods,true);
-
-		if (is_array($goodsarr)) {
-			$weight = 0;
-			$allgoods = array();
-
-			foreach ($goodsarr as &$g ) {
-				if (empty($g)) {
-					continue;
-				}
-
-				$goodsid = $g['goodsid'];
-				$optionid = $g['optionid'];
-				$goodstotal = $g['total'];
-
-				if ($goodstotal < 1) {
-					$goodstotal = 1;
-				}
-
-				if (empty($goodsid)) {
-					$nowsendfree = true;
-				}
-
-				$data = Db::name('shop_goods')->where('id',$goodsid)->field('id as goodsid,title,type, weight,total,issendfree,isnodiscount, thumb,marketprice,cash,isverify,goodssn,productsn,sales,istime,timestart,timeend,usermaxbuy,maxbuy,unit,buylevels,buygroups,deleted,status,deduct,ispresell,preselltimeend,manydeduct,`virtual`,discounts,deduct2,ednum,edmoney,edareas,edareas_code,diyformid,diyformtype,diymode,dispatchtype,dispatchid,dispatchprice,presellprice,sdiscount,isdiscount_time,isdiscount_discounts ,virtualsend,merchid,merchsale,buyagain,buyagain_islong,buyagain_condition, buyagain_sale,bargain,unite_total,islive,liveprice')->find();
-				
-				if ((0 < $data['ispresell']) && (($data['preselltimeend'] == 0) || (time() < $data['preselltimeend']))) {
-					$data['marketprice'] = $data['presellprice'];
-				}
-
-				if (empty($data)) {
-					$nowsendfree = true;
-				}
-
-				if ($data['status'] == 2) {
-					$data['marketprice'] = 0;
-				}
-
-
-				if ($data['seckillinfo'] && ($data['seckillinfo']['status'] == 0)) {
-					$data['is_task_goods'] = 0;
-				}
-				else {
-					$task_goods_data = model('goods')->getTaskGoods($mid, $goodsid, $rank, $log_id, $join_id, $optionid);
-
-					if (empty($task_goods_data['is_task_goods'])) {
-						$data['is_task_goods'] = 0;
-					}
-					 else {
-						$allow_sale = false;
-						$data['is_task_goods'] = $task_goods_data['is_task_goods'];
-						$data['is_task_goods_option'] = $task_goods_data['is_task_goods_option'];
-						$data['task_goods'] = $task_goods_data['task_goods'];
-					}
-				}
-
-				$data['stock'] = $data['total'];
-				$data['total'] = $goodstotal;
-
-				if (!(empty($optionid))) {
-					$option = Db::name('shop_goods_option')->where('id',$optionid)->where('goodsid',$goodsid)->field('id,title,marketprice,presellprice,goodssn,productsn,stock,`virtual`,weight,liveprice,islive')->find();
-
-					if (!(empty($option))) {
-						$data['optionid'] = $optionid;
-						$data['optiontitle'] = $option['title'];
-
-						$data['marketprice'] = (((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0)) ? $option['presellprice'] : $option['marketprice']));
-
-						if (empty($data['unite_total'])) {
-							$data['stock'] = $option['stock'];
-						}
-
-						if (!(empty($option['weight']))) {
-							$data['weight'] = $option['weight'];
-						}
-					}
-				}
-
-				if ($data['type'] == 4) {
-					$data['marketprice'] = $g['wholesaleprice'];
-					$data['wholesaleprice'] = $g['wholesaleprice'];
-				}
-
-				if ($data['seckillinfo'] && ($data['seckillinfo']['status'] == 0)) {
-					$data['ggprice'] = $data['seckillinfo']['price'] * $g['total'];
-					$seckill_payprice += $data['ggprice'];
-					$seckill_price += $data['marketprice'] * $g['total'];
-				}
-				else {
-					$prices = model('order')->getGoodsDiscountPrice($data, $level);
-					$data['ggprice'] = $prices['price'];
-				}
-
-				if ($is_openmerch == 1) {
-					$merchid = $data['merchid'];
-					$merch_array[$merchid]['goods'][] = $data['goodsid'];
-					$merch_array[$merchid]['ggprice'] += $data['ggprice'];
-				}
-
-				if ($data['isverify'] == 2) {
-					$isverify = true;
-				}
-
-				if (!(empty($data['virtual'])) || ($data['type'] == 2) || ($data['type'] == 3) || ($data['type'] == 20)) {
-					$isvirtual = true;
-				}
-
-				if ($data['seckillinfo'] && ($data['seckillinfo']['status'] == 0)) {
-					$g['taskdiscountprice'] = 0;
-					$g['lotterydiscountprice'] = 0;
-					$g['discountprice'] = 0;
-					$g['isdiscountprice'] = 0;
-					$g['discounttype'] = 0;
-				}
-				 else {
-					$g['taskdiscountprice'] = $prices['taskdiscountprice'];
-					$g['lotterydiscountprice'] = $prices['lotterydiscountprice'];
-					$g['discountprice'] = $prices['discountprice'];
-					$g['isdiscountprice'] = $prices['isdiscountprice'];
-					$g['discounttype'] = $prices['discounttype'];
-					$taskdiscountprice += $prices['taskdiscountprice'];
-					$lotterydiscountprice += $prices['lotterydiscountprice'];
-					$buyagainprice += $prices['buyagainprice'];
-				}
-
-				if (($data['seckillinfo'] && ($data['seckillinfo']['status'] == 0)) || $_SESSION['taskcut']) {
-				}
-				 else if ($prices['discounttype'] == 1) {
-					$isdiscountprice += $prices['isdiscountprice'];
-				}
-				 else if ($prices['discounttype'] == 2) {
-					$discountprice += $prices['discountprice'];
-				}
-
-				$realprice += $data['ggprice'];
-				$allgoods[] = $data;
-				if ($data['seckillinfo'] && ($data['seckillinfo']['status'] == 0)) {
-				}
-				 else if ((0 < floatval($g['buyagain'])) && empty($g['buyagain_sale'])) {
-					if (model('goods')->canBuyAgain($g)) {
-						$buyagain_sale = false;
-					}
-				}
-			}
-
-			unset($g);
-
-			if ($is_openmerch == 1) {
-				foreach ($merch_array as $key => $value ) {
-					if (0 < $key) {
-						$merch_array[$key]['set'] = model('store')->getSet('sale', $key);
-						$merch_array[$key]['enoughs'] = model('store')->getEnoughs($merch_array[$key]['set']);
-					}
-				}
-			}
-
-			$saleset = false;
-			if ($buyagain_sale && $allow_sale) {
-				$saleset['enoughs'] = model('store')->getEnoughs();
-			}
-
-			foreach ($allgoods as $g ) {
-				if ($g['type'] != 5) {
-					$isonlyverifygoods = false;
-				}
-
-				if ($g['seckillinfo'] && ($g['seckillinfo']['status'] == 0)) {
-					$g['deduct'] = 0;
-				}
-				else if ((0 < floatval($g['buyagain'])) && empty($g['buyagain_sale'])) {
-					if (model('goods')->canBuyAgain($g)) {
-						$g['deduct'] = 0;
-					}
-
-				}
-
-
-				if ($g['seckillinfo'] && ($g['seckillinfo']['status'] == 0)) {
-				}
-				 else if ($open_redis) {
-					if ($g['manydeduct']) {
-						$deductprice += $g['deduct'] * $g['total'];
-					}
-					else {
-						$deductprice += $g['deduct'];
-					}
-
-					if ($g['deduct2'] == 0) {
-						$deductprice2 += $g['ggprice'];
-					}
-					 else if (0 < $g['deduct2']) {
-						if ($g['ggprice'] < $g['deduct2']) {
-							$deductprice2 += $g['ggprice'];
-						}
-						 else {
-							$deductprice2 += $g['deduct2'];
-						}
-					}
-				}
-			}
-
-			if ($isverify || $isvirtual) {
-				$nowsendfree = true;
-			}
-
-			if (!(empty($allgoods)) && !($nowsendfree) && !($isonlyverifygoods)) {
-				$dispatch_array = model('order')->getOrderDispatchPrice($allgoods, $member, $address, $saleset, $merch_array, 1);
-				$dispatch_price = $dispatch_array['dispatch_price'] - $dispatch_array['seckill_dispatch_price'];
-				$nodispatch_array = $dispatch_array['nodispatch_array'];
-				$seckill_dispatchprice = $dispatch_array['seckill_dispatch_price'];
-			}
-
-			if ($is_openmerch == 1) {
-				$merch_enough = model('order')->getMerchEnough($merch_array);
-				$merch_array = $merch_enough['merch_array'];
-				$merch_enough_total = $merch_enough['merch_enough_total'];
-				$merch_saleset = $merch_enough['merch_saleset'];
-
-				if (0 < $merch_enough_total) {
-					$realprice -= $merch_enough_total;
-				}
-			}
-			if ($saleset) {
-				foreach ($saleset['enoughs'] as $e ) {
-					if ((floatval($e['enough']) <= $realprice - $seckill_payprice) && (0 < floatval($e['money']))) {
-						$deductenough_money = floatval($e['money']);
-						$deductenough_enough = floatval($e['enough']);
-						$realprice -= floatval($e['money']);
-						break;
-					}
-				}
-			}
-
-
-			if ($dflag != 'true') {
-				$include_dispath = 0;
-
-				if (empty($saleset['dispatchnodeduct'])) {
-					$deductprice2 += $dispatch_price;
-
-					if (!(empty($dispatch_price))) {
-						$include_dispath = 1;
-					}
-				}
-			}
-
-
-			$goodsdata_coupon = array();
-
-			foreach ($allgoods as $g ) {
-				if ($g['seckillinfo'] && ($g['seckillinfo']['status'] == 0)) {
-				}
-				else if (0 < floatval($g['buyagain'])) {
-					if (!(model('goods')->canBuyAgain($g)) || !(empty($g['buyagain_sale']))) {
-						$goodsdata_coupon[] = array('goodsid' => $g['goodsid'], 'total' => $g['total'], 'optionid' => $g['optionid'], 'marketprice' => $g['marketprice'], 'merchid' => $g['merchid'], 'cates' => $g['cates'], 'discounttype' => $g['discounttype'], 'isdiscountprice' => $g['isdiscountprice'], 'discountprice' => $g['discountprice'], 'isdiscountunitprice' => $g['isdiscountunitprice'], 'discountunitprice' => $g['discountunitprice'], 'type' => $g['type'], 'wholesaleprice' => $g['wholesaleprice']);
-					}
-				}
-				else {
-					$goodsdata_coupon[] = array('goodsid' => $g['goodsid'], 'total' => $g['total'], 'optionid' => $g['optionid'], 'marketprice' => $g['marketprice'], 'merchid' => $g['merchid'], 'cates' => $g['cates'], 'discounttype' => $g['discounttype'], 'isdiscountprice' => $g['isdiscountprice'], 'discountprice' => $g['discountprice'], 'isdiscountunitprice' => $g['isdiscountunitprice'], 'discountunitprice' => $g['discountunitprice'], 'type' => $g['type'], 'wholesaleprice' => $g['wholesaleprice']);
-				}
-			}
-			if (empty($goodsdata_coupon) || !($allow_sale)) {
-				$couponcount = 0;
-			}
-
-			$realprice += $dispatch_price + $seckill_dispatchprice;
-			$deductcredit = 0;
-			$deductmoney = 0;
-
-			if (!(empty($saleset))) {
-				$credit = $member['credit1'];
-
-				if (0 < $credit) {
-					$credit = floor($credit);
-				}
-
-
-				if (!(empty($saleset['creditdeduct']))) {
-					$pcredit = intval($saleset['credit']);
-					$pmoney = round(floatval($saleset['money']), 2);
-
-					if ((0 < $pcredit) && (0 < $pmoney)) {
-						if (($credit % $pcredit) == 0) {
-							$deductmoney = round(intval($credit / $pcredit) * $pmoney, 2);
-						}
-						 else {
-							$deductmoney = round((intval($credit / $pcredit) + 1) * $pmoney, 2);
-						}
-					}
-
-					if ($deductprice < $deductmoney) {
-						$deductmoney = $deductprice;
-					}
-
-					if (($realprice - $seckill_payprice) < $deductmoney) {
-						$deductmoney = $realprice - $seckill_payprice;
-					}
-
-					$deductcredit = floor((($pmoney * $pcredit) == 0 ? 0 : ($deductmoney / $pmoney) * $pcredit));
-				}
-
-
-				if (!(empty($saleset['moneydeduct']))) {
-					$deductcredit2 = $member['credit2'];
-
-					if (($realprice - $seckill_payprice) < $deductcredit2) {
-						$deductcredit2 = $realprice - $seckill_payprice;
-					}
-
-					if ($deductprice2 < $deductcredit2) {
-						$deductcredit2 = $deductprice2;
-					}
-				}
-			}
-		}
-
-		if ($is_openmerch == 1) {
-			$merchs = model('store')->getMerchs($merch_array);
-		}
-
-		$return_array = array();
-		$return_array['price'] = $dispatch_price + $seckill_dispatchprice;
-		$return_array['couponcount'] = $couponcount;
-		$return_array['realprice'] = $realprice;
-		$return_array['deductenough_money'] = $deductenough_money;
-		$return_array['deductenough_enough'] = $deductenough_enough;
-		$return_array['deductcredit2'] = $deductcredit2;
-		$return_array['include_dispath'] = $include_dispath;
-		$return_array['deductcredit'] = $deductcredit;
-		$return_array['deductmoney'] = $deductmoney;
-		$return_array['taskdiscountprice'] = $taskdiscountprice;
-		$return_array['lotterydiscountprice'] = $lotterydiscountprice;
-		$return_array['discountprice'] = $discountprice;
-		$return_array['isdiscountprice'] = $isdiscountprice;
-		$return_array['merch_showenough'] = $merch_saleset['merch_showenough'];
-		$return_array['merch_deductenough_money'] = $merch_saleset['merch_enoughdeduct'];
-		$return_array['merch_deductenough_enough'] = $merch_saleset['merch_enoughmoney'];
-		$return_array['merchs'] = $merchs;
-		$return_array['buyagain'] = $buyagainprice;
-		$return_array['seckillprice'] = $seckill_price - $seckill_payprice;
-
-		if (!(empty($nodispatch_array['isnodispatch']))) {
-			$return_array['isnodispatch'] = 1;
-			$return_array['nodispatch'] = $nodispatch_array['nodispatch'];
-		}
-		 else {
-			$return_array['isnodispatch'] = 0;
-			$return_array['nodispatch'] = '';
-		}
-
-		$this->result(1,'success', $return_array);
-	}
-
-	public function caculatecoupon($contype, $couponid, $wxid, $wxcardid, $wxcode, $goodsarr, $totalprice, $discountprice, $isdiscountprice, $isSubmit = 0, $discountprice_array = array(), $merchisdiscountprice = 0)
-	{
-		$mid = $this->getMemberId();
-		if (empty($goodsarr)) {
-			return false;
-		}
-
-		if ($contype == 0) {
-			return;
-		}
-
-
-		if ($contype == 1) {
-			$sql = 'select id,uniacid,card_type,logo_url,title, card_id,least_cost,reduce_cost,discount,merchid,limitgoodtype,limitgoodcatetype,limitgoodcateids,limitgoodids,merchid,limitdiscounttype  from ' . tablename('ewei_shop_wxcard');
-			$sql .= '  where uniacid=:uniacid  and id=:id and card_id=:card_id   limit 1';
-			$data = pdo_fetch($sql, array(':uniacid' => $uniacid, ':id' => $wxid, ':card_id' => $wxcardid));
-			$merchid = intval($data['merchid']);
-		}
-		 else if ($contype == 2) {
-			$sql = 'SELECT d.id,d.couponid,c.enough,c.backtype,c.deduct,c.discount,c.backmoney,c.backcredit,c.backredpack,c.merchid,c.limitgoodtype,c.limitgoodcatetype,c.limitgoodids,c.limitgoodcateids,c.limitdiscounttype  FROM ' . tablename('ewei_shop_coupon_data') . ' d';
-			$sql .= ' left join ' . tablename('ewei_shop_coupon') . ' c on d.couponid = c.id';
-			$sql .= ' where d.id=:id and d.uniacid=:uniacid and d.mid=:mid and d.used=0  limit 1';
-			$data = pdo_fetch($sql, array(':uniacid' => $uniacid, ':id' => $couponid, ':mid' => $mid));
-			$merchid = intval($data['merchid']);
-		}
-
-
-		if (empty($data)) {
-			return;
-		}
-
-
-		if (is_array($goodsarr)) {
-			$goods = array();
-
-			foreach ($goodsarr as $g ) {
-				if (empty($g)) {
-					continue;
-				}
-
-
-				if ((0 < $merchid) && ($g['merchid'] != $merchid)) {
-					continue;
-				}
-
-
-				$cates = explode(',', $g['cates']);
-				$limitcateids = explode(',', $data['limitgoodcateids']);
-				$limitgoodids = explode(',', $data['limitgoodids']);
-				$pass = 0;
-
-				if (($data['limitgoodcatetype'] == 0) && ($data['limitgoodtype'] == 0)) {
-					$pass = 1;
-				}
-
-
-				if ($data['limitgoodcatetype'] == 1) {
-					$result = array_intersect($cates, $limitcateids);
-
-					if (0 < count($result)) {
-						$pass = 1;
-					}
-
-				}
-
-
-				if ($data['limitgoodtype'] == 1) {
-					$isin = in_array($g['goodsid'], $limitgoodids);
-
-					if ($isin) {
-						$pass = 1;
-					}
-
-				}
-
-
-				if ($pass == 1) {
-					$goods[] = $g;
-				}
-
-			}
-
-			$limitdiscounttype = intval($data['limitdiscounttype']);
-			$coupongoodprice = 0;
-			$gprice = 0;
-
-			foreach ($goods as $k => $g ) {
-				$gprice = (double) $g['marketprice'] * (double) $g['total'];
-
-				switch ($limitdiscounttype) {
-				case 1:
-					$coupongoodprice += $gprice - ((double) $g['discountunitprice'] * (double) $g['total']);
-					$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice - ((double) $g['discountunitprice'] * (double) $g['total']);
-
-					if ($g['discounttype'] == 1) {
-						$isdiscountprice -= (double) $g['isdiscountunitprice'] * (double) $g['total'];
-						$discountprice += (double) $g['discountunitprice'] * (double) $g['total'];
-
-						if ($isSubmit == 1) {
-							$totalprice = ($totalprice - $g['ggprice']) + $g['price2'];
-							$discountprice_array[$g['merchid']]['ggprice'] = ($discountprice_array[$g['merchid']]['ggprice'] - $g['ggprice']) + $g['price2'];
-							$goodsarr[$k]['ggprice'] = $g['price2'];
-							$discountprice_array[$g['merchid']]['isdiscountprice'] -= (double) $g['isdiscountunitprice'] * (double) $g['total'];
-							$discountprice_array[$g['merchid']]['discountprice'] += (double) $g['discountunitprice'] * (double) $g['total'];
-
-							if (!(empty($data['merchsale']))) {
-								$merchisdiscountprice -= (double) $g['isdiscountunitprice'] * (double) $g['total'];
-								$discountprice_array[$g['merchid']]['merchisdiscountprice'] -= (double) $g['isdiscountunitprice'] * (double) $g['total'];
-							}
-
-						}
-
-					}
-
-
-					break;
-
-				case 2:
-					$coupongoodprice += $gprice - ((double) $g['isdiscountunitprice'] * (double) $g['total']);
-					$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice - ((double) $g['isdiscountunitprice'] * (double) $g['total']);
-
-					if ($g['discounttype'] == 2) {
-						$discountprice -= (double) $g['discountunitprice'] * (double) $g['total'];
-
-						if ($isSubmit == 1) {
-							$totalprice = ($totalprice - $g['ggprice']) + $g['price1'];
-							$discountprice_array[$g['merchid']]['ggprice'] = ($discountprice_array[$g['merchid']]['ggprice'] - $g['ggprice']) + $g['price1'];
-							$goodsarr[$k]['ggprice'] = $g['price1'];
-							$discountprice_array[$g['merchid']]['discountprice'] -= (double) $g['discountunitprice'] * (double) $g['total'];
-						}
-
-					}
-
-
-					break;
-
-				case 3:
-					$coupongoodprice += $gprice;
-					$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice;
-
-					if ($g['discounttype'] == 1) {
-						$isdiscountprice -= (double) $g['isdiscountunitprice'] * (double) $g['total'];
-
-						if ($isSubmit == 1) {
-							$totalprice = ($totalprice - $g['ggprice']) + $g['price0'];
-							$discountprice_array[$g['merchid']]['ggprice'] = ($discountprice_array[$g['merchid']]['ggprice'] - $g['ggprice']) + $g['price0'];
-							$goodsarr[$k]['ggprice'] = $g['price0'];
-
-							if (!(empty($data['merchsale']))) {
-								$merchisdiscountprice -= $g['isdiscountunitprice'] * (double) $g['total'];
-								$discountprice_array[$g['merchid']]['merchisdiscountprice'] -= $g['isdiscountunitprice'] * (double) $g['total'];
-							}
-
-
-							$discountprice_array[$g['merchid']]['isdiscountprice'] -= $g['isdiscountunitprice'] * (double) $g['total'];
-						}
-
-					}
-					 else if ($g['discounttype'] == 2) {
-						$discountprice -= (double) $g['discountunitprice'] * (double) $g['total'];
-
-						if ($isSubmit == 1) {
-							$totalprice = ($totalprice - $g['ggprice']) + $g['price0'];
-							$goodsarr[$k]['ggprice'] = $g['price0'];
-							$discountprice_array[$g['merchid']]['ggprice'] = ($discountprice_array[$g['merchid']]['ggprice'] - $g['ggprice']) + $g['price0'];
-							$discountprice_array[$g['merchid']]['discountprice'] -= (double) $g['discountunitprice'] * (double) $g['total'];
-						}
-
-					}
-
-
-					break;
-
-				default:
-					if ($g['discounttype'] == 1) {
-						$coupongoodprice += $gprice - ((double) $g['isdiscountunitprice'] * (double) $g['total']);
-						$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice - ((double) $g['isdiscountunitprice'] * (double) $g['total']);
-					}
-					 else if ($g['discounttype'] == 2) {
-						$coupongoodprice += $gprice - ((double) $g['discountunitprice'] * (double) $g['total']);
-						$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice - ((double) $g['discountunitprice'] * (double) $g['total']);
-					}
-					 else if ($g['discounttype'] == 0) {
-						$coupongoodprice += $gprice;
-						$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice;
-					}
-
-
-					break;
-				}
-			}
-
-			if ($contype == 1) {
-				$deduct = (double) $data['reduce_cost'] / 100;
-				$discount = (double) 100 - intval($data['discount']) / 10;
-
-				if ($data['card_type'] == 'CASH') {
-					$backtype = 0;
-				}
-				 else if ($data['card_type'] == 'DISCOUNT') {
-					$backtype = 1;
-				}
-
-			}
-			 else if ($contype == 2) {
-				$deduct = (double) $data['deduct'];
-				$discount = (double) $data['discount'];
-				$backtype = (double) $data['backtype'];
-			}
-
-
-			$deductprice = 0;
-			$coupondeduct_text = '';
-
-			if ((0 < $deduct) && ($backtype == 0) && (0 < $coupongoodprice)) {
-				if ($coupongoodprice < $deduct) {
-					$deduct = $coupongoodprice;
-				}
-
-
-				if ($deduct <= 0) {
-					$deduct = 0;
-				}
-
-
-				$deductprice = $deduct;
-				$coupondeduct_text = '优惠券优惠';
-
-				foreach ($discountprice_array as $key => $value ) {
-					$discountprice_array[$key]['deduct'] = ((double) $value['coupongoodprice'] / (double) $coupongoodprice) * $deduct;
-				}
-			}
-			 else if ((0 < $discount) && ($backtype == 1)) {
-				$deductprice = $coupongoodprice * (1 - ($discount / 10));
-
-				if ($coupongoodprice < $deductprice) {
-					$deductprice = $coupongoodprice;
-				}
-
-
-				if ($deductprice <= 0) {
-					$deductprice = 0;
-				}
-
-
-				foreach ($discountprice_array as $key => $value ) {
-					$discountprice_array[$key]['deduct'] = (double) $value['coupongoodprice'] * (1 - ($discount / 10));
-				}
-
-				if (0 < $merchid) {
-					$coupondeduct_text = '店铺优惠券折扣(' . $discount . '折)';
-				}
-				 else {
-					$coupondeduct_text = '优惠券折扣(' . $discount . '折)';
-				}
-			}
-
-		}
-
-
-		$totalprice -= $deductprice;
-		$return_array = array();
-		$return_array['isdiscountprice'] = $isdiscountprice;
-		$return_array['discountprice'] = $discountprice;
-		$return_array['deductprice'] = $deductprice;
-		$return_array['coupongoodprice'] = $coupongoodprice;
-		$return_array['coupondeduct_text'] = $coupondeduct_text;
-		$return_array['totalprice'] = $totalprice;
-		$return_array['discountprice_array'] = $discountprice_array;
-		$return_array['merchisdiscountprice'] = $merchisdiscountprice;
-		$return_array['couponmerchid'] = $merchid;
-		$return_array['$goodsarr'] = $goodsarr;
-		return $return_array;
+		$this->result(1,'success',array('list'=>$goods_list,'total'=>$total,'weight'=>$weight,'realprice'=>$realprice,'goodsprice'=>$goodsprice,'deductprice'=>$deductprice,'taskdiscountprice'=>$taskdiscountprice,'lotterydiscountprice'=>$lotterydiscountprice,'discountprice'=>$discountprice,'isdiscountprice'=>$isdiscountprice,'deductprice2'=>$deductprice2,'needaddress'=>$needaddress,'address'=>$needaddress ? ($address_list ? $address_list : (object)null) : (object)null,'dispatch_price'=>$dispatch_price, 'isverify' => $isverify, 'isvirtual' => $isvirtual, 'isonlyverifygoods' => $isonlyverifygoods, 'stores' => $stores));
 	}
 
 	/**
@@ -2205,8 +1447,7 @@ class Order extends Base
             $goods = $_POST['goods'];
         }        
         $goods = json_decode($goods,true);
-        if (empty($goods) || !(is_array($goods))) 
-        {
+        if (empty($goods) || !(is_array($goods))) {
             $this->result(0, '未找到任何商品');
         }
 
@@ -2310,7 +1551,7 @@ class Order extends Base
 				$this->result(0, '参数错误');
 			}
 
-			$data = Db::name('shop_goods')->where('id',$goodsid)->field('id as goodsid,title,type,intervalfloor,intervalprice, weight,total,issendfree,isnodiscount, thumb,marketprice,liveprice,cash,isverify,verifytype,goodssn,productsn,sales,istime,timestart,timeend,hasoption,isendtime,usetime,endtime,ispresell,presellprice,preselltimeend,usermaxbuy,minbuy,maxbuy,unit,buylevels,buygroups,deleted,unite_total,status,deduct,manydeduct,`virtual`,discounts,deduct2,ednum,edmoney,edareas,edareas_code,diyformtype,diyformid,diymode,dispatchtype,dispatchid,dispatchprice,merchid,merchsale,cates,isdiscount,isdiscount_time,isdiscount_discounts, virtualsend,buyagain,buyagain_islong,buyagain_condition, buyagain_sale ,verifygoodslimittype,verifygoodslimitdate,cannotrefund')->find();
+			$data = Db::name('shop_goods')->where('id',$goodsid)->field('id as goodsid,title,type,intervalfloor,intervalprice, weight,total,issendfree,isnodiscount, thumb,marketprice,liveprice,cash,isverify,verifytype,goodssn,productsn,sales,istime,timestart,timeend,hasoption,isendtime,usetime,endtime,ispresell,presellprice,preselltimeend,usermaxbuy,minbuy,maxbuy,unit,buylevels,buygroups,deleted,unite_total,status,deduct,manydeduct,`virtual`,discounts,deduct2,ednum,edmoney,edareas,edareas_code,dispatchtype,dispatchid,dispatchprice,merchid,merchsale,cates,isdiscount,isdiscount_time,isdiscount_discounts, virtualsend,buyagain,buyagain_islong,buyagain_condition, buyagain_sale ,verifygoodslimittype,verifygoodslimitdate,cannotrefund')->find();
 
 			if ((0 < $data['ispresell']) && (($data['preselltimeend'] == 0) || (time() < $data['preselltimeend']))) {
 				$data['marketprice'] = $data['presellprice'];
@@ -2347,8 +1588,7 @@ class Order extends Base
 
 				if (empty($task_goods_data['is_task_goods'])) {
 					$data['is_task_goods'] = 0;
-				}
-				else {
+				} else {
 					$allow_sale = false;
 					$tgoods['title'] = $data['title'];
 					$tgoods['mid'] = $mid;
@@ -2399,7 +1639,7 @@ class Order extends Base
 				}
 
 				if (0 < $data['usermaxbuy']) {
-					$order_goodscount = Db::name('shop_order_goods')->alias('og')->join('shop_order o','og.orderid=og.id','left')->where('og.goodsid=' . $data['goodsid'] .' and  og.status>=0 and og.mid = ' . $mid)->sum('og.total');
+					$order_goodscount = Db::name('shop_order_goods')->alias('og')->join('shop_order o','og.orderid=og.id','left')->where('og.goodsid=' . $data['goodsid'] .' and  o.status>=0 and og.mid = ' . $mid)->sum('og.total');
 
 					if ($data['usermaxbuy'] <= $order_goodscount) {
 						$this->result(0, $data['title'] . '最多限购 ' . $data['usermaxbuy'] . $unit . '!');
@@ -2575,8 +1815,7 @@ class Order extends Base
 					}
 
 					$discountprice_array[$merchid]['isdiscountprice'] += $prices['isdiscountprice'];
-				}
-				 else if ($prices['discounttype'] == 2) {
+				} else if ($prices['discounttype'] == 2) {
 					$discountprice += $prices['discountprice'];
 					$discountprice_array[$merchid]['discountprice'] += $prices['discountprice'];
 				}
@@ -2595,12 +1834,10 @@ class Order extends Base
 				if ($isendtime == 0) {
 					if (0 < $data['usetime']) {
 						$endtime = time() + (3600 * 24 * intval($data['usetime']));
-					}
-					 else {
+					} else {
 						$endtime = 0;
 					}
-				}
-				 else {
+				} else {
 					$endtime = $data['endtime'];
 				}
 			}
@@ -2615,32 +1852,28 @@ class Order extends Base
 					$isvirtualsend = true;
 				}
 			}
-			if ($data['seckillinfo'] && ($data['seckillinfo']['status'] == 0)) {
-			} else {
-				if ((0 < floatval($data['buyagain'])) && empty($data['buyagain_sale'])) {
-					if (model('goods')->canBuyAgain($data)) {
-						$data['deduct'] = 0;
-						$saleset = false;
-					}
+			if ((0 < floatval($data['buyagain'])) && empty($data['buyagain_sale'])) {
+				if (model('goods')->canBuyAgain($data)) {
+					$data['deduct'] = 0;
+					$saleset = false;
 				}
-				if ($open_redis) {
-					if ($data['manydeduct']) {
-						$deductprice += $data['deduct'] * $data['total'];
-					}
-					 else {
-						$deductprice += $data['deduct'];
-					}
+			}
+			if ($open_redis) {
+				if ($data['manydeduct']) {
+					$deductprice += $data['deduct'] * $data['total'];
+				}
+				 else {
+					$deductprice += $data['deduct'];
+				}
 
-					if ($data['deduct2'] == 0) {
+				if ($data['deduct2'] == 0) {
+					$deductprice2 += $data['ggprice'];
+				} else if (0 < $data['deduct2']) {
+					if ($data['ggprice'] < $data['deduct2']) {
 						$deductprice2 += $data['ggprice'];
 					}
-					 else if (0 < $data['deduct2']) {
-						if ($data['ggprice'] < $data['deduct2']) {
-							$deductprice2 += $data['ggprice'];
-						}
-						 else {
-							$deductprice2 += $data['deduct2'];
-						}
+					 else {
+						$deductprice2 += $data['deduct2'];
 					}
 				}
 			}
@@ -2663,8 +1896,8 @@ class Order extends Base
 		if ($is_openmerch == 1) {
 			foreach ($merch_array as $key => $value ) {
 				if (0 < $key) {
-					$merch_array[$key]['set'] = model('store')->getSet('sale', $key);
-					$merch_array[$key]['enoughs'] = model('store')->getEnoughs($merch_array[$key]['set']);
+					$merch_array[$key]['set'] = model('merch')->getSet('sale', $key);
+					$merch_array[$key]['enoughs'] = model('merch')->getEnoughs($merch_array[$key]['set']);
 				}
 			}
 			if ($allow_sale && empty($_SESSION['taskcut'])) {
@@ -2699,12 +1932,10 @@ class Order extends Base
 		foreach ($allgoods as $g ) {
 			if ($g['seckillinfo'] && ($g['seckillinfo']['status'] == 0)) {
 				$goodsdata_coupon_temp[] = $g;
-			}
-			 else if (0 < floatval($g['buyagain'])) {
+			} else if (0 < floatval($g['buyagain'])) {
 				if (!(model('goods')->canBuyAgain($g)) || !(empty($g['buyagain_sale']))) {
 					$goodsdata_coupon[] = $g;
-				}
-				 else {
+				} else {
 					$goodsdata_coupon_temp[] = $g;
 				}
 			}
@@ -2729,7 +1960,6 @@ class Order extends Base
 			$allgoods = $return_array['$goodsarr'];
 			$allgoods = array_merge($allgoods, $goodsdata_coupon_temp);
 		}
-
 		$addressid = input('addressid/d',0);
 		$address = false;
 		if (!(empty($addressid)) && ($dispatchtype == 0) && !($isonlyverifygoods)) {
@@ -2737,8 +1967,7 @@ class Order extends Base
 
 			if (empty($address)) {
 				$this->result(0, '未找到地址');
-			}
-			else {
+			} else {
 				if (empty($address['province']) || empty($address['city'])) {
 					$this->result(0, '地址请选择省市信息');
 				}
@@ -2869,7 +2098,10 @@ class Order extends Base
 				}
 			}
 		}
-		$carrier = input('carriers/a');
+
+		$carrier_realname = trim(input('carrier_realname'));
+		$carrier_mobile = trim(input('carrier_mobile'));
+		$carrier = array('carrier_realname' => $carrier_realname, 'carrier_mobile' => $carrier_mobile);
 		$carriers = ((is_array($carrier) ? iserializer($carrier) : iserializer(array())));
 
 		if ($totalprice <= 0) {
@@ -2917,8 +2149,7 @@ class Order extends Base
 
 			if ($taskGoodsInfo0['goods'][$goodsid]['num'] <= 1) {
 				unset($taskGoodsInfo0['goods'][$goodsid]);
-			}
-			 else {
+			} else {
 				--$taskGoodsInfo0['goods'][$goodsid]['num'];
 			}
 			Db::name('shop_task_extension_join')->where('id',$task_id)->where('mid',$mid)->update(array('rewarded' => serialize($taskGoodsInfo0)));
@@ -2964,8 +2195,7 @@ class Order extends Base
 		$order['couponprice'] = $couponprice;
 		if ($multiple_order == 0) {
 			$order['merchshow'] = 1;
-		}
-		else {
+		} else {
 			$order['merchshow'] = 0;
 		}
 		$order['buyagainprice'] = $buyagainprice;
@@ -2993,8 +2223,7 @@ class Order extends Base
 			$order['isvirtualsend'] = (($isvirtualsend ? 1 : 0));
 			$order['invoicename'] = trim(input('invoicename/s',''));
 			$order['coupongoodprice'] = $coupongoodprice;
-		}
-		else {
+		} else {
 			$order['isparent'] = 1;
 			$order['merchid'] = 0;
 		}
@@ -3163,7 +2392,7 @@ class Order extends Base
 				model('coupon')->addtaskdata($orderid);
 			}
 			if (is_array($carrier)) {
-				$up = array('realname' => $carrier['carrier_realname'], 'carrier_mobile' => $carrier['carrier_mobile']);
+				$up = array('realname' => $carrier['carrier_realname'], 'carrier_realname' => $carrier['carrier_realname'], 'carrier_mobile' => $carrier['carrier_mobile']);
 				Db::name('member')->where('id',$member['id'])->update($up);
 			}
 			if ($fromcart == 1) {
@@ -3244,8 +2473,7 @@ class Order extends Base
 			if (($order['status'] == 1) && ($order['tradestatus'] == 1)) {
 				$order['ordersn'] = $order['ordersn_trade'];
 				$order['price'] = $order['betweenprice'];
-			}
-			else {
+			} else {
 				if (($order['status'] == 1) && ($order['tradestatus'] == 2)) {
 					$this->result(0,'您访问的信息不存在');
 				}
@@ -3304,14 +2532,17 @@ class Order extends Base
 			$params['tid'] .= 'GJ' . $var;
 		}
 		$paytype = input('paytype/d') ? input('paytype/d') : $order['paytype'];
-
+		$headerinfo = $this->headerinfo;
+		if(!in_array($headerinfo['device-type'], array('iOS','android','wechat','web'))) {
+			$this->result(0,'支付出错!');
+		}
 		if ($paytype == 1) {
 			$params['user'] = $mid;
 			$params['fee'] = $order['price'];
 			$params['title'] = $param_title;
 			if (isset($set['pay']) && ($set['pay']['app_wechat'] == 1)) {
-				$wechat = model('payment')->wechat_build($params, 0);
-				if (is_error($wechat)) {
+				$wechat = model('payment')->wechat_build($params, $headerinfo['device-type'], 0, $member['wechat_openid']);
+				if (!is_array($wechat)) {
 					$this->result(0,$wechat);
 				}
 			}
@@ -3332,7 +2563,7 @@ class Order extends Base
 				$params['fee'] = $order['price'];
 				$params['title'] = $param_title;
 
-				$alipay = model('payment')->alipay_build($params, 0);
+				$alipay = model('payment')->alipay_build($params, $headerinfo['device-type'], 0, getHttpHost() . '/public/dist/order');
 				if (empty($alipay)) {
 					$this->result(0,'参数错误');
 				}
@@ -3632,6 +2863,259 @@ class Order extends Base
 		}
         
 		$this->result(1,'success',$goods);
+	}
+
+	public function caculatecoupon($contype, $couponid, $wxid, $wxcardid, $wxcode, $goodsarr, $totalprice, $discountprice, $isdiscountprice, $isSubmit = 0, $discountprice_array = array(), $merchisdiscountprice = 0)
+	{
+		$mid = $this->getMemberId();
+		if (empty($goodsarr)) {
+			return false;
+		}
+
+		if ($contype == 0) {
+			return;
+		}
+
+		if ($contype == 1) {
+			$data = Db::name('shop_wxcard')->where('id',$wxid)->where('card_id',$wxcardid)->field('id,card_type,logo_url,title, card_id,least_cost,reduce_cost,discount,merchid,limitgoodtype,limitgoodcatetype,limitgoodcateids,limitgoodids,merchid,limitdiscounttype')->find();
+			$merchid = intval($data['merchid']);
+		} else if ($contype == 2) {
+			$data = Db::name('shop_coupon_data')->alias('d')->join('shop_coupon c','d.couponid = c.id','left')->where('d.id = ' . $couponid . ' and d.mid = ' . $mid . 'and d.used = 0')->field('d.id,d.couponid,c.enough,c.backtype,c.deduct,c.discount,c.backmoney,c.backcredit,c.backredpack,c.merchid,c.limitgoodtype,c.limitgoodcatetype,c.limitgoodids,c.limitgoodcateids,c.limitdiscounttype')->find();
+			$merchid = intval($data['merchid']);
+		}
+
+		if (empty($data)) {
+			return;
+		}
+
+		if (is_array($goodsarr)) {
+			$goods = array();
+
+			foreach ($goodsarr as $g ) {
+				if (empty($g)) {
+					continue;
+				}
+
+				if ((0 < $merchid) && ($g['merchid'] != $merchid)) {
+					continue;
+				}
+
+				$cates = explode(',', $g['cates']);
+				$limitcateids = explode(',', $data['limitgoodcateids']);
+				$limitgoodids = explode(',', $data['limitgoodids']);
+				$pass = 0;
+
+				if (($data['limitgoodcatetype'] == 0) && ($data['limitgoodtype'] == 0)) {
+					$pass = 1;
+				}
+
+
+				if ($data['limitgoodcatetype'] == 1) {
+					$result = array_intersect($cates, $limitcateids);
+					if (0 < count($result)) {
+						$pass = 1;
+					}
+				}
+
+
+				if ($data['limitgoodtype'] == 1) {
+					$isin = in_array($g['goodsid'], $limitgoodids);
+
+					if ($isin) {
+						$pass = 1;
+					}
+				}
+
+
+				if ($pass == 1) {
+					$goods[] = $g;
+				}
+
+			}
+
+			$limitdiscounttype = intval($data['limitdiscounttype']);
+			$coupongoodprice = 0;
+			$gprice = 0;
+
+			foreach ($goods as $k => $g ) {
+				$gprice = (double) $g['marketprice'] * (double) $g['total'];
+
+				switch ($limitdiscounttype) {
+				case 1:
+					$coupongoodprice += $gprice - ((double) $g['discountunitprice'] * (double) $g['total']);
+					$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice - ((double) $g['discountunitprice'] * (double) $g['total']);
+
+					if ($g['discounttype'] == 1) {
+						$isdiscountprice -= (double) $g['isdiscountunitprice'] * (double) $g['total'];
+						$discountprice += (double) $g['discountunitprice'] * (double) $g['total'];
+
+						if ($isSubmit == 1) {
+							$totalprice = ($totalprice - $g['ggprice']) + $g['price2'];
+							$discountprice_array[$g['merchid']]['ggprice'] = ($discountprice_array[$g['merchid']]['ggprice'] - $g['ggprice']) + $g['price2'];
+							$goodsarr[$k]['ggprice'] = $g['price2'];
+							$discountprice_array[$g['merchid']]['isdiscountprice'] -= (double) $g['isdiscountunitprice'] * (double) $g['total'];
+							$discountprice_array[$g['merchid']]['discountprice'] += (double) $g['discountunitprice'] * (double) $g['total'];
+
+							if (!(empty($data['merchsale']))) {
+								$merchisdiscountprice -= (double) $g['isdiscountunitprice'] * (double) $g['total'];
+								$discountprice_array[$g['merchid']]['merchisdiscountprice'] -= (double) $g['isdiscountunitprice'] * (double) $g['total'];
+							}
+
+						}
+
+					}
+
+
+					break;
+
+				case 2:
+					$coupongoodprice += $gprice - ((double) $g['isdiscountunitprice'] * (double) $g['total']);
+					$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice - ((double) $g['isdiscountunitprice'] * (double) $g['total']);
+
+					if ($g['discounttype'] == 2) {
+						$discountprice -= (double) $g['discountunitprice'] * (double) $g['total'];
+
+						if ($isSubmit == 1) {
+							$totalprice = ($totalprice - $g['ggprice']) + $g['price1'];
+							$discountprice_array[$g['merchid']]['ggprice'] = ($discountprice_array[$g['merchid']]['ggprice'] - $g['ggprice']) + $g['price1'];
+							$goodsarr[$k]['ggprice'] = $g['price1'];
+							$discountprice_array[$g['merchid']]['discountprice'] -= (double) $g['discountunitprice'] * (double) $g['total'];
+						}
+
+					}
+
+
+					break;
+
+				case 3:
+					$coupongoodprice += $gprice;
+					$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice;
+
+					if ($g['discounttype'] == 1) {
+						$isdiscountprice -= (double) $g['isdiscountunitprice'] * (double) $g['total'];
+
+						if ($isSubmit == 1) {
+							$totalprice = ($totalprice - $g['ggprice']) + $g['price0'];
+							$discountprice_array[$g['merchid']]['ggprice'] = ($discountprice_array[$g['merchid']]['ggprice'] - $g['ggprice']) + $g['price0'];
+							$goodsarr[$k]['ggprice'] = $g['price0'];
+
+							if (!(empty($data['merchsale']))) {
+								$merchisdiscountprice -= $g['isdiscountunitprice'] * (double) $g['total'];
+								$discountprice_array[$g['merchid']]['merchisdiscountprice'] -= $g['isdiscountunitprice'] * (double) $g['total'];
+							}
+
+
+							$discountprice_array[$g['merchid']]['isdiscountprice'] -= $g['isdiscountunitprice'] * (double) $g['total'];
+						}
+
+					} else if ($g['discounttype'] == 2) {
+						$discountprice -= (double) $g['discountunitprice'] * (double) $g['total'];
+						if ($isSubmit == 1) {
+							$totalprice = ($totalprice - $g['ggprice']) + $g['price0'];
+							$goodsarr[$k]['ggprice'] = $g['price0'];
+							$discountprice_array[$g['merchid']]['ggprice'] = ($discountprice_array[$g['merchid']]['ggprice'] - $g['ggprice']) + $g['price0'];
+							$discountprice_array[$g['merchid']]['discountprice'] -= (double) $g['discountunitprice'] * (double) $g['total'];
+						}
+					}
+
+					break;
+
+				default:
+					if ($g['discounttype'] == 1) {
+						$coupongoodprice += $gprice - ((double) $g['isdiscountunitprice'] * (double) $g['total']);
+						$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice - ((double) $g['isdiscountunitprice'] * (double) $g['total']);
+					}
+					 else if ($g['discounttype'] == 2) {
+						$coupongoodprice += $gprice - ((double) $g['discountunitprice'] * (double) $g['total']);
+						$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice - ((double) $g['discountunitprice'] * (double) $g['total']);
+					}
+					 else if ($g['discounttype'] == 0) {
+						$coupongoodprice += $gprice;
+						$discountprice_array[$g['merchid']]['coupongoodprice'] += $gprice;
+					}
+					break;
+				}
+			}
+
+			if ($contype == 1) {
+				$deduct = (double) $data['reduce_cost'] / 100;
+				$discount = (double) 100 - intval($data['discount']) / 10;
+
+				if ($data['card_type'] == 'CASH') {
+					$backtype = 0;
+				}
+				 else if ($data['card_type'] == 'DISCOUNT') {
+					$backtype = 1;
+				}
+
+			}
+			 else if ($contype == 2) {
+				$deduct = (double) $data['deduct'];
+				$discount = (double) $data['discount'];
+				$backtype = (double) $data['backtype'];
+			}
+
+
+			$deductprice = 0;
+			$coupondeduct_text = '';
+
+			if ((0 < $deduct) && ($backtype == 0) && (0 < $coupongoodprice)) {
+				if ($coupongoodprice < $deduct) {
+					$deduct = $coupongoodprice;
+				}
+
+
+				if ($deduct <= 0) {
+					$deduct = 0;
+				}
+
+
+				$deductprice = $deduct;
+				$coupondeduct_text = '优惠券优惠';
+
+				foreach ($discountprice_array as $key => $value ) {
+					$discountprice_array[$key]['deduct'] = ((double) $value['coupongoodprice'] / (double) $coupongoodprice) * $deduct;
+				}
+			} else if ((0 < $discount) && ($backtype == 1)) {
+				$deductprice = $coupongoodprice * (1 - ($discount / 10));
+
+				if ($coupongoodprice < $deductprice) {
+					$deductprice = $coupongoodprice;
+				}
+
+
+				if ($deductprice <= 0) {
+					$deductprice = 0;
+				}
+
+
+				foreach ($discountprice_array as $key => $value ) {
+					$discountprice_array[$key]['deduct'] = (double) $value['coupongoodprice'] * (1 - ($discount / 10));
+				}
+
+				if (0 < $merchid) {
+					$coupondeduct_text = '店铺优惠券折扣(' . $discount . '折)';
+				} else {
+					$coupondeduct_text = '优惠券折扣(' . $discount . '折)';
+				}
+			}
+
+		}
+
+
+		$totalprice -= $deductprice;
+		$return_array = array();
+		$return_array['isdiscountprice'] = $isdiscountprice;
+		$return_array['discountprice'] = $discountprice;
+		$return_array['deductprice'] = $deductprice;
+		$return_array['coupongoodprice'] = $coupongoodprice;
+		$return_array['coupondeduct_text'] = $coupondeduct_text;
+		$return_array['totalprice'] = $totalprice;
+		$return_array['discountprice_array'] = $discountprice_array;
+		$return_array['merchisdiscountprice'] = $merchisdiscountprice;
+		$return_array['couponmerchid'] = $merchid;
+		$return_array['$goodsarr'] = $goodsarr;
+		return $return_array;
 	}
 
 }

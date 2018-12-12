@@ -181,7 +181,7 @@ function selectcounty(v3,v4,v5) {
         var city_code = TopnodeList[dropElement1.selectedIndex].getElementsByTagName("city")[dropElement2.selectedIndex].getAttribute("code");
         if (city_code) {
             var left = city_code.substring(0,2);
-            var xmlUrl = '../addons/ewei_shopv2/static/js/dist/area/list/'+left+'/'+city_code+'.xml';
+            var xmlUrl = '/public/static/js/dist/area/list/'+left+'/'+city_code+'.xml';
             xmlCityDoc = loadXmlFile(xmlUrl);
 
             if (window.ActiveXObject) {

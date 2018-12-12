@@ -147,14 +147,22 @@ class Common extends \think\Model
 		return $setdata;
 	}
 
-	public static function getCopyright($ismanage = 1)
+	public static function getCopyright($ismanage = 1, $merchid = 0)
 	{
 		$copyright = Cache::get('systemcopyright');
 
 		if (!(is_array($copyright))) {
 			$copyright = Db::name('shop_system_copyright')->where('ismanage',$ismanage)->limit(1)->find();
 		}
-
+		$account = session('?account');
+		if( !empty($merchid) ) 
+		{
+			$merch = Db::name('shop_merch')->where('id',$merchid)->find();
+			if( !empty($merch["logo"]) ) 
+			{
+				$copyright["logo"] = tomedia($merch["logo"]);
+			}
+		}
 		return $copyright;
 	}
 

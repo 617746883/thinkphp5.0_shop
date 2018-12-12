@@ -1,0 +1,47 @@
+{include file='_header'}
+<div class="page-header">
+    当前位置：<span class="text-primary">提现申请信息</span><small>申请单号: {$item['applyno']}</small>
+</div>
+<div class="page-content">
+<div class="step-region" >
+    <ul class="ui-step ui-step-4" >
+        <li {if $item['status']>=1}class="ui-step-done"{/if}>
+            <div class="ui-step-number" >1</div>
+            <div class="ui-step-title" >申请中</div>
+            <div class="ui-step-meta" >{if 1<=$item['status']}{:date('Y-m-d',$item['applytime'])}<br/>{:date('H:i:s',$item['applytime'])}{/if}</div>
+        </li>
+        <li  {if $item['status']>=2}class="ui-step-done"{/if}>
+            <div class="ui-step-number">2</div>
+            <div class="ui-step-title">商家审核</div>
+            <div class="ui-step-meta">{if 2<=$item['status']}{:date('Y-m-d',$item['checktime'])}<br/>{:date('H:i:s',$item['checktime'])}{/if}</div>
+        </li>
+        <li {if $item['status']>=3}class="ui-step-done"{/if}>
+            <div class="ui-step-number" >3</div>
+            <div class="ui-step-title">商家打款</div>
+            <div class="ui-step-meta" >{if 3<=$item['status']}{:date('Y-m-d',$item['paytime'])}<br/>{:date('H:i:s',$item['paytime'])}{/if}</div>
+        </li>
+        <li {if $item['status']==-1}class="ui-step-done"{/if}>
+            <div class="ui-step-number" >!</div>
+            <div class="ui-step-title">无效</div>
+            <div class="ui-step-meta" >{if -1==$item['status']}{:date('Y-m-d',$item['invalidtime'])}<br/>{:date('H:i:s',$item['invalidtime'])}{/if}</div>
+        </li>
+    </ul>
+</div>
+{include file='apply/box'}
+{include file='apply/applytype'}
+<form action="" method="get" class="form-horizontal" role="form" id="form1">
+    <input type="hidden" name="id" value="{$id}"/>
+    <div class="col-sm-6 pull-right">
+        <div class="input-group">
+            <input type="text" class="form-control input-sm" name="keyword" value="{$keyword}" placeholder="订单编号"/>
+            <span class="input-group-btn">
+                <button class="btn btn-primary" type="submit"> 搜索</button>
+                <button type="submit" name="export" value="1" class="btn btn-success">导出</button>
+            </span>
+        </div>
+    </div>
+</form>
+{include file='apply/table'}
+</div>
+{include file='_footer'}
+

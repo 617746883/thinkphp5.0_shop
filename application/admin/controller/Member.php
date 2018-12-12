@@ -48,7 +48,7 @@ class Member extends Base
 		}
 
 		if (!(empty($realname))) {
-			$realname = trim($realname);
+			$keyword = trim($realname);
 			$condition .= ' and ( realname like "%' . $keyword . '%" or nickname like "%' . $keyword . '%" or mobile like "%' . $keyword . '%" or id like "%' . $keyword . '%")';
 		}
 
@@ -330,7 +330,7 @@ class Member extends Base
 		else {
 			$list = $others;
 		}
-		$this->assign(['list'=>$list,'enabled'=>$enabled,'keyword'=>$keyword]);
+		$this->assign(['list'=>$list,'enabled'=>$enabled,'keyword'=>$keyword,'shopset'=>$shopset]);
 		return $this->fetch('member/level/list');
 	}
 
@@ -367,7 +367,7 @@ class Member extends Base
 
 		if (Request::instance()->isPost()) {
 			$enabled = intval(input('enabled'));
-			$data = array('level' => intval(input('level')), 'levelname' => trim(input('levelname')), 'ordercount' => trim(input('ordercount')), 'ordermoney' => input('ordermoney'), 'discount' => trim(input('discount')), 'enabled' => $enabled);
+			$data = array('level' => intval(input('level')), 'levelname' => trim(input('levelname')), 'ordercount' => intval(input('ordercount')), 'ordermoney' => trim(input('ordermoney')), 'creditnum' => trim(input('creditnum')), 'discount' => trim(input('discount')), 'enabled' => $enabled);
 			$goodsids = iserializer($_POST['goodsids']);
 			$buygoods = intval($_POST['buygoods']);
 
@@ -686,5 +686,51 @@ class Member extends Base
 		return $this->fetch('');
 	}
 
+	public function recharge()
+	{
+		$type = trim(input('type'));
+		$id = intval(input('id'));
+		$profile = model('member')->getMember($id);
+
+		if (Request::instance()->isPost()) {
+			$typestr = ($type == 'credit1' ? '积分' : '余额');
+			$num = floatval(input('num'));
+			$remark = trim(input('remark'));
+
+			if ($num <= 0) {
+				show_json(0, array('message' => '请填写大于0的数字!'));
+			}
+
+			$changetype = input('changetype');
+			if (intval($changetype) == 2) {
+				$num -= $profile[$type];
+			} else {
+				if (intval($changetype) == 1) {
+					$num = 0 - $num;
+				}
+			}
+
+			model('member')->setCredit($profile['id'], $type, $num, array(0, '后台会员充值' . $typestr . ' ' . $remark));
+			$changetype = 0;
+			$changenum = 0;
+
+			if (0 <= $num) {
+				$changetype = 0;
+				$changenum = $num;
+			} else {
+				$changetype = 1;
+				$changenum = 0 - $num;
+			}
+			
+			if ($type == 'credit1') {
+				model('notice')->sendMemberPointChange($profile['id'], $changenum, $changetype);
+			}
+
+			model('shop')->plog('member.recharge.' . $type, '充值' . $typestr . ': ' . $num . ' 会员信息: ID: ' . $profile['id'] . ' /  ' . $profile['id'] . '/' . $profile['nickname'] . '/' . $profile['realname'] . '/' . $profile['mobile']);
+			show_json(1, array('url' => referer()));
+		}
+		$this->assign(['id'=>$id,'profile'=>$profile,'type'=>$type]);
+		echo $this->fetch('member/detail/recharge');
+	}
 
 }

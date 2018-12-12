@@ -1,6 +1,0 @@
-{
-    "require": {
-        "topthink/think-worker": "^2.0",
-        "phpoffice/phpexcel": "^1.8"
-    }
-}

@@ -1,0 +1,53 @@
+{include file='_header'}
+<div cla file=s="page-heading"> <h2>商品销售转化率</h2> <span>查询商品浏览量及购买转化率，默认排序为转化率从高到低 总数: <span style='color:red'>{$total}</span></div>
+
+<form action="" method="get" class="form-horizontal">
+	<div class="page-toolbar row m-b-sm m-t-sm">
+		<div class="col-sm-5">
+			<div class="btn-group btn-group-sm" style='float:left'>
+				<button class="btn btn-default btn-sm"  type="button" data-toggle='refresh'><i class='fa fa-refresh'></i></button>
+			</div> 	 			
+		</div>	
+		<div class="col-sm-6 pull-right">
+			<select name='orderby'  class='form-control  input-sm select-md'   style="width:100px;"  >
+				<option value='' {if $orderby==''}selected{/if}>排序</option>
+				<option value='0' {if $orderby=='desc'}selected{/if}>降序</option>
+				<option value='1' {if $orderby=='asc'}selected{/if}>升序</option>
+			</select>
+			<div class="input-group">				 
+				<input type="text" class="form-control input-sm"  name="title" value="{$_GPC['title']}" placeholder="商品名称"/> 
+				<span class="input-group-btn">							
+					<button class="btn btn-sm btn-primary btn-sm" type="submit"> 搜索</button>
+                    <button type="submit" name="export" value="1" class="btn btn-success  btn-sm">导出 Excel</button>
+				</span>
+			</div>
+		</div>
+	</div>
+</form> 
+     <table class="table table-hover">
+            <thead>
+                <tr>                
+                    <th>商品名称</th>
+                    <th style='width:100px;'>访问次数</th>
+                    <th style='width:100px;'>购买件数</th>
+                    <th>转化率</th>
+                </tr>
+            </thead>
+            <tbody>
+                {foreach name='list' item='row'}
+                <tr>
+                    <td>
+                        <img src="{$row['thumb']}" style="width: 30px; height: 30px;border:1px solid #ccc;padding:1px;">
+                        {$row['title']}</td>
+                    <td>{$row['viewcount']}</td>
+                    <td>{:intval($row['buycount'])}</td> 
+                    <td>   <div class="progress" style='max-width:500px;'>
+                            <div style="width: {$row['percent']}%;" class="progress-bar progress-bar-info"><span style="color:#000">{:empty($row['percent'])?'':$row['percent'].'%'}</span></div>
+                       </div></td>
+                </tr>
+                {/foreach}
+        </table>
+        {$pager}
+ 
+{include file='_footer'}
+<!--6Z2S5bKb5piT6IGU5LqS5Yqo572R57uc56eR5oqA5pyJ6ZmQ5YWs5Y+454mI5p2D5omA5pyJ-->

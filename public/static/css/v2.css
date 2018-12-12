@@ -2770,7 +2770,7 @@ label.error {
 .img-preview {
     overflow: hidden;
     text-align: center;
-    /*width: 100%;*/
+    width: 100%;
 }
 
 .img-preview-sm {
@@ -7103,8 +7103,7 @@ body.rtls.top-navigation .footer.fixed {
     }
 }
 
-.rtls {content:'1389024'}
-
+.rtls {content:'2064384'}
 .rtls .ltr-support {
     direction: ltr;
 }
@@ -7882,7 +7881,6 @@ body.skin-3 {
     color: #fff;
     background-color: #1ab394;
 }
-
 @media (min-width: 768px) {
     .bs-glyphicons {
         margin-right: 0;
@@ -7892,4 +7890,10 @@ body.skin-3 {
         width: 12.5%;
         font-size: 12px
     }
+}
+.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+    background-color: #ddd;
+}
+.input-group-addon.disabled{
+    background-color: #ddd;
 }

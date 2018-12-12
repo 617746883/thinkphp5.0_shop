@@ -8,6 +8,7 @@
 </div>
 <div class="page-content">
     <form action="" method="get" class="form-horizontal" plugins="form">
+        <input type='hidden' id='tab' name='type' value="{$type}"/>
         <div class="page-toolbar m-b-sm m-t-sm">
             <div class="col-sm-6">
                 <span class='pull-left'>
@@ -19,7 +20,7 @@
                     <div class="input-group-select">
                         <select name="category" class='form-control' style="width:120px;">
                             <option value="" {if empty($category)}selected{/if} >商品分类</option>
-                            {foreach name='category' item='cate'}
+                            {foreach name='categorys' item='cate'}
                             <option value="{$cate['id']}" {if $category==$cate['id']}selected{/if}>{$cate['name']}</option>
                             {/foreach}
                         </select>
@@ -31,7 +32,7 @@
                             <option value='1' {if $status=='1'}selected{/if} >上架</option>
                         </select>
                     </div>
-                    <input type="text" class="input-sm form-control" name='keyword' value="{$keyword}" placeholder="请输入关键词">
+                    <input type="text" class="input-sm form-control" name='keyword' value="{$_GET['keyword']}" placeholder="请输入关键词">
                     <span class="input-group-btn">
                         <button class="btn btn-primary" type="submit">搜索</button>
                     </span>
@@ -58,6 +59,7 @@
         <div class="table_kf {if $type=='sold'}active{/if}" id="tab_sold">{include file='groups/goods/sold'}</div>
         <div class="table_kf {if $type=='store'}active{/if}" id="tab_store">{include file='groups/goods/store'}</div>
         <div class="table_kf {if $type=='recycle'}active{/if}" id="tab_recycle">{include file='groups/goods/recycle'}</div>
+
     </form>
 </div>
 <script type="text/javascript">

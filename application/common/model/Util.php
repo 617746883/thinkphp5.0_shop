@@ -80,21 +80,25 @@ class Util extends \think\Model
 	    	return array('code'=>-1,'msg'=>'120秒内不允许重复发送','data'=>'');
 	    }	        
 	    $row = Db::name('sms_log')->insert(array('mobile'=>$mobile,'code'=>$captcha,'type'=>$type,'createtime'=>time()));
-	    if(!$row)
-	    {
+	    if(!$row) {
 	    	return array('code'=>-2,'msg'=>'发送失败!','data'=>'123');
-	    }	       
-	    $content = '【天润智慧社区】您的验证码是：'.$captcha.'      5分钟内有效，请妥善保管。';
+	    }	
+	    $shopset = model('common')->getSysset();  
+	    $set=Db::name('shop_sms_set')->find();   
+	    if (!empty($set['aliyun_new'])) {
+	    	$send = self::sendSMS($mobile,$captcha,'SMS_148614721','IWE');
+	    } else {
+	    	$content = '【' . $shopset['shop']['name'] . '】您的验证码是：'.$captcha.'      5分钟内有效，请妥善保管。';	    
+        	$send = self::sendSMS($mobile,$content);
+	    }
 	    
-        $send = self::sendSMS($mobile,$content);
-	    if($send['status'] !== 1)
-	    {
+	    if($send['status'] !== 1) {
 	    	return array('code'=>-1,'msg'=>'发送失败!!!','data'=>$send);
 	    }       
 	    return array('code'=>1,'msg'=>'发送成功','data'=>$send);
 	}
 
-	public static function sendSMS($mobile, $message = '')
+	public static function sendSMS($mobile, $message = '', $templatecode = '', $signname = '')
     {
         if(!check_mobile($mobile)){
             return array('status'=>0, 'msg' => '手机号码格式有误');
@@ -124,8 +128,19 @@ class Util extends \think\Model
 			if($result) {
 	            return array('status'=>1, 'msg' => $result);
 	        } else {
-	            return array('status'=>0, 'msg' => $result);
+	            return array('status'=>0, 'msg' => array());
 	        }
+        } elseif (!empty($set['aliyun_new'])) {
+        	vendor('alisms.SignatureHelper');
+        	$params = Array (
+		        "code" => $message
+		    );
+        	$option = array('keyid' => $set['aliyun_new_keyid'], 'keysecret' => $set['aliyun_new_keysecret'], 'phonenumbers' => $mobile, 'signname' => $signname, 'templatecode' => $templatecode, 'templateparam' => $params);
+        	$aliyun_new = new \SignatureHelper();
+			$result = $aliyun_new->sendSms($option);return $result;
+			if ($result['Message'] != 'OK') {
+				return array('status' => 0, 'msg' => '短信发送失败(错误信息: ' . $result['Message'] . ')');
+			}
         }
     }
 

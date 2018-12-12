@@ -264,12 +264,10 @@ class Shop extends Base
 			if (!empty($id)) {
 				Db::name('shop_adv')->where('id',$id)->update($data);
 				model('shop')->plog('shop.adv.edit', '修改广告 ID: ' . $id);
-			}
-			else {
+			} else {
 				$id = Db::name('shop_adv')->insertGetId($data);
 				model('shop')->plog('shop.adv.add', '添加广告 ID: ' . $id);
 			}
-
 			show_json(1);
 		}
 
@@ -1018,6 +1016,48 @@ class Shop extends Base
 		}
 		$list = Db::name('shop_goods')->alias('g')->where($condition1)->field('g.id,g.title,g.thumb,(select ifnull(sum(og.price),0) from  ' . tablename('shop_order_goods') . ' og left join ' . tablename('shop_order') . ' o on og.orderid=o.id  where o.status>=1 and og.goodsid=g.id ' . $condition . ')  as money , (select ifnull(sum(og.total),0) from ' . tablename('shop_order_goods') . ' og left join ' . tablename('shop_order') . ' o on og.orderid=o.id  where o.status>=1 and og.goodsid=g.id ' . $condition . ') as count')->order('count','desc')->limit(7)->select();
 		return $list;
+	}
+
+	public function cityexpress()
+    {
+		$condition = ' merchid=0 ';
+		$cityexpress = Db::name('shop_city_express')->where($condition)->find();
+		if (!empty($cityexpress)) {
+			$config = unserialize($cityexpress['config']);
+
+			if ($cityexpress['express_type'] == 1) {
+				$cityexpress['app_key'] = $config['app_key'];
+				$cityexpress['app_secret'] = $config['app_secret'];
+				$cityexpress['source_id'] = $config['source_id'];
+				$cityexpress['shop_no'] = $config['shop_no'];
+				$cityexpress['city_code'] = $config['city_code'];
+			}
+		}
+		if (Request::instance()->isPost()) {
+			$data = array('merchid' => 0, 'start_fee' => floatval(round($_POST['start_fee'], 2)), 'start_km' => intval($_POST['start_km']), 'pre_km' => intval($_POST['pre_km']), 'pre_km_fee' => floatval(round($_POST['pre_km_fee'], 2)), 'fixed_km' => intval($_POST['fixed_km']), 'fixed_fee' => floatval(round($_POST['fixed_fee'], 2)), 'receive_goods' => intval($_POST['receive_goods']), 'geo_key' => trim($_POST['geo_key']), 'lat' => trim($_POST['lat']), 'lng' => trim($_POST['lng']), 'range' => intval($_POST['range']), 'zoom' => intval($_POST['zoom']), 'express_type' => intval($_POST['express_type']), 'config' => iserializer($this->TrimArray($_POST['config'])), 'tel1' => trim($_POST['tel1']), 'tel2' => trim($_POST['tel2']), 'is_sum' => trim($_POST['is_sum']), 'is_dispatch' => trim($_POST['is_dispatch']), 'enabled' => intval($_POST['enabled']));
+
+			if (!empty($cityexpress)) {
+				model('shop')->plog('shop.cityexpress.edit', '修改同城配送 ID: ' . $cityexpress['id']);
+				Db::name('shop_city_express')->where('id',$cityexpress['id'])->update($data);
+			}
+			else {
+				$id = Db::name('shop_city_express')->insertGetId($data);
+				model('shop')->plog('shop.cityexpress.add', '添加同城配送 ID: ' . $id);
+			}
+
+			show_json(1, array('url' => url('admin/shop/cityexpress')));
+		}
+		$this->assign(['cityexpress'=>$cityexpress]);
+    	return $this->fetch('shop/cityexpress/index');
+    }
+
+    public function TrimArray($arr)
+	{
+		foreach ($arr as $key => $val) {
+			$arr[$key] = trim($val);
+		}
+
+		return $arr;
 	}
 
 }

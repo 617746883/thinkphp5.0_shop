@@ -48,7 +48,7 @@
                 <label class="radio-inline"><input type="radio" name="type" value="2" {if !empty($item['id'])}disabled {/if}  {if $item['type'] == 2}checked="true"{/if}  onclick="type_change(2);" /> 虚拟商品</label>
                 <label class="radio-inline"><input type="radio" name="type" value="4" {if !empty($item['id'])}disabled {/if}  {if $item['type'] == 4}checked="true"{/if}  onclick="type_change(4);" /> 批发商品</label>
                 <label class="radio-inline"><input type="radio" name="type" value="5" {if !empty($item['id'])}disabled {/if}  {if $item['type'] == 5}checked="true"{/if}  onclick="type_change(5);" /> 记次/时商品</label>
-                <label class="radio-inline"><input type="radio" name="type" value="20" {if !empty($item['id'])}disabled {/if}  {if $item['type'] == 20}checked="true"{/if}  onclick="type_change(20);" /> 充值卡</label>
+                <!-- <label class="radio-inline"><input type="radio" name="type" value="20" {if !empty($item['id'])}disabled {/if}  {if $item['type'] == 20}checked="true"{/if}  onclick="type_change(20);" /> 充值卡</label> -->
                 <span class="help-block">商品类型，商品保存后无法修改，请谨慎选择</span>
             </div>
         </div>
@@ -350,6 +350,7 @@
                     {/foreach}
                 </select>
             </div>
+            <span class="help-block">如果开启了同城配送，系统优先使用同城配送方式，如果未开启同城配送或者超出同城配送范围则使用普通快递方式计算运费</span>
         </div>
     </div>
 <div class="form-group dispatch_info" {if ($item['type'] == 2 || $item['type'] == 3 || $item['type'] == 10)}style="display: none;"{/if}>
@@ -360,6 +361,7 @@
             <input type="text" name="dispatchprice" id="dispatchprice" class="form-control" value="{$item['dispatchprice']}" />
             <span class="input-group-addon">元</span>
         </div>
+        <span class="help-block">如果开启了同城配送，同城运费根据统一邮费进行计算</span>
     </div>
 </div>
 
@@ -376,7 +378,7 @@
             <option value="" selected="true">请选择</option>
         </select>
         {if !empty($new_area) && !empty($address_street)}
-        <select id="sel-street" name="street" class="select form-control select-group" style="width:220px;display:inline">
+        <select id="sel-street" name="street" class="select form-control select-group" style="width:220px;display:none">
             <option value="" selected="true">请选择</option>
         </select>
         {/if}

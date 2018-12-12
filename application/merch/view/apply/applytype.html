@@ -1,0 +1,36 @@
+<div class="col-sm-6" style='float:left;height:auto;overflow: hidden;margin-bottom:20px;font-size:18px;'>
+
+    <b>提现方式: </b>
+
+    {if empty($item['applytype'])}
+
+    <span class='label label-primary'>{$apply_type[$item['applytype']]}</span>
+
+    {elseif $item['applytype'] == 1}
+
+    <span class='label label-success'>{$apply_type[$item['applytype']]}</span>
+
+    {elseif $item['applytype'] == 2}
+
+    <span class='label label-warning'>{$apply_type[$item['applytype']]}</span>
+
+    <b>姓名: </b><span style='color:red' id="realname">{$item['applyrealname']}</span>
+
+    <b>支付宝帐号: </b><span style='color:red' id="alipay">{$item['alipay']}</span>
+
+    {elseif $item['applytype'] == 3}
+
+    <span class='label label-danger'>{$apply_type[$item['applytype']]}</span>
+
+    <b>姓名: </b><span style='color:red' id="realname">{$item['applyrealname']}</span>
+
+    <b>银行: </b><span style='color:red' id="bankname">{$item['bankname']}</span>
+
+    <b>卡号: </b><span style='color:red' id="bankcard">{$item['bankcard']}</span>
+
+    {/if}
+
+    <input type="hidden" name="applytype" id="applytype" value="{$item['applytype']}" />
+
+</div>
+

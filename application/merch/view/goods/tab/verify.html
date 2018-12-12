@@ -1,80 +1,49 @@
 <style type='text/css'>
-    body { width:100%;} 
+    body { width:100%;}
     .img-thumbnail { width:100px; height:100px;}
     .img-nickname { height:25px;line-height:25px;width:90px;margin-left:5px;margin-right:5px;position: absolute;bottom:55px;color:#fff;text-align: center;background:rgba(0,0,0,0.7)}
 </style>
- <div class="region-goods-details row">
-     <div class="region-goods-left col-sm-2">线下核销</div>
-     <div class="region-goods-right col-sm-10">
-         <div class="form-group">
-             <label class="col-xs-12 col-sm-3 col-md-2 control-label">支持线下核销</label>
-             <div class="col-sm-6 col-xs-6">
-                 <label class="radio-inline"><input type="radio" name="isverify" value="2" {if $item['isverify'] == 2}checked="true"{/if}   /> 支持</label>
-                 <label class="radio-inline"><input type="radio" name="isverify" value="1" {if empty($item['isverify']) || $item['isverify'] == 1}checked="true"{/if}  /> 不支持</label>
-             </div>
-         </div>
 
-         <div class="form-group">
-             <label class="col-xs-12 col-sm-3 col-md-2 control-label">核销类型</label>
-             <div class="col-sm-6 col-xs-6">
-                 <label class="radio-inline"><input type="radio" name="verifytype" value="0" {if empty($item['verifytype'])}checked="true"{/if} /> 按订单核销</label>
-                 <label class="radio-inline"><input type="radio" name="verifytype" value="1" {if $item['verifytype'] == 1}checked="true"{/if} /> 按次核销</label>
-                 <label class="radio-inline"><input type="radio" name="verifytype" value="2" {if $item['verifytype'] == 2}checked="true"{/if} /> 按消费码核销</label>
-                 <p class="help-block">
-                     按订单核销： 不管购买多少 一次核销完成<br>
-                     按次核销：  一个消费码使用多次（购买的数量）<br>
-                     按消费码核销： 多个消费码  一次核销一个
-                 </p>
-             </div>
-         </div>
-         <div class="form-group" {if empty($item['isverify'])}style="display:none;"{/if}>
-         <label class="col-sm-2 control-label">兑换限时</label>
-         <div class="col-sm-9 col-xs-12">
-             <label class="radio-inline">
-                 <input type="radio" name='isendtime' value="0" {if empty($item['isendtime'])}checked{/if} /> 指定时间兑换
-             </label>
-             <label class="radio-inline">
-                 <input type="radio" name='isendtime' value="1" {if $item['isendtime']==1}checked{/if} /> 限时兑换
-             </label>
-         </div>
-     </div>
-     <div class="form-group" id="usetime" {if !empty($item['isendtime'])}style="display:none;"{/if}>
-     <label class="col-sm-2 control-label">自动使用期限</label>
-     <div class="col-sm-9 col-xs-12">
-         <div class="input-group">
-             <input type='text' class='form-control' name='usetime' value="{$item['usetime']}" />
-             <span class="input-group-addon">天</span>
-         </div>
-         <span class='help-block'>商品购买X天后自动使用，自动使用后无法退款，设置为0则没有限制。</span>
-     </div>
-</div>
-<div class="form-group" id="endtime" {if empty($item['isendtime'])}style="display:none;"{/if}>
-    <label class="col-sm-2 control-label">使用有效期至</label>
-    <div class="col-sm-9 col-xs-12">
-        {:tpl_form_field_date('endtime', $endtime,true)}
+<div class="region-goods-details row">
+    <div class="region-goods-left col-sm-2">
+        促销方式
+    </div>
+    <div class="region-goods-right col-sm-10">
+        <div class="form-group">
+            <label class="col-lg control-label">支持线下核销</label>
+            <div class="col-sm-6 col-xs-6">
+                <label class="radio-inline"><input type="radio" name="isverify" value="1" {if empty($item['isverify']) || $item['isverify'] == 1}checked="true"{/if}  /> 不支持</label>
+                <label class="radio-inline"><input type="radio" name="isverify" value="2" {if $item['isverify'] == 2}checked="true"{/if}   /> 支持</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">核销类型</label>
+            <div class="col-sm-6 col-xs-6">
+                <label class="radio-inline"><input type="radio" name="verifytype" value="0" {if empty($item['verifytype'])}checked="true"{/if}  /> 按订单核销</label>
+                <label class="radio-inline"><input type="radio" name="verifytype" value="1" {if $item['verifytype'] == 1}checked="true"{/if}   /> 按次核销</label>
+                <label class="radio-inline"><input type="radio" name="verifytype" value="2" {if $item['verifytype'] == 2}checked="true"{/if}   /> 按消费码核销</label>
+                <p class="help-block">
+                    按订单核销： 不管购买多少 一次核销完成<br>
+                    按次核销：  一个消费码使用多次（购买的数量）<br>
+                    按消费码核销： 多个消费码  一次核销一个
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">核销门店选择</label>
+            <div class="col-sm-9 col-xs-12 chks">
+                <?php echo tpl_selector('storeids',
+                array('text'=>'storename',
+                    'multi'=>1,
+                    'type'=>'text',
+                    'placeholder'=>'门店名称',
+                    'buttontext'=>'选择门店 ',
+                    'items'=>$stores,
+                    'url'=>url('merch/store/query')))?>
+            </div>
+        </div>
     </div>
 </div>
-<div class="form-group">
-    <label class="col-xs-12 col-sm-3 col-md-2 control-label">核销门店选择</label>
-    <div class="col-sm-9 col-xs-12 chks">
-        {:tpl_selector('storeids', array('text'=>'storename','multi'=>1,'type'=>'text','placeholder'=>'门店名称','buttontext'=>'选择门店 ','items'=>$stores,'url'=>url('merch/shop/storequery')))}
-    </div>
 
-</div>
-     </div>
- </div>
 
-<script type="text/javascript">
-    $(function(){
-        $("input[name='isendtime']").off("click").on("click",function(){
-            if($(this).val()==0){
-                $("#usetime").show();
-                $("#endtime").hide();
-            }else{
-                $("#endtime").show();
-                $("#usetime").hide();
-            }
-        })
-    })
-</script>
-<!--NDAwMDA5NzgyNw==-->
+

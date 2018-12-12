@@ -21,7 +21,7 @@
                         {/foreach}
                     </select>
                 </div>
-                <div class="input-group-select">
+                <div class="input-group-select" style="display: none;">
                     <select name='status' class='form-control  input-sm select-md' style="width:100px;"  >
                         <option value=''>审核</option>
                         <option value='0' {if $status=='0'}selected{/if}>未审核</option>
@@ -51,7 +51,7 @@
         <a class='btn btn-default btn-sm btn-operation'  data-toggle='batch' data-href="{:url('admin/merch/status',array('status'=>1))}"  data-confirm='确认要启用账户吗?'>
             <i class="icow icow-qiyong"></i>启用
         </a>
-        <a class='btn btn-default btn-sm btn-operation'  data-toggle='batch' data-href="{:url('admin/merch/status',array('status'=>-1))}" data-confirm='确认要禁用账户吗?'>
+        <a class='btn btn-default btn-sm btn-operation'  data-toggle='batch' data-href="{:url('admin/merch/status',array('status'=>0))}" data-confirm='确认要禁用账户吗?'>
             <i class="icow icow-jinyong"></i>禁用
         </a>
         <a class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/merch/delete')}">
@@ -121,7 +121,7 @@
                     <a class='btn btn-default btn-sm btn-operation'  data-toggle='batch' data-href="{:url('admin/merch/status',array('status'=>1))}"  data-confirm='确认要启用账户吗?'>
                         <i class="icow icow-qiyong"></i>启用
                     </a>
-                    <a class='btn btn-default btn-sm btn-operation'  data-toggle='batch' data-href="{:url('admin/merch/status',array('status'=>-1))}" data-confirm='确认要禁用账户吗?'>
+                    <a class='btn btn-default btn-sm btn-operation'  data-toggle='batch' data-href="{:url('admin/merch/status',array('status'=>0))}" data-confirm='确认要禁用账户吗?'>
                         <i class="icow icow-jinyong"></i> 禁用
                     </a>
                     <a class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/merch/delete')}">

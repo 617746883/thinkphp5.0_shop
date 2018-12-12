@@ -30,7 +30,7 @@ class Index extends Base
 		$banner = Db::name('shop_banner')->where('enabled = 1')->order('displayorder','desc')->field('displayorder,enabled',true)->select();
 		$banner = set_medias($banner,'thumb');
 
-		$sale = Db::name('shop_goods')->where('status',1)->where('deleted',0)->field('id,title,pcate,ccate,tcate,thumb')->limit(2)->select();
+		$sale = Db::name('shop_goods')->where('status = 1 and deleted = 0 and checked =0')->field('id,title,pcate,ccate,tcate,thumb')->limit(2)->select();
 		$sale = set_medias($sale,'thumb');
 		foreach ($sale as &$row) {
 			$catename = '';
@@ -100,9 +100,9 @@ class Index extends Base
 		$timegoods = set_medias($timegoods,'thumb');
 		$time = array('title'=>'限时购','subtitle'=>'每日精品商品限时抢购','goods'=>$timegoods);
 
-		$groupsgoods = Db::name('shop_goods')->where('status = 1 and deleted = 0 and merchid = 0 and isgroups = 1 and isrecommand = 1')->field('id,title,thumb,marketprice')->order('displayorder','desc')->limit(2)->select();
+		$groupsgoods = Db::name('shop_goods')->where('status = 1 and deleted = 0 and merchid = 0 and ishot = 1 and isrecommand = 1')->field('id,title,thumb,marketprice')->order('displayorder','desc')->limit(2)->select();
 		$groupsgoods = set_medias($groupsgoods,'thumb');
-		$groups = array('title'=>'团购','subtitle'=>'精品商品享团购','goods'=>$groupsgoods);
+		$groups = array('title'=>'热卖','subtitle'=>'每日为您精选热卖','goods'=>$groupsgoods);
 		
 		$discountgoods = Db::name('shop_goods')->where('status = 1 and deleted = 0 and merchid = 0 and isdiscount = 1 and isrecommand = 1')->field('id,title,thumb,marketprice')->order('displayorder','desc')->limit(2)->select();
 		$discountgoods = set_medias($discountgoods,'thumb');
@@ -114,7 +114,7 @@ class Index extends Base
 
 		$num = input('num/d',6);
 		$shopset = model('common')->getSysset('shop');
-		$condition = 't1.deleted = 0 and t1.status = 1 and t1.isrecommand = 1 and t1.merchid = 0 and t1.istime = 0 and t1.isgroups = 0 and t1.isdiscount = 0';
+		$condition = 't1.deleted = 0 and t1.status = 1 and t1.isrecommand = 1 and t1.merchid = 0 and t1.istime = 0 and t1.ishot = 0 and t1.isdiscount = 0';
 
 		$list = Db::query("SELECT t1.id,t1.title,t1.subtitle,t1.thumb,t1.marketprice,t1.productprice,t1.minprice,t1.maxprice,t1.isdiscount,t1.isdiscount_time,t1.sales,t1.salesreal,t1.total,t1.description,t1.`type`,t1.ispresell,t1.merchid,t1.labelname,t1.quality,t1.seven,t1.repair FROM " . tablename('shop_goods') . " AS t1 JOIN (SELECT ROUND(RAND() * ((SELECT MAX(id) FROM " . tablename('shop_goods') . ")-(SELECT MIN(id) FROM " . tablename('shop_goods') . "))) AS id) AS t2 WHERE t1.id >= t2.id AND " . $condition . " ORDER BY t1.id desc LIMIT " . $num
 		);

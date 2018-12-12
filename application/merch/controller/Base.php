@@ -26,16 +26,19 @@ class Base extends Controller
 	public function __construct()
 	{
 		parent::__construct();  
-        if(!session('?merch')) {
-            $this->error('你还没有登录系统！','merch/login/index');
+        
+        if(!session('?account')) {
+            $this->redirect(url('merch/login/index'));
         }
-        $account = session('merch');
-        $merch = Db::name('shop_store')->where('id',$account['merchid'])->find();
+        $account = session('account');
+        $merch = Db::name('shop_merch')->alias('merch')->join('shop_merch_group grp','merch.groupid = grp.id','left')->join('shop_merch_category cate','merch.cateid = cate.id','left')->field('merch.*,grp.groupname,grp.goodschecked,grp.commissionchecked,grp.changepricechecked,grp.finishchecked,cate.catename')->where('merch.id = ' . $account['merchid'])->find();
         $this->account = $account;
         $this->merch = $merch;
-		$this->init();
-        $frame_menus = $this->frame_menus();
-        $this->assign(['frame_menus'=>$frame_menus,'account'=>$account,'merch'=>$merch]);
+		$this->init();        
+        $copyright = model('common')->getCopyright(1,$merch['id']);        
+        $system = model('system')->init($merch['id']);
+        $sysmenus = model('system')->getMenu(true,$merch['id']);
+        $this->assign(['frame_menus'=>$frame_menus,'account'=>$account,'merch'=>$merch,'copyright'=>$copyright,'system'=>$system,'sysmenus'=>$sysmenus]);
 	}
 
 	public function init()
@@ -61,6 +64,11 @@ class Base extends Controller
         $module = strtolower($request->module());
         $controller = strtolower($request->controller());
         $action = strtolower($request->action());
+        if ($controller == 'goods') {
+            $merch = $this->merch;
+            $totals = model('goods')->getTotals($merch['id']);
+            $this->assign(['totals'=>$totals]);
+        }
         $this->assign(['module'=>$module,'controller'=>$controller,'action'=>$action]);
         if ($controller == 'index') {
             return $this->fetch('/tabs');

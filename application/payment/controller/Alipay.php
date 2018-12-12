@@ -35,6 +35,12 @@ class Alipay extends Controller
 				$this->order($tid,$total_fee,$transaction_id);
 			} else if ($type == '1') {
 				$this->groups($tid,$total_fee,$transaction_id);
+			} else if ($type == '2') {
+				$this->creditShop($tid,$total_fee,$transaction_id);
+			} else if ($type == '3') {
+				$this->auction($tid,$total_fee,$transaction_id);
+			} else if ($type == '4') {
+				$this->seckill($tid,$total_fee,$transaction_id);
 			} else if ($type == '123') {
 				$this->community($tid,$total_fee,$transaction_id);
 			}
@@ -75,6 +81,36 @@ class Alipay extends Controller
 		} else {
 			echo "fail";
 		}
+	}
+
+	protected function creditShop($tid = '', $total_fee = 0, $transaction_id = '')
+	{
+		$order = Db::name('shop_creditshop_log')->where('logno',$tid)->find();
+
+		$log = Db::name('shop_core_paylog')->where('module','creditshop')->where('tid',$tid)->find();
+
+		if (!empty($log) && ($log['status'] == '0') && ($log['fee'] == $total_fee)) {
+			Db::name('shop_creditshop_log')->where('logno',$log['tid'])->update(array('paytype' => 1, 'transid' => $transaction_id));
+			$logno = trim($tid);
+			if( empty($logno) ) {
+				$this->tofail();
+			}
+			$logno = str_replace("_borrow", "", $logno);
+			$result = model("creditshop")->payResult($logno, "wechat", $total_fee, $transaction_id);
+
+			if ($result) {
+				$log['tag'] = iunserializer($log['tag']);
+				$log['tag']['transaction_id'] = $transaction_id;
+				$record = array();
+				$record['status'] = '1';
+				$record['type'] = 'wechat';
+				$record['tag'] = iserializer($log['tag']);
+				$record['createtime'] = time();
+				Db::name('shop_core_paylog')->where('plid',$log['plid'])->update($record);
+			}
+		} else {
+			$this->tofail();
+		}	
 	}
 
 	protected function community($tid = '', $total_fee = 0, $transaction_id = '')

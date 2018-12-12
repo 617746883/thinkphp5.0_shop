@@ -243,7 +243,7 @@ class Goods extends Base
 
 	public function label()
 	{
-		$condition = ' 1 ';
+		$condition = ' merchid = 0 ';
 		$psize = 20;
 
 		if (input('enabled') != '') {
@@ -359,7 +359,7 @@ class Goods extends Base
 	{
 		$kwd = trim(input('keyword'));
 		$params = array();
-		$condition = ' status = 1 ';
+		$condition = ' status = 1 and merchid = 0';
 
 		if (!empty($kwd)) {
 			$condition .= ' and label like "%' . $kwd . '%"';
@@ -419,77 +419,154 @@ class Goods extends Base
 	}
 
 	protected function goodslist($goodsfrom = 'sale')
-	{
-		$store_data = model('common')->getPluginset('store');
-		if ($merch_data['is_openmerch']) {
+	{		
+		$shopset = $this->shopset;
+		$merch_data = model("common")->getPluginset("merch");
+		if($merch_data["is_openmerch"] ) {
 			$is_openmerch = 1;
-		}
-		else {
+		} else {
 			$is_openmerch = 0;
 		}
 		$psize = 20;
-		$condition = ' 1 and isgroups = 0 ';
-		$keyword = input('keyword');
-		$cate = input('cate');
-		if (!empty($keyword)) {
-			$keyword = trim($keyword);
-			$condition .= ' AND ( g.`title` LIKE "%' . $keyword . '%" or g.`keywords` LIKE "%' . $keyword . '%" or g.`goodssn` LIKE "%' . $keyword . '%" or g.`productsn` LIKE "%' . $keyword . '%"';
-
-			// if ($is_openmerch) {
-			// 	$condition .= ' or merch.`merchname` LIKE :keyword';
-			// }
-
-			$condition .= ')';
-		}
-
-		if(empty($goodsfrom))
+		$querysql = Db::name('shop_goods')->alias('g');
+		$condition = " g.type<>9";
+		if( !empty($_GET["keyword"]) ) 
 		{
-			$goodsfrom = 'sale';
+			$keyword = trim($_GET["keyword"]);
+			$querysql = $querysql->join('shop_goods_option op','g.id = op.goodsid','left');
+			if( $is_openmerch ) {
+				$querysql = $querysql->join('shop_merch merch','merch.id = g.merchid','left');
+			}
+			$querysql = $querysql->group('g.`id`');
+			$condition .= " AND (g.`id` = '%" . $keyword . "%' or g.`title` LIKE '%" . $keyword . "%' or g.`keywords` LIKE '%" . $keyword . "%' or g.`goodssn` LIKE '%" . $keyword . "%' or g.`productsn` LIKE '%" . $keyword . "%' or op.`title` LIKE '%" . $keyword . "%' or op.`goodssn` LIKE '%" . $keyword . "%' or op.`productsn` LIKE '%" . $keyword . "%'";
+			if( $is_openmerch ) 
+			{
+				$condition .= " or merch.`merchname` LIKE '%" . $keyword . "%'";
+			}
+			$condition .= " )";
 		}
-
-		if ($goodsfrom == 'sale') {
-			$condition .= ' AND g.status > 0 and g.checked=0 and g.total>0 and g.deleted=0 ';
-			$status = 1;
+		if( !empty($_GET["cate"]) ) 
+		{
+			$cate = intval($_GET["cate"]);
+			$condition .= " AND FIND_IN_SET(" . $cate . ",cates)<>0 ";
 		}
-		else if ($goodsfrom == 'out') {
-			$condition .= ' AND g.status > 0 and g.total <= 0 and g.deleted=0 and g.type!=30 ';
-			$status = 1;
-		}
-		else if ($goodsfrom == 'stock') {
-			$status = 0;
-			$condition .= ' AND (g.status = 0 or g.checked=1) and g.deleted=0 ';
-		}
-		else if ($goodsfrom == 'cycle') {
-			$status = 0;
-			$condition .= ' AND g.deleted=1 ';
-		}
-		else {
-			if ($goodsfrom == 'verify') {
-				$status = 0;
-				$condition .= ' AND g.deleted=0 and merchid>0 and checked=1 ';
+		if( !empty($_GET["attribute"]) ) 
+		{
+			if( $_GET["attribute"] == "new" ) 
+			{
+				$condition .= " AND `isnew`=1 ";
+			}
+			else 
+			{
+				if( $_GET["attribute"] == "hot" ) 
+				{
+					$condition .= " AND `ishot`=1 ";
+				}
+				else 
+				{
+					if( $_GET["attribute"] == "recommand" ) 
+					{
+						$condition .= " AND `isrecommand`=1 ";
+					}
+					else 
+					{
+						if( $_GET["attribute"] == "discount" ) 
+						{
+							$condition .= " AND `isdiscount`=1 ";
+						}
+						else 
+						{
+							if( $_GET["attribute"] == "time" ) 
+							{
+								$condition .= " AND `istime`=1 ";
+							}
+							else 
+							{
+								if( $_GET["attribute"] == "sendfree" ) 
+								{
+									$condition .= " AND `issendfree`=1 ";
+								}
+								else 
+								{
+									if( $_GET["attribute"] == "nodiscount" ) 
+									{
+										$condition .= " AND `isdiscount`=1 ";
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
-
-		if (!empty($cate)) {
-			$cate = intval($cate);
-			$condition .= ' AND FIND_IN_SET(' . $cate . ',cates)<>0 ';
+		empty($goodsfrom) && ($_GET['goodsfrom'] = $goodsfrom = 'sale');
+		$_GET['goodsfrom'] = $goodsfrom;
+		if( $goodsfrom == "sale" ) {
+			$condition .= " AND g.`status` > 0 and g.`checked`=0 and g.`total`>0 and g.`deleted`=0";
+			$status = 1;
+		} else {
+			if( $goodsfrom == "out" ) 
+			{
+				$condition .= " AND g.`status` > 0 and g.`total` <= 0 and g.`deleted`=0 and g.type!=30";
+				$status = 1;
+			}
+			else 
+			{
+				if( $goodsfrom == "stock" ) 
+				{
+					$status = 0;
+					$condition .= " AND (g.`status` = 0 or g.`checked`=1) and g.`deleted`=0";
+				}
+				else 
+				{
+					if( $goodsfrom == "cycle" ) 
+					{
+						$status = 0;
+						$condition .= " AND g.`deleted`=1";
+					}
+					else 
+					{
+						if( $goodsfrom == "verify" ) 
+						{
+							$status = 0;
+							$condition .= " AND g.`deleted`=0 and merchid>0 and checked=1";
+						}
+					}
+				}
+			}
 		}
 		
-		$list = Db::name('shop_goods')
-			->alias('g')
-			// ->join('shop_goods_option op','g.id = op.goodsid','left')
-			// ->join('shop_store store','store.id = g.merchid','left')
-			->where($condition)
-			->field('g.*')
-			->order('g.createtime','desc')
-			->paginate($psize);
-		$pager = $list->render();
-		$categorys = model('shop')->getFullCategory(true);
-		$category = array();
-
-		foreach ($categorys as $val) {
-			$category[$val['id']] = $val;
+		$list = $querysql->where($condition)->field('g.*')->order('g.status DESC, g.displayorder DESC,g.id DESC')->paginate($psize);;
+		foreach( $list as $key => $value ) 
+		{
+			$value["allcates"] = explode(",", $value["cates"]);
+			$value["allcates"] = array_unique($value["allcates"]);
+			$sale_cpcount = Db::query("SELECT sum(og.total)  as sale_count FROM " . tablename("shop_order_goods") . " og LEFT JOIN " . tablename("shop_order") . " o on og.orderid=o.id  WHERE og.goodsid=" . $value["id"] . " and o.`status`>=1 and o.refundid = 0 ");
+			$value["sale_cpcount"] = $sale_cpcount["sale_count"];
+			$data = array();
+    		$data = $value;
+    		$list->offsetSet($key,$data);
 		}
+		unset($value);
+		$pager = $list->render();
+		if( $is_openmerch ) 
+		{
+			$merch_user = model('merch')->getListUser($list, "merch_user");
+			if( !empty($list) && !empty($merch_user) ) 
+			{
+				foreach( $list as &$row ) 
+				{
+					$row["merchname"] = ($merch_user[$row["merchid"]]["merchname"] ? $merch_user[$row["merchid"]]["merchname"] : $shopset["shop"]["name"]);
+				}
+			}
+		}
+		$categorys = model("shop")->getFullCategory(true, true);
+		$category = array( );
+		foreach( $categorys as $cate ) 
+		{
+			$category[$cate["id"]] = $cate;
+		}		
+		$goodstotal = intval($shopset["goodstotal"]);
 		
 		$this->assign(['list'=>$list,'pager'=>$pager,'category'=>$category,'cate'=>$cate,'status'=>$status,'keyword'=>$keyword,'goodsfrom'=>$goodsfrom]);
 		return $this->fetch('goods/index');
@@ -518,12 +595,12 @@ class Goods extends Base
 		if (!(empty($item)) && ($item['type'] == 5) && !(empty($item['opencard'])) && !(empty($item['cardid']))) {
 			$card = Db::name('shop_goods_cards')->where('id',$item['cardid'])->find();
 		}
+		$noticetype = explode(",", $item["noticetype"]);
 		$status = $item['status'];
 
 		if (json_decode($item['labelname'], true)) {
 			$labelname = json_decode($item['labelname'], true);
-		}
-		else {
+		} else {
 			$labelname = unserialize($item['labelname']);
 		}
 		$endtime = ((empty($item['endtime']) ? date('Y-m-d H:i', time()) : date('Y-m-d H:i', $item['endtime'])));
@@ -577,7 +654,7 @@ class Goods extends Base
 			if (($goodstype != 1) && (input('status/d') == 2)) {
 				show_json(0, '赠品只能是实体商品');
 			}
-			$data = array('displayorder' => input('displayorder/d',0), 'title' => trim(input('goodsname/s','')), 'unit' => trim(input('unit/s')), 'subtitle' => trim(input('subtitle/s')), 'shorttitle' => trim(input('shorttitle/s')), 'keywords' => trim(input('keywords/s')), 'type' => $goodstype, 'ispresell' => input('ispresell/d',0), 'presellprice' => input('presellprice/f'), 'presellstart' => input('presellstart/d',0), 'presellend' => input('presellend/d',0), 'preselltimestart' => (0 < input('presellstart/d',0) ? strtotime(input('preselltimestart')) : 0), 'preselltimeend' => (0 < input('presellend/d',0) ? strtotime(input('preselltimeend')) : 0), 'presellsendtype' => input('presellsendtype/d',0), 'presellsendstatrttime' => strtotime(input('presellsendstatrttime')), 'presellsendtime' => input('presellsendtime/d',0), 'presellover' => input('presellover/d',0), 'presellovertime' => (0 < input('presellovertime/d',0) ? input('presellovertime/d') : 0), 'virtualsend' => input('virtualsend/d',0), 'virtualsendcontent' => trim(input('virtualsendcontent/s')), 'virtual' => ($goodstype == 3 ? input('virtual/d',0) : 0), 'isrecommand' => input('isrecommand/d',0), 'ishot' => input('ishot/d',0), 'isnew' => input('isnew/d',0), 'issendfree' => input('issendfree/d',0), 'isnodiscount' => input('isnodiscount/d',0), 'marketprice' => input('marketprice'), 'productprice' => trim(input('productprice')), 'costprice' => input('costprice'), 'thumb_first' => input('thumb_first/d',0), 'video' => trim(input('video/s')), 'sales' => input('sales/d',0), 'showsales' => input('showsales/d',0), 'ednum' => input('ednum/d',0), 'edmoney' => trim(input('edmoney')), 'edareas' => trim(input('edareas')), 'edareas_code' => trim(input('edareas_code')), 'province' => trim(input('province/s')), 'city' => trim(input('city/s')), 'invoice' => input('invoice/d',0), 'quality' => input('quality/d',0), 'seven' => input('seven/d',0), 'repair' => input('repair/d',0), 'labelname' => serialize(input('labelname/a')), 'status' => ($status != 2 ? input('status/d',0) : $status), 'isstatustime' => input('isstatustime/d',0), 'nosearch' => input('nosearch/d',0), 'groupstype' => input('groupstype/d',0), 'cannotrefund' => input('cannotrefund/d',0), 'autoreceive' => input('autoreceive/d',0), 'goodssn' => trim(input('goodssn/s')), 'productsn' => trim(input('productsn/s')), 'weight' => input('weight'), 'total' => input('total/d',0), 'totalcnf' => input('totalcnf/d',0), 'hasoption' => input('hasoption/d',0), 'maxbuy' => input('maxbuy/d',0), 'minbuy' => input('minbuy/d',0), 'usermaxbuy' => input('usermaxbuy/d',0), 'showlevels' => (is_array(input('showlevels/a')) ? implode(',', input('showlevels/a')) : ''), 'buylevels' => (is_array(input('buylevels/a')) ? implode(',', input('buylevels/a')) : ''), 'showgroups' => (is_array(input('showgroups/a')) ? implode(',', input('showgroups/a')) : ''), 'buygroups' => (is_array(input('buygroups/a')) ? implode(',', input('buygroups/a')) : ''), 'isdiscount' => input('isdiscount/d',0), 'isdiscount_title' => trim(mb_substr(input('isdiscount_title'), 0, 5, 'UTF-8')), 'isdiscount_time' => strtotime(input('isdiscount_time')), 'money' => input('money'), 'deduct' => input('deduct'), 'manydeduct' => input('manydeduct'), 'deduct2' => input('deduct2'), 'buyagain' => input('buyagain/f'), 'buyagain_islong' => input('buyagain_islong/d',0), 'buyagain_condition' => input('buyagain_condition/d',0), 'buyagain_sale' => input('buyagain_sale/d',0), 'istime' => input('istime/d',0), 'timestart' => strtotime(input('saletime/a')['start']), 'timeend' => strtotime(input('saletime/a')['end']), 'description' => trim(input('description/s')), 'createtime' => time(), 'showtotal' => input('showtotal/d',0), 'unite_total' => input('unite_total/d',0), 'credit' => trim(input('credit')), 'buyshow' => input('buyshow/d',0));
+			$data = array('displayorder' => input('displayorder/d',0), 'title' => trim(input('goodsname/s','')), 'unit' => trim(input('unit/s')), 'subtitle' => trim(input('subtitle/s')), 'shorttitle' => trim(input('shorttitle/s')), 'keywords' => trim(input('keywords/s')), 'type' => $goodstype, 'ispresell' => input('ispresell/d',0), 'presellprice' => input('presellprice/f'), 'presellstart' => input('presellstart/d',0), 'presellend' => input('presellend/d',0), 'preselltimestart' => (0 < input('presellstart/d',0) ? strtotime(input('preselltimestart')) : 0), 'preselltimeend' => (0 < input('presellend/d',0) ? strtotime(input('preselltimeend')) : 0), 'presellsendtype' => input('presellsendtype/d',0), 'presellsendstatrttime' => strtotime(input('presellsendstatrttime')), 'presellsendtime' => input('presellsendtime/d',0), 'presellover' => input('presellover/d',0), 'presellovertime' => (0 < input('presellovertime/d',0) ? input('presellovertime/d') : 0), 'virtualsend' => input('virtualsend/d',0), 'virtualsendcontent' => trim(input('virtualsendcontent/s')), 'virtual' => ($goodstype == 3 ? input('virtual/d',0) : 0), 'isrecommand' => input('isrecommand/d',0), 'ishot' => input('ishot/d',0), 'isnew' => input('isnew/d',0), 'issendfree' => input('issendfree/d',0), 'isnodiscount' => input('isnodiscount/d',0), 'marketprice' => input('marketprice'), 'productprice' => trim(input('productprice')), 'costprice' => input('costprice'), 'thumb_first' => input('thumb_first/d',0), 'video' => trim(input('video/s')), 'sales' => input('sales/d',0), 'showsales' => input('showsales/d',0), 'ednum' => input('ednum/d',0), 'edmoney' => trim(input('edmoney')), 'edareas' => trim(input('edareas')), 'edareas_code' => trim(input('edareas_code')), 'province' => trim(input('province/s')), 'city' => trim(input('city/s')), 'invoice' => input('invoice/d',0), 'quality' => input('quality/d',0), 'seven' => input('seven/d',0), 'repair' => input('repair/d',0), 'labelname' => serialize(input('labelname/a')), 'status' => ($status != 2 ? input('status/d',0) : $status), 'isstatustime' => input('isstatustime/d',0), 'nosearch' => input('nosearch/d',0), 'groupstype' => input('groupstype/d',0), 'cannotrefund' => input('cannotrefund/d',0), 'autoreceive' => input('autoreceive/d',0), 'goodssn' => trim(input('goodssn/s')), 'productsn' => trim(input('productsn/s')), 'weight' => input('weight'), 'total' => input('total/d',0), 'totalcnf' => input('totalcnf/d',0), 'hasoption' => input('hasoption/d',0), 'maxbuy' => input('maxbuy/d',0), 'minbuy' => input('minbuy/d',0), 'usermaxbuy' => input('usermaxbuy/d',0), 'showlevels' => (is_array(input('showlevels/a')) ? implode(',', input('showlevels/a')) : ''), 'buylevels' => (is_array(input('buylevels/a')) ? implode(',', input('buylevels/a')) : ''), 'showgroups' => (is_array(input('showgroups/a')) ? implode(',', input('showgroups/a')) : ''), 'buygroups' => (is_array(input('buygroups/a')) ? implode(',', input('buygroups/a')) : ''), "noticemid" => (is_array($_POST["noticemid"]) ? implode(",", $_POST["noticemid"]) : ""), "noticetype" => (is_array($_POST["noticetype"]) ? implode(",", $_POST["noticetype"]) : ""), 'isdiscount' => input('isdiscount/d',0), 'isdiscount_title' => trim(mb_substr(input('isdiscount_title'), 0, 5, 'UTF-8')), 'isdiscount_time' => strtotime(input('isdiscount_time')), 'money' => input('money'), 'deduct' => input('deduct'), 'manydeduct' => input('manydeduct'), 'deduct2' => input('deduct2'), 'buyagain' => input('buyagain/f'), 'buyagain_islong' => input('buyagain_islong/d',0), 'buyagain_condition' => input('buyagain_condition/d',0), 'buyagain_sale' => input('buyagain_sale/d',0), 'istime' => input('istime/d',0), 'timestart' => strtotime(input('saletime/a')['start']), 'timeend' => strtotime(input('saletime/a')['end']), 'description' => trim(input('description/s')), 'createtime' => time(), 'showtotal' => input('showtotal/d',0), 'unite_total' => input('unite_total/d',0), 'credit' => trim(input('credit')), 'buyshow' => input('buyshow/d',0));
 			if($goodstype!=4)
 			{
 				if($data['marketprice']==''||$data['productprice']==''||$data['costprice']=='')
@@ -678,8 +755,7 @@ class Goods extends Base
 				$data['detail_btnurl1'] = trim(input('detail_btnurl1'));
 				$data['detail_btntext2'] = trim(input('detail_btntext2'));
 				$data['detail_btnurl2'] = trim(input('detail_btnurl2'));
-			}
-			else {
+			} else {
 				if ((intval($item['isverify']) == 2) || ($goodstype == 2) || ($goodstype == 3)) {
 					$data['cash'] = 0;
 				} else {
@@ -701,9 +777,9 @@ class Goods extends Base
 			$ccateid = 0;
 			$tcateid = 0;
 			if (is_array($_POST['cates'])) {
-				$cates = input('cates/a');
+				$cates = $_POST['cates'];
 				foreach ($cates as $key => $cid ) {
-					$c = Db::name('shop_goods_category')->where('id',$id)->field('level')->find();
+					$c = Db::name('shop_goods_category')->where('id',$cid)->field('level')->find();
 
 					if ($c['level'] == 1) {
 						$pcates[] = $cid;
@@ -781,218 +857,228 @@ class Goods extends Base
 				$data['verifygoodsdays'] = intval($verifygoodsdays);
 				$data['verifygoodslimitdate'] = intval($verifygoodslimitdate);
 			}
-			if (empty($id)) {
-				$data['merchid'] = 0;
-				$id = Db::name('shop_goods')->insertGetId($data);
-				model('shop')->plog('goods.add', '添加商品 ID: ' . $id);
-			} else {
-				unset($data['createtime']);
-				Db::name('shop_goods')->where('id',$id)->update($data);
-				model('shop')->plog('goods.edit', '编辑商品 ID: ' . $id);
-			}
-			$param_ids = $_POST['param_id'];
-			$param_titles = $_POST['param_title'];
-			$param_values = $_POST['param_value'];
-			$param_displayorders = $_POST['param_displayorder'];
-			$len = count($param_ids);
-			$paramids = array();
-			$k = 0;
-
-			while ($k < $len) {
-				$param_id = '';
-				$get_param_id = $param_ids[$k];
-				$a = array('title' => $param_titles[$k], 'value' => $param_values[$k], 'displayorder' => $k, 'goodsid' => $id);
-
-				if (!(is_numeric($get_param_id))) {
-					$param_id = Db::name('shop_goods_param')->insertGetId($a);
+			// 启动事务
+			Db::startTrans();
+			try {
+			    if (empty($id)) {
+					$data['merchid'] = 0;
+					$id = Db::name('shop_goods')->insertGetId($data);
+					model('shop')->plog('goods.add', '添加商品 ID: ' . $id);
 				} else {
-				 	Db::name('shop_goods_param')->where('id',$get_param_id)->update($a);
-					$param_id = $get_param_id;
+					unset($data['createtime']);
+					Db::name('shop_goods')->where('id',$id)->update($data);
+					model('shop')->plog('goods.edit', '编辑商品 ID: ' . $id);
 				}
+				$param_ids = $_POST['param_id'];
+				$param_titles = $_POST['param_title'];
+				$param_values = $_POST['param_value'];
+				$param_displayorders = $_POST['param_displayorder'];
+				$len = count($param_ids);
+				$paramids = array();
+				$k = 0;
 
-				$paramids[] = $param_id;
-				++$k;
-			}
+				while ($k < $len) {
+					$param_id = '';
+					$get_param_id = $param_ids[$k];
+					$a = array('title' => $param_titles[$k], 'value' => $param_values[$k], 'displayorder' => $k, 'goodsid' => $id);
 
-			if (0 < count($paramids)) {
-				Db::name('shop_goods_param')->where('id','not in',implode(',', $paramids))->where('goodsid',$id)->delete();
-			} else {
-			 	Db::name('shop_goods_param')->where('goodsid',$id)->delete();
-			}
-
-			$totalstocks = 0;
-			$files = $_FILES;
-			$spec_ids = $_POST['spec_id'];
-			$spec_titles = $_POST['spec_title'];
-			$specids = array();
-			$len = count($spec_ids);
-			$specids = array();
-			$spec_items = array();
-			$k = 0;
-			while ($k < $len) {
-				$spec_id = '';
-				$get_spec_id = $spec_ids[$k];
-				$a = array('goodsid' => $id, 'displayorder' => $k, 'title' => $spec_titles[$get_spec_id]);
-
-				if (is_numeric($get_spec_id)) {
-					Db::name('shop_goods_spec')->where('id',$get_spec_id)->update($a);
-					$spec_id = $get_spec_id;
-				} else {
-					$spec_id = Db::name('shop_goods_spec')->insertGetId($a);;
-				}
-
-				$spec_item_ids = $_POST['spec_item_id_' . $get_spec_id];
-				$spec_item_titles = $_POST['spec_item_title_' . $get_spec_id];
-				$spec_item_shows = $_POST['spec_item_show_' . $get_spec_id];
-				$spec_item_thumbs = $_POST['spec_item_thumb_' . $get_spec_id];
-				$spec_item_oldthumbs = $_POST['spec_item_oldthumb_' . $get_spec_id];
-				$spec_item_virtuals = $_POST['spec_item_virtual_' . $get_spec_id];
-				$itemlen = count($spec_item_ids);
-				$itemids = array();
-				$n = 0;
-
-				while ($n < $itemlen) {
-					$item_id = '';
-					$get_item_id = $spec_item_ids[$n];
-					$d = array('specid' => $spec_id, 'displayorder' => $n, 'title' => $spec_item_titles[$n], 'show' => $spec_item_shows[$n], 'thumb' => trim($spec_item_thumbs[$n]), 'virtual' => ($data['type'] == 3 ? $spec_item_virtuals[$n] : 0));
-					$f = 'spec_item_thumb_' . $get_item_id;
-
-					if (is_numeric($get_item_id)) {
-						Db::name('shop_goods_spec_item')->where('id',$get_item_id)->update($d);
-						$item_id = $get_item_id;
+					if (!(is_numeric($get_param_id))) {
+						$param_id = Db::name('shop_goods_param')->insertGetId($a);
 					} else {
-					 	$item_id = Db::name('shop_goods_spec_item')->insertGetId($d);
+					 	Db::name('shop_goods_param')->where('id',$get_param_id)->update($a);
+						$param_id = $get_param_id;
 					}
 
-					$itemids[] = $item_id;
-					$d['get_id'] = $get_item_id;
-					$d['id'] = $item_id;
-					$spec_items[] = $d;
-					++$n;
+					$paramids[] = $param_id;
+					++$k;
 				}
 
-				if (0 < count($itemids)) {
-					Db::name('shop_goods_spec_item')->where('specid',$spec_id)->where('id','not in',implode(',', $itemids))->delete();
+				if (0 < count($paramids)) {
+					Db::name('shop_goods_param')->where('id','not in',implode(',', $paramids))->where('goodsid',$id)->delete();
 				} else {
-				 	Db::name('shop_goods_spec_item')->where('specid',$spec_id)->delete();
+				 	Db::name('shop_goods_param')->where('goodsid',$id)->delete();
 				}
-				Db::name('shop_goods_spec')->where('id',$spec_id)->update(array('content' => serialize($itemids)));
-				$specids[] = $spec_id;
-				++$k;
-			}
 
-			if (0 < count($specids)) {
-				Db::name('shop_goods_spec')->where('goodsid',$id)->where('id','not in',implode(',', $specids))->delete();
-			} else {
-			 	Db::name('shop_goods_spec')->where('goodsid',$id)->delete();
-			}
-			$optionArray = json_decode($_POST['optionArray'], true);
-			$isdiscountDiscountsArray = json_decode($_POST['isdiscountDiscountsArray'], true);
-			$discountArray = json_decode($_POST['discountArray'], true);
-			$option_idss = $optionArray['option_ids'];
-			$len = count($option_idss);
-			$optionids = array();
-			$levelArray = array();
-			$isDiscountsArray = array();
-			$k = 0;
-			while ($k < $len) {
-				$option_id = '';
-				$ids = $option_idss[$k];
-				$get_option_id = $optionArray['option_id'][$k];
-				$idsarr = explode('_', $ids);
-				$newids = array();
+				$totalstocks = 0;
+				$files = $_FILES;
+				$spec_ids = $_POST['spec_id'];
+				$spec_titles = $_POST['spec_title'];
+				$specids = array();
+				$len = count($spec_ids);
+				$specids = array();
+				$spec_items = array();
+				$k = 0;
+				while ($k < $len) {
+					$spec_id = '';
+					$get_spec_id = $spec_ids[$k];
+					$a = array('goodsid' => $id, 'displayorder' => $k, 'title' => $spec_titles[$get_spec_id]);
 
-				foreach ($idsarr as $key => $ida ) {
-					foreach ($spec_items as $it ) {
-						while ($it['get_id'] == $ida) {
-							$newids[] = $it['id'];
-							break;
+					if (is_numeric($get_spec_id)) {
+						Db::name('shop_goods_spec')->where('id',$get_spec_id)->update($a);
+						$spec_id = $get_spec_id;
+					} else {
+						$spec_id = Db::name('shop_goods_spec')->insertGetId($a);;
+					}
+
+					$spec_item_ids = $_POST['spec_item_id_' . $get_spec_id];
+					$spec_item_titles = $_POST['spec_item_title_' . $get_spec_id];
+					$spec_item_shows = $_POST['spec_item_show_' . $get_spec_id];
+					$spec_item_thumbs = $_POST['spec_item_thumb_' . $get_spec_id];
+					$spec_item_oldthumbs = $_POST['spec_item_oldthumb_' . $get_spec_id];
+					$spec_item_virtuals = $_POST['spec_item_virtual_' . $get_spec_id];
+					$itemlen = count($spec_item_ids);
+					$itemids = array();
+					$n = 0;
+
+					while ($n < $itemlen) {
+						$item_id = '';
+						$get_item_id = $spec_item_ids[$n];
+						$d = array('specid' => $spec_id, 'displayorder' => $n, 'title' => $spec_item_titles[$n], 'show' => $spec_item_shows[$n], 'thumb' => trim($spec_item_thumbs[$n]), 'virtual' => ($data['type'] == 3 ? $spec_item_virtuals[$n] : 0));
+						$f = 'spec_item_thumb_' . $get_item_id;
+
+						if (is_numeric($get_item_id)) {
+							Db::name('shop_goods_spec_item')->where('id',$get_item_id)->update($d);
+							$item_id = $get_item_id;
+						} else {
+						 	$item_id = Db::name('shop_goods_spec_item')->insertGetId($d);
+						}
+
+						$itemids[] = $item_id;
+						$d['get_id'] = $get_item_id;
+						$d['id'] = $item_id;
+						$spec_items[] = $d;
+						++$n;
+					}
+
+					if (0 < count($itemids)) {
+						Db::name('shop_goods_spec_item')->where('specid',$spec_id)->where('id','not in',implode(',', $itemids))->delete();
+					} else {
+					 	Db::name('shop_goods_spec_item')->where('specid',$spec_id)->delete();
+					}
+					Db::name('shop_goods_spec')->where('id',$spec_id)->update(array('content' => serialize($itemids)));
+					$specids[] = $spec_id;
+					++$k;
+				}
+
+				if (0 < count($specids)) {
+					Db::name('shop_goods_spec')->where('goodsid',$id)->where('id','not in',implode(',', $specids))->delete();
+				} else {
+				 	Db::name('shop_goods_spec')->where('goodsid',$id)->delete();
+				}
+				$optionArray = json_decode($_POST['optionArray'], true);
+				$isdiscountDiscountsArray = json_decode($_POST['isdiscountDiscountsArray'], true);
+				$discountArray = json_decode($_POST['discountArray'], true);
+				$option_idss = $optionArray['option_ids'];
+				$len = count($option_idss);
+				$optionids = array();
+				$levelArray = array();
+				$isDiscountsArray = array();
+				$k = 0;
+				while ($k < $len) {
+					$option_id = '';
+					$ids = $option_idss[$k];
+					$get_option_id = $optionArray['option_id'][$k];
+					$idsarr = explode('_', $ids);
+					$newids = array();
+
+					foreach ($idsarr as $key => $ida ) {
+						foreach ($spec_items as $it ) {
+							while ($it['get_id'] == $ida) {
+								$newids[] = $it['id'];
+								break;
+							}
 						}
 					}
+
+					$newids = implode('_', $newids);
+					$a = array('title' => $optionArray['option_title'][$k], 'productprice' => $optionArray['option_productprice'][$k], 'costprice' => $optionArray['option_costprice'][$k], 'marketprice' => $optionArray['option_marketprice'][$k], 'presellprice' => $optionArray['option_presellprice'][$k], 'stock' => $optionArray['option_stock'][$k], 'weight' => $optionArray['option_weight'][$k], 'goodssn' => $optionArray['option_goodssn'][$k], 'productsn' => $optionArray['option_productsn'][$k], 'goodsid' => $id, 'specs' => $newids, 'virtual' => ($data['type'] == 3 ? $optionArray['option_virtual'][$k] : 0));
+
+					if ($goodstype == 4) {
+						$a['presellprice'] = 0;
+						$a['productprice'] = 0;
+						$a['costprice'] = 0;
+						$a['marketprice'] = input('intervalprice1/f');
+					}
+
+					$totalstocks += $a['stock'];
+
+					if (empty($get_option_id)) {
+						$option_id = Db::name('shop_goods_option')->insertGetId($a);
+					} else {
+					 	Db::name('shop_goods_option')->where('id',$get_option_id)->update($a);
+						$option_id = $get_option_id;
+					}
+
+					$optionids[] = $option_id;
+
+					foreach ($levels as $level ) {
+						$levelArray[$level['key']]['option' . $option_id] = $discountArray['discount_' . $level['key']][$k];
+						$isDiscountsArray[$level['key']]['option' . $option_id] = $isdiscountDiscountsArray['isdiscount_discounts_' . $level['key']][$k];
+					}
+					++$k;
 				}
-
-				$newids = implode('_', $newids);
-				$a = array('title' => $optionArray['option_title'][$k], 'productprice' => $optionArray['option_productprice'][$k], 'costprice' => $optionArray['option_costprice'][$k], 'marketprice' => $optionArray['option_marketprice'][$k], 'presellprice' => $optionArray['option_presellprice'][$k], 'stock' => $optionArray['option_stock'][$k], 'weight' => $optionArray['option_weight'][$k], 'goodssn' => $optionArray['option_goodssn'][$k], 'productsn' => $optionArray['option_productsn'][$k], 'goodsid' => $id, 'specs' => $newids, 'virtual' => ($data['type'] == 3 ? $optionArray['option_virtual'][$k] : 0));
-
-				if ($goodstype == 4) {
-					$a['presellprice'] = 0;
-					$a['productprice'] = 0;
-					$a['costprice'] = 0;
-					$a['marketprice'] = input('intervalprice1/f');
-				}
-
-				$totalstocks += $a['stock'];
-
-				if (empty($get_option_id)) {
-					$option_id = Db::name('shop_goods_option')->insertGetId($a);
+				if (((int) input('discounts/a')['type'] == 1) && $data['hasoption']) {
+					$discounts_arr = array('type' => (int) input('discounts/a')['type']);
+					$discounts_arr = array_merge($discounts_arr, $levelArray);
+					$discounts_json = json_encode($discounts_arr);
 				} else {
-				 	Db::name('shop_goods_option')->where('id',$get_option_id)->update($a);
-					$option_id = $get_option_id;
+					$discounts_json = ((is_array(input('discounts/a')) ? json_encode(input('discounts/a')) : json_encode(array())));
 				}
+				Db::name('shop_goods')->where('id',$id)->update(array('discounts' => $discounts_json));
+				$has_merch = 0;
+				$old_isdiscount_discounts = json_decode($item['isdiscount_discounts'], true);
 
-				$optionids[] = $option_id;
-
-				foreach ($levels as $level ) {
-					$levelArray[$level['key']]['option' . $option_id] = $discountArray['discount_' . $level['key']][$k];
-					$isDiscountsArray[$level['key']]['option' . $option_id] = $isdiscountDiscountsArray['isdiscount_discounts_' . $level['key']][$k];
+				if (!(empty($old_isdiscount_discounts['merch']))) {
+					$has_merch = 1;
 				}
-				++$k;
-			}
-			if (((int) input('discounts/a')['type'] == 1) && $data['hasoption']) {
-				$discounts_arr = array('type' => (int) input('discounts/a')['type']);
-				$discounts_arr = array_merge($discounts_arr, $levelArray);
-				$discounts_json = json_encode($discounts_arr);
-			} else {
-				$discounts_json = ((is_array(input('discounts/a')) ? json_encode(input('discounts/a')) : json_encode(array())));
-			}
-			Db::name('shop_goods')->where('id',$id)->update(array('discounts' => $discounts_json));
-			$has_merch = 0;
-			$old_isdiscount_discounts = json_decode($item['isdiscount_discounts'], true);
+				if (!(empty($isDiscountsArray)) && $data['hasoption']) {
+					$is_discounts_arr = array_merge(array('type' => 1), $isDiscountsArray);
 
-			if (!(empty($old_isdiscount_discounts['merch']))) {
-				$has_merch = 1;
-			}
-			if (!(empty($isDiscountsArray)) && $data['hasoption']) {
-				$is_discounts_arr = array_merge(array('type' => 1), $isDiscountsArray);
-
-				if ($has_merch == 1) {
-					$is_discounts_arr['merch'] = $old_isdiscount_discounts['merch'];
-				}
-				$is_discounts_json = json_encode($is_discounts_arr);
-			} else {
-				foreach ($levels as $level ) {
-					if ($level['key'] == 'default') {
-						$isDiscountsDefaultArray[$level['key']]['option0'] = $_POST['isdiscount_discounts_level_' . $level['key'] . '_default'];
+					if ($has_merch == 1) {
+						$is_discounts_arr['merch'] = $old_isdiscount_discounts['merch'];
 					}
-					 else {
-						$isDiscountsDefaultArray[$level['key']]['option0'] = $_POST['isdiscount_discounts_level_' . $level['id'] . '_default'];
+					$is_discounts_json = json_encode($is_discounts_arr);
+				} else {
+					foreach ($levels as $level ) {
+						if ($level['key'] == 'default') {
+							$isDiscountsDefaultArray[$level['key']]['option0'] = $_POST['isdiscount_discounts_level_' . $level['key'] . '_default'];
+						}
+						 else {
+							$isDiscountsDefaultArray[$level['key']]['option0'] = $_POST['isdiscount_discounts_level_' . $level['id'] . '_default'];
+						}
 					}
+
+					$is_discounts_arr = array_merge(array('type' => 0), $isDiscountsDefaultArray);
+
+					if ($has_merch == 1) {
+						$is_discounts_arr['merch'] = $old_isdiscount_discounts['merch'];
+					}
+					$is_discounts_json = ((is_array($is_discounts_arr) ? json_encode($is_discounts_arr) : json_encode(array())));
+				}
+				Db::name('shop_goods')->where('id',$id)->update(array('isdiscount_discounts' => $is_discounts_json));
+				if ((0 < count($optionids)) && ($data['hasoption'] !== 0)) {
+					Db::name('shop_goods_option')->where('goodsid',$id)->where('id','not in',implode(',', $optionids))->delete();
+					$sql = 'update ' . tablename('shop_goods') . ' g set' . "\r\n" . ' g.minprice = (select min(marketprice) from ' . tablename('shop_goods_option') . ' where goodsid = ' . $id . '),' . "\r\n" . '            g.maxprice = (select max(marketprice) from ' . tablename('shop_goods_option') . ' where goodsid = ' . $id . ')' . "\r\n" . '            where g.id = ' . $id . ' and g.hasoption=1';
+					Db::query($sql);
+				} else {
+					Db::name('shop_goods_option')->where('goodsid',$id)->delete();
+					$sql = 'update ' . tablename('shop_goods') . ' set minprice = marketprice,maxprice = marketprice where id = ' . $id . ' and hasoption=0;';
+					Db::query($sql);
 				}
 
-				$is_discounts_arr = array_merge(array('type' => 0), $isDiscountsDefaultArray);
+				$goodsinfo = Db::name('shop_goods')->where('id',$id)->field('id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,total,description,merchsale')->find();
+				$goodsinfo = model('goods')->getOneMinPrice($goodsinfo);
+				Db::name('shop_goods')->where('id',$id)->update(array('minprice' => $goodsinfo['minprice'], 'maxprice' => $goodsinfo['maxprice']));
 
-				if ($has_merch == 1) {
-					$is_discounts_arr['merch'] = $old_isdiscount_discounts['merch'];
+				if (($data['hasoption'] !== 0) && ($data['totalcnf'] != 2) && empty($data['unite_total'])) {
+					Db::name('shop_goods')->where('id',$id)->update(array('total' => $totalstocks));
 				}
-				$is_discounts_json = ((is_array($is_discounts_arr) ? json_encode($is_discounts_arr) : json_encode(array())));
-			}
-			Db::name('shop_goods')->where('id',$id)->update(array('isdiscount_discounts' => $is_discounts_json));
-			if ((0 < count($optionids)) && ($data['hasoption'] !== 0)) {
-				Db::name('shop_goods_option')->where('goodsid',$id)->where('id','not in',implode(',', $optionids))->delete();
-				$sql = 'update ' . tablename('shop_goods') . ' g set' . "\r\n" . ' g.minprice = (select min(marketprice) from ' . tablename('shop_goods_option') . ' where goodsid = ' . $id . '),' . "\r\n" . '            g.maxprice = (select max(marketprice) from ' . tablename('shop_goods_option') . ' where goodsid = ' . $id . ')' . "\r\n" . '            where g.id = ' . $id . ' and g.hasoption=1';
-				Db::query($sql);
-			} else {
-				Db::name('shop_goods_option')->where('goodsid',$id)->delete();
-				$sql = 'update ' . tablename('shop_goods') . ' set minprice = marketprice,maxprice = marketprice where id = ' . $id . ' and hasoption=0;';
-				Db::query($sql);
-			}
-
-			$goodsinfo = Db::name('shop_goods')->where('id',$id)->field('id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,total,description,merchsale')->find();
-			$goodsinfo = model('goods')->getOneMinPrice($goodsinfo);
-			Db::name('shop_goods')->where('id',$id)->update(array('minprice' => $goodsinfo['minprice'], 'maxprice' => $goodsinfo['maxprice']));
-
-			if (($data['hasoption'] !== 0) && ($data['totalcnf'] != 2) && empty($data['unite_total'])) {
-				Db::name('shop_goods')->where('id',$id)->update(array('total' => $totalstocks));
+			    // 提交事务
+			    Db::commit();
+			} catch (\Exception $e) {
+			    // 回滚事务
+			    show_json(0,'操作失败');
+			    Db::rollback();
 			}
 			show_json(1, array('url' => url('admin/goods/edit', array('id' => $id))));
 		}
@@ -1296,6 +1382,19 @@ class Goods extends Base
 					$stores = Db::name('shop_store')->where('id','in',$item['storeids'])->select();
 				}
 			}
+			if( !empty($item["noticemid"]) ) {
+				$salers = array( );
+				if( isset($item["noticemid"]) && !empty($item["noticemid"]) ) 
+				{
+					$openids = array( );
+					$strsopenids = explode(",", $item["noticemid"]);
+					foreach( $strsopenids as $openid ) 
+					{
+						$openids[] = "'" . $openid . "'";
+					}
+					$salers = Db::name('member')->where("id in (" . implode(",", $openids) . ")")->field('id,nickname,avatar')->select();
+				}
+			}
 			$dispatch_data = Db::name('shop_dispatch')->where('merchid',$merchid)->where('enabled',1)->order('displayorder','desc')->select();
 			if ($merchid == 0) {
 				$details = Db::name('shop_goods')->whereNotNull('detail_shopname')->group('detail_shopname')->field('detail_logo,detail_shopname,detail_btntext1, detail_btnurl1 ,detail_btntext2,detail_btnurl2,detail_totaltitle')->select();
@@ -1306,7 +1405,7 @@ class Goods extends Base
 				unset($d);
 			}
 		}
-		$this->assign(['item'=>$item,'category'=>$category,'dispatch_data'=>$dispatch_data,'new_area'=>$new_area,'address_street'=>$address_street,'levels'=>$levels,'groups'=>$groups,'virtual_types'=>$virtual_types,'allspecs'=>$allspecs,'cates'=>$cates,'piclist'=>$piclist,'params'=>$params,'html'=>$html,'discounts_html'=>$discounts_html,'isdiscount_discounts_html'=>$isdiscount_discounts_html,'areas'=>$areas,'labelname'=>$labelname,'intervalprices'=>$intervalprices,'details'=>$details,'discounts'=>$discounts]);
+		$this->assign(['item'=>$item,'category'=>$category,'merchid'=>$merchid,'dispatch_data'=>$dispatch_data,'new_area'=>$new_area,'address_street'=>$address_street,'levels'=>$levels,'groups'=>$groups,'virtual_types'=>$virtual_types,'allspecs'=>$allspecs,'cates'=>$cates,'piclist'=>$piclist,'params'=>$params,'html'=>$html,'discounts_html'=>$discounts_html,'isdiscount_discounts_html'=>$isdiscount_discounts_html,'areas'=>$areas,'labelname'=>$labelname,'intervalprices'=>$intervalprices,'details'=>$details,'discounts'=>$discounts,'stores'=>$stores,'salers'=>$salers,'endtime'=>$endtime,'noticetype'=>$noticetype]);
 		return $this->fetch('goods/post');
 	}
 
@@ -1709,6 +1808,148 @@ class Goods extends Base
 		}
 
 		show_json(1, array('url' => referer()));
+	}
+
+	public function ajax_batchcates() 
+	{
+		$iscover = $_POST["iscover"];
+		$goodsids = $_POST["goodsids"];
+		$cates = $_POST["cates"];
+		$data = array( );
+		$reust_cates = $this->reust_cates($cates);
+		foreach( $goodsids as $goodsid ) 
+		{
+			if( !empty($iscover) ) 
+			{
+				$data = $reust_cates;
+				$data["cates"] = implode(",", $data["cates"]);
+				$data["pcates"] = implode(",", $data["pcates"]);
+				$data["ccates"] = implode(",", $data["ccates"]);
+				$data["tcates"] = implode(",", $data["tcates"]);
+				Db::name('shop_goods')->where('id',$goodsid)->update($data);
+			}
+			else 
+			{
+				$goods = Db::name('shop_goods')->where('id',$goodsid)->field('pcate,ccate,tcate,cates,pcates,ccates,tcates')->find();
+				if( !empty($goods["cates"]) ) 
+				{
+					$goods_cates = explode(",", $goods["cates"]);
+					if( !empty($reust_cates["cates"]) ) 
+					{
+						$data["cates"] = implode(",", array_unique(array_merge($goods_cates, $reust_cates["cates"]), SORT_NUMERIC));
+					}
+				}
+				if( !empty($goods["pcates"]) ) 
+				{
+					$goods_pcates = explode(",", $goods["pcates"]);
+					if( !empty($reust_cates["pcates"]) ) 
+					{
+						$data["pcates"] = implode(",", array_unique(array_merge($goods_pcates, $reust_cates["pcates"]), SORT_NUMERIC));
+					}
+				}
+				if( !empty($goods["ccates"]) ) 
+				{
+					$goods_ccates = explode(",", $goods["ccates"]);
+					if( !empty($reust_cates["ccates"]) ) 
+					{
+						$data["ccates"] = implode(",", array_unique(array_merge($goods_ccates, $reust_cates["ccates"]), SORT_NUMERIC));
+					}
+				}
+				if( !empty($goods["tcates"]) ) 
+				{
+					$goods_tcates = explode(",", $goods["tcates"]);
+					if( !empty($reust_cates["tcates"]) ) 
+					{
+						$data["tcates"] = implode(",", array_unique(array_merge($goods_tcates, $reust_cates["tcates"]), SORT_NUMERIC));
+					}
+				}
+				if( !empty($reust_cates["pcate"]) ) 
+				{
+					$data["pcate"] = $reust_cates["pcate"];
+				}
+				if( !empty($reust_cates["ccate"]) ) 
+				{
+					$data["ccate"] = $reust_cates["ccate"];
+				}
+				if( !empty($reust_cates["tcate"]) ) 
+				{
+					$data["tcate"] = $reust_cates["tcate"];
+				}
+				Db::name('shop_goods')->where('id',$goodsid)->update($data);
+			}
+		}
+		show_json(1);
+	}
+
+	public function reust_cates($param_cates) 
+	{
+		$pcates = array( );
+		$ccates = array( );
+		$tcates = array( );
+		$cates = array( );
+		$pcateid = 0;
+		$ccateid = 0;
+		$tcateid = 0;
+		if( is_array($param_cates) ) 
+		{
+			foreach( $param_cates as $key => $cid ) 
+			{
+				$c = Db::name('shop_goods_category')->where('id',$cid)->field('level')->find();
+				if( $c["level"] == 1 ) 
+				{
+					$pcates[] = $cid;
+				}
+				else 
+				{
+					if( $c["level"] == 2 ) 
+					{
+						$ccates[] = $cid;
+					}
+					else 
+					{
+						if( $c["level"] == 3 ) 
+						{
+							$tcates[] = $cid;
+						}
+					}
+				}
+				if( $key == 0 ) 
+				{
+					if( $c["level"] == 1 ) 
+					{
+						$pcateid = $cid;
+					}
+					else 
+					{
+						if( $c["level"] == 2 ) 
+						{
+							$crow = Db::name('shop_goods_category')->where('id',$cid)->field('parentid')->find();
+							$pcateid = $crow["parentid"];
+							$ccateid = $cid;
+						}
+						else 
+						{
+							if( $c["level"] == 3 ) 
+							{
+								$tcateid = $cid;
+								$tcate = Db::name('shop_goods_category')->where('id',$cid)->field('id,parentid')->find();
+								$ccateid = $tcate["parentid"];
+								$ccate = Db::name('shop_goods_category')->where('id',$ccateid)->field('id,parentid')->find();
+								$pcateid = $ccate["parentid"];
+							}
+						}
+					}
+				}
+			}
+		}
+		$data["pcate"] = $pcateid;
+		$data["ccate"] = $ccateid;
+		$data["tcate"] = $tcateid;
+		$data["cates"] = $param_cates;
+		$data["pcates"] = $pcates;
+		$data["ccates"] = $ccates;
+		$data["tcates"] = $tcates;
+		return $data;
 	}
 
 	public function restore()

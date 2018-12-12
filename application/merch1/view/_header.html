@@ -1,0 +1,53 @@
+{include file='_header_base'}
+<style>
+    .deg180{
+        transform:rotate(180deg);
+        -ms-transform:rotate(180deg); 	/* IE 9 */
+        -moz-transform:rotate(180deg); 	/* Firefox */
+        -webkit-transform:rotate(180deg); /* Safari 和 Chrome */
+        -o-transform:rotate(180deg); 	/* Opera */
+    }
+    .nav.navbar-right {
+        width:160px !important;
+    }
+    .nav li{
+        width: 140
+    }
+</style>
+<div class="navbar-collapse collapse" id="navbar">
+    <ul class="nav navbar-nav gray-bg">
+        <li {if $controller=='index'} class="active"{/if}><a href="{:url('merch/index/index')}">首页</a></li>
+        <li {if $controller=='goods'} class="active"{/if} style="position: relative;"><a href="{:url('merch/goods/index')}"> 商品 </a></li>
+        <!-- <li {if $controller=='member'} class="active"{/if}><a href="{:url('merch/member')}"> 会员</a></li> -->
+        <li {if $controller=='order'} class="active"{/if}><a href="{:url('merch/order/index')}"> 订单</a></li>
+        <!-- <li {if $controller=='sale'} class="active"{/if}><a href="{:url('merch/sale')}">营销</a></li> -->
+        <li {if $controller=='finance'} class="active"{/if}><a href="{:url('merch/finance/index')}"> 财务</a></li>
+        <li {if $controller=='statistics'} class="active"{/if}><a href="{:url('merch/statistics/index')}">数据</a></li>
+        <li {if $controller=='sysset'} class="active"{/if} ><a href="{:url('merch/sysset/index')}"> 设置 </a></li>
+    </ul>
+    <ul class="nav navbar-top-links navbar-right">
+        <li class="dropdown">
+            <a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" style="position:relative; width: 160px;display: flex;flex-direction: row;justify-content: center;align-items: center;" onclick="$(this).find('span').toggleClass('deg180')">
+                <name style="width: 80px;white-space:nowrap;overflow:hidden;text-overflow: ellipsis;">{$account['username']}</name>
+                <span class="caret" style="position: absolute;top: 24px;right: 16px;"></span>
+            </a>
+            <ul role="menu" class="dropdown-menu">
+                <li><a href="{:url('merch/sysset/index')}"><i class="icon icon-settings"></i> 系统管理</a></li>
+                <li><a href="{:url('merch/user/index')}" target="_blank"><i class="icon icon-lock"></i> 修改密码</a></li>
+                <li><a href="{:url('merch/user/user')}" target="_blank"><i class="icon icon-lock"></i> 子账户管理</a></li>
+                <li><a href="{:url('merch/user/loginout')}" target="_blank"><i class="icow icow-exit"></i> 退出系统</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+</nav>
+</div>
+<div class='wrapper main-wrapper wrapper-content' style="width: 1200px;margin:0 auto;display: flex;flex-direction: row;justify-content: center;">
+    {if empty($frame_menus) || $no_left}
+    <div class="page-content" style="width:1000px">
+        {else}
+        <div class="page-menubar">
+            {$frame_menus}
+        </div>
+        <div class="page-content">
+            {/if}

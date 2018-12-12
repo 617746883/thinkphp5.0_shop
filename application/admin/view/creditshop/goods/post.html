@@ -1,4 +1,7 @@
 {include file='_header'}
+<script type="text/javascript" src="__STATIC__/js/lib/moment.js"></script>
+<link rel="stylesheet" href="__STATIC__/components/datetimepicker/jquery.datetimepicker.css">
+<link rel="stylesheet" href="__STATIC__/components/daterangepicker/daterangepicker.css">
 <style>
     .spec_item_thumb {position: relative;width: 30px;height: 20px;padding: 0;border-left: none;}
     .spec_item_thumb img{cursor: pointer;}
@@ -23,14 +26,12 @@
                 <li {if $_GET['tab']=='act'}class="active"{/if}><a href="#tab_act">抽奖设置</a></li>
                 <li {if $_GET['tab']=='verify'}class="active"{/if}><a href="#tab_verify" >线下核销</a></li>
                 <li {if $_GET['tab']=='vip'}class="active"{/if}><a href="#tab_vip">会员特权</a></li>
-                <li {if $_GET['tab']=='sub'}class="active"{/if}><a href="#tab_sub">商家管理</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane {if $_GET['tab']=='basic' || empty($_GET['tab'])}active{/if}" id="tab_basic">{include file='creditshop/goods/basic'}</div>
                 <div class="tab-pane {if $_GET['tab']=='option'}active{/if}" id="tab_option">{include file='creditshop/goods/option'}</div>
                 <div class="tab-pane {if $_GET['tab']=='notice'}active{/if}" id="tab_notice">{include file='creditshop/goods/notice'}</div>
                 <div class="tab-pane {if $_GET['tab']=='act'}active{/if}" id="tab_act">{include file='creditshop/goods/act'}</div>
-                <div class="tab-pane {if $_GET['tab']=='sub'}active{/if}" id="tab_sub">{include file='creditshop/goods/sub'}</div>
                 <div class="tab-pane {if $_GET['tab']=='vip'}active{/if}" id="tab_vip">{include file='creditshop/goods/vip'}</div>
                 <div class="tab-pane {if $_GET['tab']=='verify'}active{/if}" id="tab_verify"  {if $_GET['tab']=='basic'}active{/if}>{include file='creditshop/goods/verify'}</div>
             </div>
@@ -64,239 +65,6 @@
          $(":input[name=share_title]").val(o.share_title);
          $(":input[name=share_icon]").val(o.share_icon);
          $(":input[name=share_desc]").val(o.description);
-         if(o.hasoption>0){
-             $("#hasoption").prop("checked","true");
-             var obj = $("#hasoption");
-             if (obj.get(0).checked){
-                 //refreshOptions();
-                 $('.hasoption').attr('readonly',true);
-                 $("#tboption").show();
-                 $("#tbdiscount").show();
-                 $("#isdiscount_discounts").show();
-                 $("#isdiscount_discounts_default").hide();
-                 $("#discounts_type1").show().parent().show();
-             }
-             if(o.allspecs){
-                 $specs = '';
-                 o.allspecs.forEach(function (e) {
-                     $specs += "<div class='spec_item' id='spec_"+e.id+"' >";
-                     $specs += "<div style='border:1px solid #e7eaec;padding:10px;margin-bottom: 10px;' >";
-                     $specs += "<input name='spec_id[]' type='hidden' class='form-control spec_id' value='"+e.id+"'/>";
-                     $specs += "<div class='form-group'>";
-                     $specs += "<div class='col-sm-12'>";
-                     $specs += "<div class='input-group'>";
-                     $specs += "<input name='spec_title["+e.id+"]' type='text' class='form-control  spec_title' value='"+e.title+"' placeholder='规格名称 (比如: 颜色)'/>";
-                     $specs += "<div class='input-group-btn'>";
-                     $specs += "<a href='javascript:;' id='add-specitem-"+e.id+"' specid='"+e.id+"' class='btn btn-info add-specitem' onclick='addSpecItem("+e.id+")'><i class='fa fa-plus'></i> 添加规格项</a>";
-                     $specs += "<a href='javascript:void(0);' class='btn btn-danger' onclick='removeSpec('"+e.id+"')'><i class='fa fa-remove'></i></a>";
-                     $specs += "</div>";
-                     $specs += "</div>";
-                     $specs += "</div>";
-                     $specs += "</div>";
-                     $specs += "<div class='form-group'>";
-                     $specs += "<div class='col-md-12'>";
-                     $specs += "<div id='spec_item_"+e.id+"' class='spec_item_items'>";
-                    if (e.items){
-                        e.items.forEach(function (event) {
-                            var cheacked_str = '',has_thumb = '',disnone = '';
-                            if(event.show==1){
-                                cheacked_str = 'checked';
-                            }
-                            if(event.thumb!=''){
-                                has_thumb = 'has_thumb';
-                            }else{
-                                disnone = 'style="display:none"';
-                            }
-                            $specs += '<div class="spec_item_item" style="float:left;margin:5px;width:250px; position: relative">';
-                            $specs += '<input type="hidden" class="form-control spec_item_show" name="spec_item_show_'+e.id+'[]" value="'+event.show+'" />';
-                            $specs += '<input type="hidden" class="form-control spec_item_id" name="spec_item_id_'+e.id+'[]" value="'+event.id+'" />';
-                            $specs += '<div class="input-group">';
-                            $specs += '<span class="input-group-addon">';
-                            $specs += '<input type="checkbox" '+cheacked_str+' value="1" onclick="showItem(this)">';
-                            $specs += "</span>";
-                            $specs += '<input type="text" class="form-control spec_item_title" name="spec_item_title_'+e.id+'[]" VALUE="'+event.title+'" />';
-                            $specs += '<span class="input-group-addon spec_item_thumb '+has_thumb+' ">';
-                            $specs += '<input type="hidden"  name="spec_item_thumb_'+e.id+'[]" value="'+event.thumb+'"/>';
-                            $specs += '<img onclick="selectSpecItemImage(this)" onerror="this.src=\'{EWEI_SHOPV2_LOCAL}static/images/nopic100.jpg\'"';
-                            if(event.thumb!=''){
-                                $specs += 'src="{php echo tomedia('+event.thumb+')}"';
-                            }else{
-                                $specs += 'src="{EWEI_SHOPV2_LOCAL}static/images/nopic100.jpg" data-toggle="popover" data-html ="true" data-placement="top" data-trigger ="hover" ' +
-                                    ' data-content="<img src=\'{php echo tomedia("'+event.thumb+'")}\' style=\'width:100px;height:100px;\' >" ';
-                            }
-                            $specs += ' width="100%" />';
-                            $specs += '<i class="fa fa-times-circle" '+disnone+'></i> ';
-                            $specs += "</span>";
-                            $specs += '<span class="input-group-addon">';
-                            $specs += '<a href="javascript:;" onclick="removeSpecItem(this)" title="删除"><i class="fa fa-times"></i></a>';
-                            $specs += '<a href="javascript:;" class="fa fa-arrows" title="拖动调整显示顺序" ></a>';
-                            $specs += '</span>';
-                            $specs += "</div>";
-                            $specs += "</div>";
-                        })
-                    }
-                     $specs += "</div>";
-                     $specs += "</div>";
-                     $specs += "</div>";
-                     $specs += "</div>";
-                     $specs += "</div>";
-                 })
-                 $("#specs").append($specs);
-             }
-             if(o.options){
-                 var html = '<table class="table table-bordered table-condensed"><thead><tr class="active">';
-                 var specs = [];
-                 if($('.spec_item').length<=0){
-                     $("#options").html('');
-                     $("#discount").html('');
-                     $("#isdiscount_discounts").html('');
-                     //isdiscount_change();
-                     return;
-                 }
-                 $(".spec_item").each(function(i){
-                     var _this = $(this);
-                     var spec = {
-                         id: _this.find(".spec_id").val(),
-                         title: _this.find(".spec_title").val()
-                     };
-
-                     var items = [];
-                     _this.find(".spec_item_item").each(function(){
-                         var __this = $(this);
-                         var item = {
-                             id: __this.find(".spec_item_id").val(),
-                             title: __this.find(".spec_item_title").val(),
-                             virtual: __this.find(".spec_item_virtual").val(),
-                             show:__this.find(".spec_item_show").get(0).checked?"1":"0"
-                         }
-                         items.push(item);
-                     });
-                     spec.items = items;
-                     specs.push(spec);
-                 });
-                 specs.sort(function(x,y){
-                     if (x.items.length > y.items.length){
-                         return 1;
-                     }
-                     if (x.items.length < y.items.length) {
-                         return -1;
-                     }
-                 });
-
-                 var len = specs.length;
-                 var newlen = 1;
-                 var h = new Array(len);
-                 var rowspans = new Array(len);
-                 for(var i=0;i<len;i++){
-                     html+="<th>" + specs[i].title + "</th>";
-                     var itemlen = specs[i].items.length;
-                     if(itemlen<=0) { itemlen = 1 };
-                     newlen*=itemlen;
-
-                     h[i] = new Array(newlen);
-                     for(var j=0;j<newlen;j++){
-                         h[i][j] = new Array();
-                     }
-                     var l = specs[i].items.length;
-                     rowspans[i] = 1;
-                     for(j=i+1;j<len;j++){
-                         rowspans[i]*= specs[j].items.length;
-                     }
-                 }
-
-                 html += '<th><div class=""><div style="padding-bottom:10px;text-align:center;">库存</div><div class="input-group"><input type="text" class="form-control  input-sm option_total_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_total\');"></a></span></div></div></th>';
-                 html += '<th><div class=""><div style="padding-bottom:10px;text-align:center;">积分</div><div class="input-group"><input type="text" class="form-control  input-sm option_credit_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_credit\');"></a></span></div></div></th>';
-                 html+='<th><div class=""><div style="padding-bottom:10px;text-align:center;">金额</div><div class="input-group"><input type="text" class="form-control  input-sm option_money_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_money\');"></a></span></div></div></th>';
-                 html+='<th><div class=""><div style="padding-bottom:10px;text-align:center;">编码</div><div class="input-group"><input type="text" class="form-control  input-sm option_goodssn_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_goodssn\');"></a></span></div></div></th>';
-                 html+='<th><div class=""><div style="padding-bottom:10px;text-align:center;">条码</div><div class="input-group"><input type="text" class="form-control  input-sm option_productsn_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_productsn\');"></a></span></div></div></th>';
-                 html+='<th><div class=""><div style="padding-bottom:10px;text-align:center;">重量（克）</div><div class="input-group"><input type="text" class="form-control  input-sm option_weight_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_weight\');"></a></span></div></div></th>';
-                 html+='</tr></thead>';
-
-                 for(var m=0;m<len;m++){
-                     var k = 0,kid = 0,n=0;
-                     for(var j=0;j<newlen;j++){
-                         var rowspan = rowspans[m];
-                         if( j % rowspan==0){
-                             h[m][j]={title: specs[m].items[kid].title, virtual: specs[m].items[kid].virtual,html: "<td class='full' rowspan='" +rowspan + "'>"+ specs[m].items[kid].title+"</td>\r\n",id: specs[m].items[kid].id};
-                         }
-                         else{
-                             h[m][j]={title:specs[m].items[kid].title,virtual: specs[m].items[kid].virtual, html: "",id: specs[m].items[kid].id};
-                         }
-                         n++;
-                         if(n==rowspan){
-                             kid++; if(kid>specs[m].items.length-1) { kid=0; }
-                             n=0;
-                         }
-                     }
-                 }
-
-                 var hh = "";
-                 for(var i=0;i<newlen;i++){
-                     hh+="<tr>";
-                     var ids = [];
-                     var titles = [];
-                     var virtuals = [];
-                     for(var j=0;j<len;j++){
-                         hh+=h[j][i].html;
-                         ids.push( h[j][i].id);
-                         titles.push( h[j][i].title);
-                         virtuals.push( h[j][i].virtual);
-                     }
-                     ids =ids.join('_');
-                     titles= titles.join('+');
-
-                     var val ={ id : "",title:titles, total : "",money : "",credit : "",weight:"",productsn:"",goodssn:"",virtual:virtuals };
-                     o.options.forEach(function (e) {
-                         if(ids==e.specs){
-                             val ={
-                                 id : "",
-                                 title:titles,
-                                 total : e.stock,
-                                 money : "",
-                                 credit : "",
-                                 weight : e.weight,
-                                 goodssn : e.goodssn,
-                                 productsn : e.productsn,
-                                 virtual:virtuals
-                             }
-                         }
-                     });
-                     if( $(".option_id_" + ids).length>0){
-                         val ={
-                             id : $(".option_id_" + ids+":eq(0)").val(),
-                             title: titles,
-                             total : $(".option_total_" + ids+":eq(0)").val(),
-                             credit : $(".option_credit_" + ids+":eq(0)").val(),
-                             money : $(".option_money_" + ids +":eq(0)").val(),
-                             goodssn : $(".option_goodssn_" + ids +":eq(0)").val(),
-                             productsn : $(".option_productsn_" + ids +":eq(0)").val(),
-                             weight : $(".option_weight_" + ids+":eq(0)").val(),
-                             virtual : virtuals
-                         }
-                     }
-
-                     hh += '<td>'
-                     hh += '<input data-name="option_total_' + ids +'" type="text" class="form-control option_total option_total_' + ids +'" value="' +(val.total=='undefined'?'':val.total )+'"/></td>';
-                     hh += '<input data-name="option_id_' + ids+'" type="hidden" class="form-control option_id option_id_' + ids +'" value="' +(val.id=='undefined'?'':val.id )+'"/>';
-                     hh += '<input data-name="option_ids" type="hidden" class="form-control option_ids option_ids_' + ids +'" value="' + ids +'"/>';
-                     hh += '<input data-name="option_title_' + ids +'" type="hidden" class="form-control option_title option_title_' + ids +'" value="' +(val.title=='undefined'?'':val.title )+'"/></td>';
-                     hh += '<input data-name="option_virtual_' + ids +'" type="hidden" class="form-control option_virtual option_virtual_' + ids +'" value="' +(val.virtual=='undefined'?'':val.virtual )+'"/></td>';
-                     hh += '</td>';
-                     hh += '<td><input data-name="option_credit_' + ids+'" type="text" class="form-control option_credit option_credit_' + ids +'" value="' +(val.credit=='undefined'?'':val.credit )+'"/></td>';
-                     hh += '<td><input data-name="option_money_' + ids+'" type="text" class="form-control option_money option_money_' + ids +'" " value="' +(val.money=='undefined'?'':val.money )+'"/></td>';
-                     hh += '<td><input data-name="option_goodssn_' +ids+'" type="text" class="form-control option_goodssn option_goodssn_' + ids +'" " value="' +(val.goodssn=='undefined'?'':val.goodssn )+'"/></td>';
-                     hh += '<td><input data-name="option_productsn_' +ids+'" type="text" class="form-control option_productsn option_productsn_' + ids +'" " value="' +(val.productsn=='undefined'?'':val.productsn )+'"/></td>';
-                     hh += '<td><input data-name="option_weight_' + ids +'" type="text" class="form-control option_weight option_weight_' + ids +'" " value="' +(val.weight=='undefined'?'':val.weight )+'"/></td>';
-                     hh += "</tr>";
-                 }
-                 html+=hh;
-                 html+="</table>";
-                 $("#options").html(html);
-                 refreshDiscount();
-                 refreshIsDiscount();
-                 isdiscount_change();
-             }
-         }
          $("#title").val(o.title);
          var ue = UE.getEditor('goodsdetail', {
              autoHeight: false

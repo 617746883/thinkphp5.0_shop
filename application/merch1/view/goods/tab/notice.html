@@ -1,0 +1,23 @@
+<div class="region-goods-details row">
+    <div class="region-goods-left col-sm-2">卖家通知</div>
+    <div class="region-goods-right col-sm-10">
+        <div class="form-group notice">
+            <label class="col-sm-2 control-label">商家通知</label>
+            <div class="col-sm-9 col-xs-12">
+                {:tpl_selector('noticeopenid',array('key'=>'openid','text'=>'nickname','multi'=>1,'thumb'=>'avatar','placeholder'=>'昵称/姓名/手机号','buttontext'=>'选择通知人', 'items'=>$salers,'url'=>url('merch/member/query') ))}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">通知方式</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="1" name='noticetype[]' {if is_array($noticetype)}{if in_array('1',$noticetype)}checked{/if}{/if} /> 付款通知
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="2" name='noticetype[]' {if is_array($noticetype)}{if in_array('2',$noticetype)}checked{/if}{/if} /> 买家收货通知
+                </label>
+                <div class="help-block">通知商家方式</div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -70,7 +70,7 @@
         <tr ><td colspan='7' style='height:20px;padding:0;border-top:none;'>&nbsp;</td></tr>
         <tr class='trorder'>
             <td colspan='7' >
-                <span style="font-weight: bold;">{:date('Y-m-d',$item['createtime'])} {:date('H:i:s',$item['createtime'])}</span>
+                <span style="font-weight: bold;">{:date('Y-m-d',$row['createtime'])} {:date('H:i:s',$row['createtime'])}</span>
                 订单编号: {$row['ordersn']}
             </td>
             </td>
@@ -82,19 +82,19 @@
             <td style='text-align: left;overflow:hidden;border-left:none;'>{$g['title']}</td>
             <td style='text-align:right;border-left:none;'> {$g['realprice']/$g['total']}<br/>x {$g['total']}</td>
             <td style="text-align: center">{$row['addressname']}</td>
-            <td style="text-align: center">{if $row['paytype'] == 1}
+            <td style="text-align: center">{if $row['paytype'] == 4}
                 <span> <i class="icow icow-yue text-warning" style="font-size: 17px;"></i><span>余额支付</span></span>
-                {elseif $row['paytype'] == 11}
+                {elseif $row['paytype'] == 3}
                 <span> <i class="icow icow-kuajingzhifuiconfukuan text-danger" style="font-size: 17px"></i>后台付款</span>
                 {elseif $row['paytype'] == 2}
                 <span> <i class="icow icow-zaixianzhifu text-info" style="font-size: 17px"></i>在线支付</span>
-                {elseif $row['paytype'] == 21}
+                {elseif $row['paytype'] == 1}
                 <span> <i class="icow icow-weixinzhifu text-success" style="font-size: 17px"></i>微信支付</span>
-                {elseif $row['paytype'] == 22}
+                {elseif $row['paytype'] == 2}
                 <span><i class="icow icow-zhifubaozhifu text-primary" style="font-size: 17px"></i>支付宝支付</span>
                 {elseif $row['paytype'] == 23}
                 <span class="label label-primary">银联支付</span>
-                {elseif $row['paytype'] == 3}
+                {elseif $row['paytype'] == 23}
                 <span> <i class="text-primary icow icow-icon" style="font-size: 17px"></i>货到付款</span>
                 {/if}
             </td>
@@ -118,8 +118,8 @@
                              {if $row['couponprice']>0}
                             <tr><th>优惠券优惠</th><td class='text-danger'>{if $row['couponprice']>0}-{$row['couponprice']}{/if}</td></tr>
                              {/if}
-                            <tr><th>卖家改价</th><td {if 0<$item['changeprice']} class='text-default'{else}class='text-danger'{/if}>{if 0<$item['changeprice']}+{else}-{/if}{php echo number_format(abs($item['changeprice']),2)}</td></tr>
-                            <tr><th>卖家改运费</th><td {if 0<$item['changedipatchpriceprice']} class='text-default'{else}class='text-danger'{/if}>{if 0<$item['changedipatchpriceprice']}+{else}-{/if}{php echo number_format(abs($item['changedipatchpriceprice']),2)}</td></tr>
+                            <tr><th>卖家改价</th><td {if 0<$item['changeprice']} class='text-default'{else}class='text-danger'{/if}>{if 0<$item['changeprice']}+{else}-{/if}{:number_format(abs($item['changeprice']),2)}</td></tr>
+                            <tr><th>卖家改运费</th><td {if 0<$item['changedipatchpriceprice']} class='text-default'{else}class='text-danger'{/if}>{if 0<$item['changedipatchpriceprice']}+{else}-{/if}{:number_format(abs($item['changedipatchpriceprice']),2)}</td></tr>
                             <tr><th>实际总金额</th><td style='font-weight:bold'>{$row['price']}</td></tr>
                             </table>">
                     <b>{$row['price']}</b>

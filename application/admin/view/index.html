@@ -1,12 +1,10 @@
 {include file='_header'}
 <div class="page-header">当前位置：<span class="text-primary">首页</span></div>
-
 <style>
     .tab-content>.tab-pane {margin-top: 10px;}
     .tab-content>.tab-pane>.fui-list-group {border-bottom: 0;}
 </style>
 <div class="page-content transparent">
-
     <div class="row">
         <div class="col-md-4">
             <div class="ibox h300">
@@ -20,7 +18,7 @@
                     <ul class="fui-cell-group">
                         <li class="fui-cell">商城名称：<span class="text">{$shop_data['name']}</span></li>
                         <li class="fui-cell">商城介绍：<span class="text">{$shop_data['description']}</span></li>
-                        <li class="fui-cell">使用应用：<span class='text-no'>5</span>个 <a href="{:url('admin/plugins/index')}" class="text-primary">查看</a></li>
+                        <li class="fui-cell">使用应用：<span class='text-no'>7</span>个 <a href="{:url('admin/plugins/index')}" class="text-primary">查看</a></li>
                     </ul>
                 </div>
             </div>
@@ -74,21 +72,66 @@
                             </a>
                         </li>
                     </ul>
+                    <ul class="fui-list-group noborder" style="display: none;">
+                        <li class="fui-list">
+                            <a href="{:url('admin/commission/agent')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-primary icow-vip"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="commission_agent_total">-</h5>
+                                    <p>分销总数</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="fui-list">
+                            <a href="{:url('admin/commission/agent')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-warning icow-huiyuan2"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="commission_agent_status0_total">-</h5>
+                                    <p>待审核分销商</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="fui-list">
+                            <a href="{:url('admin/commission/apply',array('status'=>1))}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-green icow-yongjinmingxi"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="commission_apply_status1_total">-</h5>
+                                    <p>待审核佣金申请</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="fui-list">
+                            <a href="{:url('admin/commission/apply',array('status'=>2))}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-info icow-tixian1"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="commission_apply_status2_total">-</h5>
+                                    <p>待打款佣金申请</p>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="row">
         <div class="col-md-6">
             <div class="ibox" style="position: relative;">
                 <div class="ibox-title">
                     <h5><i class="icow">&#xe622;</i>订单概述</h5>
                     <ul class="nav nav-tabs" id="orderinfo">
-                        <li class="active"><a data-toggle="tab"  href="#order_count_0">今日</a></li>
-                        <li><a data-toggle="tab" href="#order_count_1">昨日</a></li>
-                        <li><a data-toggle="tab" href="#order_count_7">最近七日</a></li>
-                        <li><a data-toggle="tab" href="#order_count_30">本月</a></li>
+                        <li class="active"><a data-toggle="tab"  href="#order_count_0" onclick="get_order(0)">今日</a></li>
+                        <li><a data-toggle="tab" href="#order_count_1" onclick="get_order(1)">昨日</a></li>
+                        <li><a data-toggle="tab" href="#order_count_7" onclick="get_order(7)">最近七日</a></li>
+                        <li><a data-toggle="tab" href="#order_count_30" onclick="get_order(30)">本月</a></li>
                     </ul>
                 </div>
                 <div class="ibox-content">
@@ -98,13 +141,13 @@
                                 <div class="fui-list no-padding">
                                     <div class="fui-list-inner">
                                         <h4 class="text-warning order_count_0">-</h4>
-                                        成交量(件)
+                                        成交量/交易量(件)
                                     </div>
                                 </div>
                                 <div class="fui-list no-padding">
                                     <div class="fui-list-inner">
                                         <h4 class="text-warning order_price_0">-</h4>
-                                        成交额(元)
+                                        成交额/交易额(元)
                                     </div>
                                 </div>
                                 <div class="fui-list no-padding">
@@ -120,13 +163,13 @@
                                 <div class="fui-list no-padding">
                                     <div class="fui-list-inner">
                                         <h4 class="text-warning order_count_1">-</h4>
-                                        成交量(件)
+                                        成交量/交易量(件)
                                     </div>
                                 </div>
                                 <div class="fui-list no-padding">
                                     <div class="fui-list-inner">
                                         <h4 class="text-warning order_price_1">-</h4>
-                                        成交额(元)
+                                        成交额/交易额(元)
                                     </div>
                                 </div>
                                 <div class="fui-list no-padding">
@@ -142,16 +185,16 @@
                                 <div class="fui-list no-padding">
                                     <div class="fui-list-inner">
                                         <h4 class="text-warning order_count_7">-</h4>
-                                        成交量(件)
+                                        成交量/交易量(件)
                                     </div>
                                 </div>
                                 <div class="fui-list no-padding">
-                                    <div class="fui-list-inner">
+                                    <div class="fui-list-inner">                                        
                                         <h4 class="text-warning order_price_7">-</h4>
-                                        成交额(元)
+                                        成交额/交易额(元)
                                     </div>
                                 </div>
-                                <div class="fui-list no-padding">
+                                <div class="fui-list no-padding">                                    
                                     <div class="fui-list-inner">
                                         <h4 class="text-warning order_avg_7">-</h4>
                                         人均消费(元)
@@ -164,13 +207,13 @@
                                 <div class="fui-list no-padding">
                                     <div class="fui-list-inner">
                                         <h4 class="text-warning order_count_30">-</h4>
-                                        成交量(件)
+                                        成交量/交易量(件)
                                     </div>
                                 </div>
                                 <div class="fui-list no-padding">
                                     <div class="fui-list-inner">
                                         <h4 class="text-warning order_price_30">-</h4>
-                                        成交额(元)
+                                        成交额/交易额(元)
                                     </div>
                                 </div>
                                 <div class="fui-list no-padding">
@@ -184,6 +227,7 @@
                     </div>
                 </div>
             </div>
+
 
             <div class="ibox">
                 <div class="ibox-content" style="border: 0;">
@@ -201,12 +245,13 @@
                 <div class="ibox-title">
                     <h5><i class="icow">&#xe615;</i>商品销量排行</h5>
                     <ul class="nav nav-tabs" id="sale">
-                        <li class="active"><a data-toggle="tab" href="#goods_rank_0">今日</a></li>
-                        <li><a data-toggle="tab" href="#goods_rank_1">昨日</a></li>
-                        <li><a data-toggle="tab" href="#goods_rank_7">最近七日</a></li>
+                        <li class="active"><a data-toggle="tab" href="#goods_rank_0" onclick="get_goods(0)">今日</a></li>
+                        <li><a data-toggle="tab" href="#goods_rank_1" onclick="get_goods(1)">昨日</a></li>
+                        <li><a data-toggle="tab" href="#goods_rank_7" onclick="get_goods(7)">最近七日</a></li>
                         <li><a href="{:url('admin/statistics/goods_rank')}">更多</a></li>
                     </ul>
                 </div>
+
                 <div class="ibox-content">
                     <div class="tab-content relative">
                         <div class="ibox-loading" id="goods-rank-loading"></div>
@@ -219,7 +264,7 @@
                                     <th width="20%">成交数量</th>
                                     <th width="20%">成交金额</th>
                                 </tr>
-                                </thead>
+                                </thead>                                
                                 <tbody>
                                 </tbody>
                             </table>
@@ -253,199 +298,484 @@
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+
+
+
 <script type="text/javascript">
+
     myrequire(['echarts'], function () {
+
         var hasLineChart = $("#echarts-line-chart").length>0;
+
         if(hasLineChart){
+
             var lineChart = echarts.init(document.getElementById("echarts-line-chart"));
+
         }
+
         window.onresize = function () {
+
             if(hasLineChart) {
+
                 lineChart.resize();
+
             }
+
         };
+
         $.ajax({
+
             type: "GET",
+
             url: "{:url('admin/order/ajaxgettotals', array('merch' => -1))}",
+
             dataType: "json",
+
             success: function (data) {
+
                 var res = data.result;
+
                 $(".order_status1").text(res.status1);
+
                 $(".order_status4").text(res.status4);
+
                 $.ajax({
+
                     type: "GET",
+
                     url: "{:url('admin/shop/ajax')}",
+
                     dataType: "json",
+
                     success: function (data) {
+
                         var res = data.result;
+
                         $(".goods_totals").text(res.goods_totals);
+
                         $(".finance_total").text(res.finance_total);
+
+                        $(".commission_agent_total").text(res.commission_agent_total);
+
+                        $(".commission_agent_status0_total").text(res.commission_agent_status0_total);
+
+                        $(".commission_apply_status1_total").text(res.commission_apply_status1_total);
+
+                        $(".commission_apply_status2_total").text(res.commission_apply_status2_total);
+
                     }
+
                 });
+
             }
+
         });
 
+
+
+        //获取今日交易情况
+
+        get_order(0);
+
+
+
         $.ajax({
+
             type: "GET",
-            url: "{:url('admin/order/ajaxorder')}",
+
+            //   async: false,
+
+            url: "{:url('admin/order/ajaxtransaction')}",
+
             dataType: "json",
-            success: function (data) {
-                var json = data.result;
-                $(".order_count_0").text(json.order0.count);
-                $(".order_price_0").text(json.order0.price);
-                $(".order_avg_0").text(json.order0.avg);
 
-                $(".order_count_1").text(json.order1.count);
-                $(".order_price_1").text(json.order1.price);
-                $(".order_avg_1").text(json.order1.avg);
+            success: function (json) {
 
-                $(".order_count_7").text(json.order7.count);
-                $(".order_price_7").text(json.order7.price);
-                $(".order_avg_7").text(json.order7.avg);
+                var lineoption = {
 
-                $(".order_count_30").text(json.order30.count);
-                $(".order_price_30").text(json.order30.price);
-                $(".order_avg_30").text(json.order30.avg);
+                    title: {
 
-                $.ajax({
-                    type: "GET",
-                    async: false,
-                    url: "{:url('admin/order/ajaxtransaction')}",
-                    dataType: "json",
-                    success: function (json) {
-                        var lineoption = {
-                            title: {
-                                text: '近七日交易走势',
-                                top: '100',
-                                textStyle: {
-                                    fontWeight: 'normal',
-                                    fontSize: 12,
-                                    color: '#404040',
-                                    fontFamily: 'Microsoft YaHei UI',
-                                }
-                            },
-                            tooltip: {
-                                trigger: 'axis'
-                            },
-                            legend: {
-                                data: ['成交额', '成交量']
-                            },
-                            grid: {
-                                x: 50,
-                                x2: 50,
-                                y2: 30
-                            },
-                            calculable: true,
-                            xAxis: [
-                                {
-                                    type: 'category',
-                                    boundaryGap: false,
-                                    data: json.price_key,
-                                    axisLine: {
-                                        lineStyle: {
-                                            width: '0'
-                                        }
-                                    },
-                                },
-                            ],
-                            yAxis: [
-                                {
-                                    type: 'value',
-                                    axisLine: {
-                                        lineStyle: {
-                                            width: '0'
-                                        }
-                                    },
-                                    axisLabel: {
-                                        formatter: '{value}'
-                                    }
-                                }
-                            ],
-                            series: [
-                                {
-                                    name: '成交额',
-                                    type: 'line',
-                                    data: json.price_value,
-                                    markPoint: {
-                                        data: [
-                                            {
-                                                type: 'max',
-                                                name: '最大值'
-                                            },
-                                            {
-                                                type: 'min', name: '最小值'
-                                            }
-                                        ]
-                                    },
-                                    markLine: {
-                                        data: [
-                                            {type: 'average', name: '平均值'}
-                                        ]
-                                    },
-                                    itemStyle: {
-                                        normal: {
-                                            color: '#30af84'
-                                        }
-                                    }
-                                },
-                                {
-                                    name: '成交量',
-                                    type: 'line',
-                                    data: json.count_value,
-                                    markLine: {
-                                        data: [
-                                            {type: 'average', name: '平均值'}
-                                        ]
-                                    },
-                                    itemStyle: {
-                                        normal: {
-                                            color: '#44abf7'
-                                        }
-                                    }
-                                }
-                            ]
-                        };
-                        if(hasLineChart) {
-                            lineChart.setOption(lineoption);
-                            lineChart.resize();
+                        text: '近七日交易走势',
+
+                        top: '100',
+
+                        textStyle: {
+
+                            fontWeight: 'normal',
+
+                            fontSize: 12,
+
+                            color: '#404040',
+
+                            fontFamily: 'Microsoft YaHei UI',
+
                         }
-                        $("#echarts-line-chart-loading").hide();
-                        $("#echarts-line-chart").show();
-                    }
-                });
-            }
-        });
 
-        var goodsUrl = "{:url('admin/goods/edit')}?id=";
-        $.ajax({
-            type: "GET",
-            url: "{:url('admin/shop/ajaxgoods')}",
-            dataType: "json",
-            success: function (data) {
-                if(data.status==1 && !$.isEmptyObject(data.result.obj)){
-                    $.each(data.result.obj, function (id, obj) {
-                        $("#"+id+" tbody").empty();
-                        if($.isEmptyObject(obj)){
-                            var html = '<tfoot><tr><td colspan="4" style="line-height: 250px; text-align: center;">暂无数据</td></tr></tfoot>';
-                            $("#"+id+" table").append(html).find("thead").hide();
-                        }else{
-                            $.each(obj, function (index, goods) {
-                                var index = index+1, title = goods.title||'空', url = goodsUrl+goods.id;
-                                var html = '<tr><td>'+index+'</td><td><a href="'+url+'">'+title+'</a></td><td>'+goods.count+'</td><td class="text-warning">'+goods.money+'</td></tr>';
-                                $("#"+id+" tbody").append(html);
-                            });
+                    },
+
+                    tooltip: {
+
+                        trigger: 'axis'
+
+                    },
+
+                    legend: {
+
+                        data: ['交易量','成交量','交易额','成交额']
+
+                    },
+
+                    grid: {
+
+                        x: 50,
+
+                        x2: 50,
+
+                        y2: 30
+
+                    },
+
+                    calculable: true,
+
+                    xAxis: [
+
+                        {
+
+                            type: 'category',
+
+                            boundaryGap: false,
+
+                            data: json.price_key,
+
+                            axisLine: {
+
+                                lineStyle: {
+
+                                    width: '0'
+
+                                }
+
+                            },
+
+                        },
+
+                    ],
+
+                    yAxis: [
+
+                        {
+
+                            type: 'value',
+
+                            axisLine: {
+
+                                lineStyle: {
+
+                                    width: '0'
+
+                                }
+
+                            },
+
+                            axisLabel: {
+
+                                formatter: '{value}'
+
+                            }
+
                         }
-                    })
+
+                    ],
+
+                    series: [
+
+                        {
+
+                            name: '交易额',
+
+                            type: 'line',
+
+                            data: json.allprice_value,
+
+                            markPoint: {
+
+                                data: [
+
+                                    {
+
+                                        type: 'max',
+
+                                        name: '最大值'
+
+                                    },
+
+                                    {
+
+                                        type: 'min', name: '最小值'
+
+                                    }
+
+                                ]
+
+                            },
+
+                            markLine: {
+
+                                data: [
+
+                                    {type: 'average', name: '平均值'}
+
+                                ]
+
+                            },
+
+                            itemStyle: {
+
+                                normal: {
+
+                                    color: '#ffc000'
+
+                                }
+
+                            }
+
+                        },
+
+                        {
+
+                            name: '成交额',
+
+                            type: 'line',
+
+                            data: json.price_value,
+
+                            markPoint: {
+
+                                data: [
+
+                                    {
+
+                                        type: 'max',
+
+                                        name: '最大值'
+
+                                    },
+
+                                    {
+
+                                        type: 'min', name: '最小值'
+
+                                    }
+
+                                ]
+
+                            },
+
+                            markLine: {
+
+                                data: [
+
+                                    {type: 'average', name: '平均值'}
+
+                                ]
+
+                            },
+
+                            itemStyle: {
+
+                                normal: {
+
+                                    color: '#ff5555'
+
+                                }
+
+                            }
+
+                        },
+
+                        {
+
+                            name: '交易量',
+
+                            type: 'line',
+
+                            data: json.allcount_value,
+
+                            markLine: {
+
+                                data: [
+
+                                    {type: 'average', name: '平均值'}
+
+                                ]
+
+                            },
+
+                            itemStyle: {
+
+                                normal: {
+
+                                    color: '#44abf7'
+
+                                }
+
+                            }
+
+                        },
+
+                        {
+
+                            name: '成交量',
+
+                            type: 'line',
+
+                            data: json.count_value,
+
+                            markLine: {
+
+                                data: [
+
+                                    {type: 'average', name: '平均值'}
+
+                                ]
+
+                            },
+
+                            itemStyle: {
+
+                                normal: {
+
+                                    color: '#30af84'
+
+                                }
+
+                            }
+
+                        }
+
+                    ]
+
+                };
+
+                if(hasLineChart) {
+
+                    lineChart.setOption(lineoption);
+
+                    lineChart.resize();
+
                 }
-                $("#goods-rank-loading").hide();
+
+                $("#echarts-line-chart-loading").hide();
+
+                $("#echarts-line-chart").show();
+
             }
+
         });
+
+        //获取今日销量排行
+
+        get_goods(0);
+
     });
+
+
+
+    //获取订单概述
+
+    function get_order(day) {
+
+        $.ajax({
+
+            type: "GET",
+
+            url: "{:url('admin/order/ajaxorder')}?day="+day,
+
+            dataType: "json",
+
+            success: function (data) {
+
+                var json = data.result;
+
+                $(".order_count_"+day).text(json.order.order_count+"/"+json.order.allorder_count);
+
+                $(".order_price_"+day).text(json.order.order_price +"/"+json.order.allorder_price);
+
+                $(".order_avg_"+day).text(json.order.avg);
+
+            }
+
+        });
+
+    }
+
+
+
+    //获取商品销售排行榜
+
+    function get_goods(day) {
+
+        $("#goods-rank-loading").show();
+
+        var goodsUrl = "{:url('admin/goods/edit')}&id=";
+
+        $.ajax({
+
+            type: "GET",
+
+            url: "{:url('admin/shop/ajaxgoods')}?day="+day,
+
+            dataType: "json",
+
+            success: function (data) {
+
+                if(data.status==1 && !$.isEmptyObject(data.result.obj)){
+
+                    $.each(data.result.obj, function (id, obj) {
+
+                        $("#"+id+" tbody").empty();
+
+                        if($.isEmptyObject(obj)){
+
+                            var html = '<tfoot><tr><td colspan="4" style="line-height: 250px; text-align: center;">暂无数据</td></tr></tfoot>';
+
+                            $("#"+id+" table").append(html).find("thead").hide();
+
+                        }else{
+
+                            $.each(obj, function (index, goods) {
+
+                                var index = index+1, title = goods.title||'空', url = goodsUrl+goods.id;
+
+                                var html = '<tr><td>'+index+'</td><td><a href="'+url+'">'+title+'</a></td><td>'+goods.count+'</td><td class="text-warning">'+goods.money+'</td></tr>';
+
+                                $("#"+id+" tbody").append(html);
+
+                            });
+
+                        }
+
+                    })
+
+                }
+
+                $("#goods-rank-loading").hide();
+
+            }
+
+        });
+
+    }
+
 </script>
+
+
+
 {include file='_footer'}

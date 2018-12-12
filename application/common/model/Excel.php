@@ -64,5 +64,55 @@ class Excel extends \think\Model
 		$objWriter->save("php://output");
 		exit();
 	}
+
+	public function import($excefile) 
+	{
+		vendor('phpoffice.phpexcel.Classes.PHPExcel');
+		$path = ROOT_PATH . '/public/static/tmp/';
+		if (!(is_dir($path))) 
+		{
+			load()->func('file');
+			mkdirs($path, '0777');
+		}
+		$filename = $_FILES[$excefile]['name'];
+		$tmpname = $_FILES[$excefile]['tmp_name'];
+		if (empty($tmpname)) 
+		{
+			message('请选择要上传的Excel文件!', '', 'error');
+		}
+		$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+		if (($ext != 'xlsx') && ($ext != 'xls')) 
+		{
+			message('请上传 xls 或 xlsx 格式的Excel文件!', '', 'error');
+		}
+		$file = time() . $_W['uniacid'] . '.' . $ext;
+		$uploadfile = $path . $file;
+		$result = move_uploaded_file($tmpname, $uploadfile);
+		if (!($result)) 
+		{
+			message('上传Excel 文件失败, 请重新上传!', '', 'error');
+		}
+		$reader = PHPExcel_IOFactory::createReader(($ext == 'xls' ? 'Excel5' : 'Excel2007'));
+		$excel = $reader->load($uploadfile);
+		$sheet = $excel->getActiveSheet();
+		$highestRow = $sheet->getHighestRow();
+		$highestColumn = $sheet->getHighestColumn();
+		$highestColumnCount = PHPExcel_Cell::columnIndexFromString($highestColumn);
+		$values = array();
+		$row = 1;
+		while ($row <= $highestRow) 
+		{
+			$rowValue = array();
+			$col = 0;
+			while ($col < $highestColumnCount) 
+			{
+				$rowValue[] = (string) $sheet->getCellByColumnAndRow($col, $row)->getValue();
+				++$col;
+			}
+			$values[] = $rowValue;
+			++$row;
+		}
+		return $values;
+	}
 	
 }

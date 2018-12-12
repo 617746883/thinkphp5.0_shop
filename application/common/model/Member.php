@@ -149,10 +149,12 @@ class Member extends \think\Model
 		if (empty($leveltype)) {
 			$ordermoney = Db::name('shop_order_goods')->alias('og')->join('shop_order o','o.id=og.orderid','left')->where('o.mid',$mid)->where('o.status',3)->sum('og.realprice');
 			$level = Db::name('member_level')->where('enabled = 1 and ' . $ordermoney . ' >= ordermoney and ordermoney>0')->order('level','desc')->find();
-		}
-		else if ($leveltype == 1) {
+		} else if ($leveltype == 1) {
 			$ordercount = Db::name('shop_order')->where('mid',$mid)->where('status',3)->count();
 			$level = Db::name('member_level')->where('enabled=1 and ' . $ordercount . ' >= ordercount and ordercount>0')->order('level','desc')->find();
+		} else if ($leveltype == 2) {
+			$creditnum = $member['credit1'];
+			$level = Db::name('member_level')->where('enabled=1 and ' . $creditnum . ' >= creditnum and creditnum>0')->order('level','desc')->find();
 		}
 
 		if (!(empty($orderid))) {
@@ -160,8 +162,7 @@ class Member extends \think\Model
 
 			if (empty($level)) {
 				$level = $goods_level;
-			}
-			else if (!(empty($goods_level))) {
+			} else if (!(empty($goods_level))) {
 				if ($level['level'] < $goods_level['level']) {
 					$level = $goods_level;
 				}

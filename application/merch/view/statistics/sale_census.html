@@ -1,0 +1,112 @@
+{include file='_header'}
+
+<div class="page-header">当前位置：<span class="text-primary">销售统计</span></div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal table-search">
+        <div class="page-toolbar">
+            <div class="input-group">
+                <span></span>
+                <span class="input-group-select">
+                    <select name="year" class='form-control'>
+                        {foreach name='years' item='y'}
+                        <option value="{$y['data']}"  {if $y['selected']}selected="selected"{/if}>{$y['data']}年</option>
+                        {/foreach}
+                    </select>
+                </span>
+                <span class="input-group-select">
+                    <select name="month" class='form-control'>
+                        <option value=''>月份</option>
+                        {foreach name='months' item="m"}
+                        <option value="{$m['data']}"  {if $m['selected']}selected="selected"{/if}>{$m['data']}月</option>
+                        {/foreach}
+                    </select>
+                </span>
+                <span class="input-group-select">
+                     <select name="day" class='form-control'>
+                         <option value=''>日期</option>
+                     </select>
+                </span>
+                <span class="input-group-select">
+                    <select name="type" class='form-control'>
+                        <option value='0' {if $_GET['type']==0}selected="selected"{/if}>交易额</option>
+                        <option value='1' {if $_GET['type']==1}selected="selected"{/if}>交易量</option>
+                    </select>
+                </span>
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit"> 搜索</button>
+                    <button type="submit" name="export" value='1' class="btn btn-success">导出</button>
+                </span>
+            </div>
+        </div>
+ </form>
+
+
+<div class="panel panel-default">
+    <div class='panel-heading'>
+        {if empty($type)}交易额{else}交易量{/if}：<span style="color:red; ">{$totalcount}</span>，
+        最高{if empty($type)}交易额{else}交易量{/if}：<span style="color:red; ">{$maxcount}</span> {if !empty($maxcount_date)}<span>({$maxcount_date}</span>){/if}
+    </div>
+    <div class="panel-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th style='width:100px;'>
+                        {if empty($_GET['month'])}月份{else}日期{/if}
+                    </th>
+                    <th style='width:200px;'>{if empty($type)}交易额{else}交易量{/if}</th>
+                    <th style="width: 65px;">所占比例</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {foreach name='list' item='row'}
+                <tr>
+                    <td>{$row['data']}</td>
+                    <td>{$row['count']}</td>
+                    <td><span class="process-num" style="color:#000">{$row['percent']?$row['percent'].'%':''}</span></td>
+                    <td>
+                       <div class="progress">
+                           <div style="width: {$row['percent']}%;" class="progress-bar progress-bar-info" ></div>
+                       </div>
+                    </td>
+                </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+<script language='javascript'>
+    function get_days(){          
+        var year = $('select[name=year]').val();
+        var month =$('select[name=month]').val();
+        var day  = $('select[name=day]');
+        day.get(0).options.length = 0 ;
+        if(month==''){
+            day.append("<option value=''>日期</option");
+            return;
+        }
+       
+        day.get(0).options.length = 0 ;
+        day.append("<option value=''>...</option").attr('disabled',true);
+        $.post("{:url('admin/utility/days')}",{year:year,month:month},function(days){
+             day.get(0).options.length = 0 ;
+             day.removeAttr('disabled');
+             days =parseInt(days);
+             day.append("<option value=''>日期</option");
+             for(var i=1;i<=days;i++){
+                 day.append("<option value='" + i +"'>" + i + "日</option");
+             }
+          
+             {if !empty($day)}
+                day.val( {$day});
+             {/if}
+        })
+    }
+    $('select[name=month]').change(function(){
+           get_days();
+    })
+    
+    get_days();
+ </script>
+{include file='_footer'}

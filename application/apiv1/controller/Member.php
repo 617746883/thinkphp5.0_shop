@@ -112,20 +112,28 @@ class Member extends Base
 			}
 
 			$id = Db::name('shop_member_address')->insertGetId($data);
-		}
-		else {
+		} else {
 			Db::name('shop_member_address')->where('id',$id)->where('mid',$mid)->update($data);
 		}
 
 		if (!empty($isdefault)) {			
 			Db::name('shop_member_address')->where('mid',$mid)->setField('isdefault',0);
 			Db::name('shop_member_address')->where('id',$id)->where('mid',$mid)->setField('isdefault',1);
+			$member = model('member')->getMember($mid);
+			if(empty($member['province']) || empty($member['province']) || empty($member['province'])) {
+				$update['province'] = $data['province'];
+				$update['city'] = $data['city'];
+				$update['area'] = $data['area'];
+			}
+			if(!empty($update)) {
+				Db::name('member')->where('id',$mid)->update($update);
+			}
 		}
 		$this->result(1,'success',array('id'=>$id));
 	}
 
 	/**
-	 * 编辑地址
+	 * 删除地址
 	 * @param 
 	 * @return
 	 **/

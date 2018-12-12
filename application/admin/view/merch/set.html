@@ -10,11 +10,13 @@
              <ul class="nav nav-tabs" id="myTab">
                 <li {if empty($_GET['tab']) || $_GET['tab']=='basic'}class="active"{/if}><a href="#tab_basic">基本</a></li>
                 <li {if $_GET['tab']=='enter'}class="active"{/if}><a href="#tab_enter">入驻设置</a></li>
+                <li {if $_GET['tab']=='web'}class="active"{/if}><a href="#tab_web">多商户端</a></li>
                 <li {if $_GET['tab']=='protocol'}class="active"{/if}><a href="#tab_protocol">入驻申请协议</a></li>
             </ul>
             <div class="tab-content ">
                 <div class="tab-pane {if empty($_GET['tab']) || $_GET['tab']=='basic'}active{/if}" id="tab_basic">{include file='merch/set/basic'}</div>
                 <div class="tab-pane {if $_GET['tab']=='enter'}active{/if}" id="tab_enter">{include file='merch/set/enter'}</div>
+                <div class="tab-pane {if $_GET['tab']=='web'}active{/if}" id="tab_web">{include file='merch/set/web'}</div>
                 <div class="tab-pane {if $_GET['tab']=='protocol'}active{/if}" id="tab_protocol">{include file='merch/set/protocol'}</div>
             </div>
         </div>

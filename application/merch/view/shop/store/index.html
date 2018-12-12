@@ -1,0 +1,124 @@
+{include file='_header'} 
+<div class="page-header">
+    当前位置：<span class="text-primary">门店管理</span>
+</div>
+<div class="page-content">
+    <form action="" method="get">
+        <div class="page-toolbar">
+            <div class="col-sm-6">
+                <a class='btn btn-primary btn-sm' href="{:url('merch/shop/storeadd')}"><i class='fa fa-plus'></i> 添加门店</a>
+            </div>
+            <div class="col-sm-6 pull-right">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name="type" class='form-control input-sm select-md'>
+                            <option value="0" {if empty($type)}selected{/if}>门店支持</option>
+                            <option value="1" {if $type==1}selected{/if}>自提</option>
+                            <option value="2" {if $type==2}selected{/if}>核销</option>
+                            <option value="3" {if $type==3}selected{/if}>自提+核销</option>
+                        </select>
+                    </div>
+                        <input type="text" class="input-sm form-control" name='keyword' value="{$keyword}" placeholder="门店名称/地址/电话"> <span class="input-group-btn">
+                     <button class="btn btn-primary" type="submit"> 搜索</button> </span>
+                </div>
+            </div>
+        </div>
+    </form> 
+ {if count($list)>0}
+    <div class="page-table-header">
+        <input type="checkbox">
+        <div class="btn-group">
+            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('merch/shop/storestatus',array('status'=>1))}">
+                <i class='icow icow-qiyong'></i> 启用
+            </button>
+            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('merch/shop/storestatus',array('status'=>0))}">
+                <i class='icow icow-jinyong'></i> 禁用
+            </button>
+            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('merch/shop/storedelete')}">
+                <i class='icow icow-shanchu1'></i> 删除
+            </button>
+        </div>
+    </div><!--Mi-->
+    <table class="table table-hover table-responsive">
+        <thead>
+            <tr>
+                <th style="width:25px;"></th>
+	            <th style='width:50px'>顺序</th>
+                <th style=''>门店名称</th>
+                <th style="width:160px;">电话/地址</th>
+                <th style="width:60px;">核销员</th>
+                <th style="width:90px;">门店支持</th>
+                <th style="width:60px;">状态</th>
+                <th style="width: 90px;">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach name='list' item='row'}
+            <tr>
+				<td>
+					<input type='checkbox'   value="{$row['id']}"/>
+				</td>
+				<td>
+                    <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('merch/shop/storedisplayorder',array('id'=>$row['id']))}" >{$row['displayorder']}</a>
+                </td>
+                <td>{$row['storename']}</td>                
+                <td><p>{$row['tel']}</p>{$row['address']}</td>
+                <td>{$row['salercount']}</td>
+                <td>
+                    {if $row['type']==1}自提{elseif $row['type']==2}核销{elseif $row['type']==3}自提+核销{/if}
+                </td>
+                <td>
+                    <span class='label {if $row['status']==1}label-primary{else}label-default{/if}'
+						  data-toggle='ajaxSwitch' 
+						  data-switch-value='{$row['status']}'
+						  data-switch-value0='0|禁用|label label-default|{:url('merch/shop/storestatus',array('status'=>1,'id'=>$row['id']))}'
+						  data-switch-value1='1|启用|label label-success|{:url('merch/shop/storestatus',array('status'=>0,'id'=>$row['id']))}'
+						>
+					{if $row['status']==1}启用{else}禁用{/if}</span>
+                </td>
+                <td>
+                    <a class='btn btn-default btn-sm btn-op btn-operation' href="{:url('merch/shop/storeedit', array('id' => $row['id']))}">
+                        <span data-toggle="tooltip" data-placement="top" title="" data-original-title="编辑">
+                                <i class="icow icow-bianji2"></i>
+                        </span>
+                    </a>
+                    <a class='btn btn-default  btn-sm btn-op btn-operation' data-toggle="ajaxRemove"  href="{:url('merch/shop/storedelete', array('id' => $row['id']))}" data-confirm="确认删除此门店吗？">
+                        <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                            <i class='icow icow-shanchu1'></i>
+                        </span>
+                    </a>
+                </td>
+
+            </tr>
+            {/foreach}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td colspan="2">
+                    <div class="btn-group">
+                        <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('merch/shop/storestatus',array('status'=>1))}">
+                            <i class='icow icow-qiyong'></i> 启用
+                        </button>
+                        <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('merch/shop/storestatus',array('status'=>0))}">
+                            <i class='icow icow-jinyong'></i> 禁用
+                        </button>
+                        <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('merch/shop/storedelete')}">
+                            <i class='icow icow-shanchu1'></i> 删除
+                        </button>
+                    </div>
+                </td>
+                <td colspan="5" class="text-right"> {$pager}</td>
+            </tr>
+        </tfoot>
+    </table>
+</form>
+{else}
+<div class='panel panel-default'>
+	<div class='panel-body' style='text-align: center;padding:30px;'>
+		 暂时没有任何门店!
+	</div>
+</div>
+{/if}
+</div>
+{include file='_footer'}

@@ -35,12 +35,22 @@ class Login extends Controller
         }
     	$copyright = model('common')->getCopyright();
         $shopset = model('common')->getSysset('shop');
-        $this->assign(['shopset'=>$shopset,'copyright'=>$copyright,'referurl'=>$referurl]);
+        $set = model('common')->getPluginset('merch');
+        $this->assign(['shopset'=>$shopset,'copyright'=>$copyright,'referurl'=>$referurl,'set'=>$set]);
         return $this->fetch();
     }
 
     public function checklogin()
     {
+    	$merch_data = model('common')->getPluginset('merch');
+        if ($merch_data['is_openmerch']) {
+            $is_openmerch = 1;
+        } else {
+            $is_openmerch = 0;
+        }
+        if(empty($is_openmerch)) {
+            show_json(0,'未开启多商户');
+        }
     	$post = request()->post();
     	if (empty($post)) {
 			$this->redirect('merch/login/index');
@@ -51,30 +61,30 @@ class Login extends Controller
 			'lastip' => request()->ip(),
 		);
 		if(empty($post['username'])) {
-			$this->error('账号不能为空！','merch/login/index');
+			show_json(0,'账号不能为空！');
 		} else if(empty($post['pwd'])) {
-			$this->error('密码不能为空！','merch/login/index');
+			show_json(0,'密码不能为空！');
 		}
 
-		$account = db('shop_store_account')->where('username','eq',$post['username'])->find();
+		$account = Db::name('shop_merch_account')->where('username','eq',$post['username'])->find();
 		if (empty($account)) {
-			$this->error('该账号不存在，请重试！','merch/login/index');
+			show_json(0,'该账号不存在，请重试！');
 		}
-		$merch = Db::name('shop_store')->where('id',$account['merchid'])->find();
+		$merch = Db::name('shop_merch')->where('id',$account['merchid'])->find();
 		if(empty($merch)) {
-			$this->error('该商户不存在！','merch/login/index');
+			show_json(0,'该商户不存在！');
 		}
 		if($merch['accounttime'] <= time()) {
-			$this->error('该商户服务已到期！','merch/login/index');
+			show_json(0,'该商户服务已到期！');
 		}
 		$password = md5(trim($post['pwd']) . $account['salt']);
 		if ($password == $account['pwd']) {
-			Db::name('shop_store_account')->where(array('id'=>$account['id']))->data($admin_info);
+			Db::name('shop_merch_account')->where(array('id'=>$account['id']))->data($admin_info);
 			unset($account['pwd'],$account['salt']);
-			Session::set('merch',$account);
-			$this->success('登陆成功！','merch/index/index');
+			Session::set('account',$account);
+			show_json(1,array('url'=>url('merch/index/index')));
 		} else {
-			$this->error('密码错误，请重试！','merch/login/index');
+			show_json(0,'密码错误，请重试！');
 		}
 			
 	}

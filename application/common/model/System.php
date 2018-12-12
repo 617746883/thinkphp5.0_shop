@@ -4,13 +4,13 @@ use think\Db;
 use think\Request;
 class System extends \think\Model
 {
-	public static function init($merch = false)
+	public static function init($merch = 0)
     {
     	$request = Request::instance();
 		$route = strtolower($request->module() . '/' . $request->controller() . '/' . $request->action());
     	$routes = explode('/', $route);
         $arr = array(
-			'merch'       => 0,
+			'merch'       => $merch,
 			'order1'      => 1,
 			'order4'      => 0,
 			'notice'      => array(),
@@ -18,10 +18,10 @@ class System extends \think\Model
 			'foldnav'     => 0,
 			'foldpanel'   => 0,
 			'routes'      => $routes,
-			'right_menu'  => self::initRightMenu($routes)
+			'right_menu'  => self::initRightMenu($routes,$merch)
 		);
-		$arr['order1'] = self::getOrderTotal(1);
-		$arr['order4'] = self::getOrderTotal(4);
+		$arr['order1'] = self::getOrderTotal(1,$merch);
+		$arr['order4'] = self::getOrderTotal(4,$merch);
 		$arr['comment'] = Db::name('shop_order_comment')->alias('c')->join('shop_goods g','g.id=c.goodsid','left')->where('(c.checked=1 OR c.replychecked=1) AND c.deleted=0 AND g.merchid=0')->count();
 		return $arr;
     }
@@ -34,7 +34,7 @@ class System extends \think\Model
 			$condition = ' merchshow=1 and ismr=0 and ( status=1 or ( status=0 and paytype=3) ) and deleted=0';
 
 			if ($merch) {
-				$condition .= ' and merchid= ' . $merchid;
+				$condition .= ' and merchid= ' . $merch;
 			} else {
 				$condition .= ' and merchid= 0';
 			} 
@@ -45,7 +45,7 @@ class System extends \think\Model
 				$condition = ' merchshow=1 and ismr=0 and refundstate>0 and refundid<>0 and deleted=0';
 
 				if ($merch) {
-					$condition .= ' and merchid= ' . $merchid;
+					$condition .= ' and merchid= ' . $merch;
 				} else {
 					$condition .= ' and merchid= 0';
 				}
@@ -71,11 +71,10 @@ class System extends \think\Model
 		);
 		
 		if ($merch) {
-			$return_arr['menu_title'] = session('?merch_username');
+			$return_arr['menu_title'] = session('?account') ? session('account')['username'] : '商户管理后台';
 			$return_arr['menu_items'][] = array('text' => '修改密码', 'href' => url('merch/user/updatepwd'));
-			$return_arr['logout'] = url('quit');
-		}
-		else {
+			$return_arr['logout'] = url('merch/system/loginout');
+		} else {
 			$return_arr['menu_title'] = session('?admin') ? session('admin')['username'] : '商城管理后台';
 			if ($routes[1] != 'system') {
 				$return_arr['system'] = 1;
@@ -83,8 +82,8 @@ class System extends \think\Model
 
 			if ($routes[1] == 'system') {
 				$return_arr['menu_items'][] = array('text' => '返回商城', 'href' => url('admin/index/index'), 'blank' => true);
-			}
-			else {
+				$return_arr['logout'] = url('admin/system/loginout');
+			} else {
 				$return_arr['menu_items'][] = 'line';
 				$return_arr['menu_items'][] = array('text' => '我的信息', 'href' => url('admin/user/index'), 'blank' => true);
 				$return_arr['menu_items'][] = array('text' => '修改密码', 'href' => url('admin/user/index'), 'blank' => true);
@@ -102,7 +101,7 @@ class System extends \think\Model
      * @param bool $full 是否返回长URL
      * @return array
      */
-	public function getMenu($full = false)
+	public function getMenu($full = false, $merch = 0)
 	{
 		$return_menu = array();
 		$return_submenu = array();
@@ -111,7 +110,13 @@ class System extends \think\Model
 		$routes = explode('/', $route);
 		$top = strtolower($request->controller());
 
-		$allmenus = $this->shopMenu();
+		if(empty($merch)) {
+			$allmenus = $this->shopMenu();
+			$mod = 'admin';
+		} else {
+			$allmenus = $this->merchMenu();
+			$mod = 'merch';
+		}		
 
 		if (!empty($allmenus)) {
 			$submenu = $allmenus[$top];
@@ -127,10 +132,6 @@ class System extends \think\Model
 			}
 			foreach ($allmenus as $key => $val) {
 				$menu_item = array('route' => empty($val['route']) ? $key : $val['route'], 'text' => $val['title']);
-				// if ($ctl == 'system') {
-				// 	$menu_item['route'] = 'admin/system/' . $menu_item['route'];
-				// }
-
 				if (!empty($val['index'])) {
 					$menu_item['index'] = $val['index'];
 				}
@@ -147,12 +148,12 @@ class System extends \think\Model
 					}
 				}
 
-				if (($top == $menu_item['route']) || ($menu_item['route'] == $route) || (('admin/system/' . $top) == $menu_item['route'])) {
+				if (($top == $menu_item['route']) || ($menu_item['route'] == $route) || (('{$mod}/system/' . $top) == $menu_item['route'])) {
 					$menu_item['active'] = 1;
 				}
 
 				if ($full) {
-					$menu_item['url'] = url("admin/{$menu_item['route']}/index");
+					$menu_item['url'] = url("{$mod}/{$menu_item['route']}/index");
 				}
 				$return_menu[] = $menu_item;
 			}
@@ -214,7 +215,7 @@ class System extends \think\Model
 							}
 
 							if ($full) {
-								$return_menu_child['url'] = url("admin/{$top}/{$return_menu_child['route']}");
+								$return_menu_child['url'] = url("{$mod}/{$top}/{$return_menu_child['route']}");
 							}
 
 							$return_submenu['items'][] = $return_menu_child;
@@ -271,7 +272,7 @@ class System extends \think\Model
 								}
 
 								// if ($routes[1] == 'system') {
-								// 	$return_submenu_three['route'] = 'admin/system/' . $return_submenu_three['route'];
+								// 	$return_submenu_three['route'] = '{$mod}/system/' . $return_submenu_three['route'];
 								// }
 								$addedit = false;
 
@@ -288,8 +289,7 @@ class System extends \think\Model
 									if ($child['extend'] == $route) {
 										$return_menu_child['active'] = 1;
 									}
-								}
-								else {
+								} else {
 									if (is_array($child['extends'])) {
 										if (in_array($route, $child['extends'])) {
 											$return_menu_child['active'] = 1;
@@ -298,7 +298,7 @@ class System extends \think\Model
 								}
 
 								if ($full) {
-									$return_submenu_three['url'] = url("admin/{$return_submenu_three['route']}");
+									$return_submenu_three['url'] = url("{$mod}/{$return_submenu_three['route']}");
 								}
 								$return_menu_child['items'][] = $return_submenu_three;
 							}
@@ -316,14 +316,14 @@ class System extends \think\Model
 			}
 		}
 		
-		return array('menu' => $return_menu, 'submenu' => $return_submenu, 'shopmenu' => self::getShopMenu());
+		return array('menu' => $return_menu, 'submenu' => $return_submenu, 'shopmenu' => self::getShopMenu($merch));
 	}
 
 	/**
      * 获取 主商城菜单
      * @return array
      */
-	public function getShopMenu($merch = false)
+	public function getShopMenu($merch = 0)
 	{
 		$return_menu = array();
 
@@ -380,57 +380,6 @@ class System extends \think\Model
 
 		return $return_menu;
 	}
-	// public function getShopMenu($merch = false)
-	// {
-	// 	$return_menu = array();
-
-	// 	if (!$merch) {
-	// 		$menus = $this->shopMenu();
-	// 	} else {
-	// 		$menus = $this->pluginMenu('merch');
-	// 	}
-	// 	return $menus;
-	// 	foreach ($menus as $key => $val) {
-	// 		$menu_item = array(
-	// 			'title' => $val['subtitle'],
-	// 			'items' => array()
-	// 			);
-
-	// 		if (empty($val['items'])) {
-	// 			continue;
-	// 		}
-	// 		foreach ($val['items'] as $child) {
-	// 			$child_route_default = $key;
-	// 			// if (!empty($child['route'])) {
-	// 			// 	$child_route_default = $key . '/' . $child['route'];
-	// 			// 	if (!empty($child['top'])) {
-	// 			// 		$child_route_default = $child['route'];
-	// 			// 	}
-	// 			// }
-	// 			if (empty($child['items'])) {
-	// 				$menu_item_child = array('title' => $child['title'], 'route' => $child_route_default);
-
-	// 				if (!empty($child['param'])) {
-	// 				}
-
-	// 				$menu_item_child['url'] = url("admin/{$menu_item_child['route']}/{$child['route']}");
-	// 				$menu_item['items'][] = $menu_item_child;
-	// 			} else {
-	// 				foreach ($child['items'] as $three) {
-	// 					$menu_item_three = array('title' => $three['title'], 'route' => empty($three['route']) ? $child_route_default : $child_route_default . '.' . $three['route']);
-	// 					if (!empty($three['param'])) {
-	// 					}
-	// 					$menu_item_three['url'] = url($menu_item_three['route'], !empty($menu_item_three['param']) && is_array($menu_item_three['param']) ? $menu_item_three['param'] : array());
-	// 					$menu_item['items'][] = $menu_item_three;
-	// 				}
-	// 			}
-	// 		}
-
-	// 		$return_menu[] = $menu_item;
-	// 	}
-
-	// 	return $return_menu;
-	// }
 
 	/**
      * 定义 商城 菜单
@@ -490,20 +439,26 @@ class System extends \think\Model
 						'route' => '',
 						'items' => array(
 							array('title' => '幻灯片', 'route' => 'banner', 'desc' => '商城首页幻灯片管理'),
-							// array('title' => '导航图标', 'route' => 'nav', 'desc' => '商城首页导航图标管理'),
-							// array('title' => '广告', 'route' => 'adv', 'desc' => '商城首页广告管理'),
-							// array('title' => '魔方推荐', 'route' => 'cube', 'desc' => '商城首页魔方推荐管理'),
-							// array('title' => '商品推荐', 'route' => 'recommand', 'desc' => '商城首页商品推荐管理'),
-							// array('title' => '排版设置', 'route' => 'composition', 'desc' => '商城首页排版设置')
+							array('title' => '导航图标', 'route' => 'nav', 'desc' => '商城首页导航图标管理'),
+							array('title' => '广告', 'route' => 'adv', 'desc' => '商城首页广告管理'),
+							array('title' => '魔方推荐', 'route' => 'cube', 'desc' => '商城首页魔方推荐管理'),
+							array('title' => '商品推荐', 'route' => 'recommand', 'desc' => '商城首页商品推荐管理'),
+							array('title' => '排版设置', 'route' => 'composition', 'desc' => '商城首页排版设置')
 							)
 						),
 					array(
 						'title' => '商城',
 						'items' => array(
-							array('title' => '配送方式', 'route' => 'dispatch', 'desc' => '商城配送方式管理'),
 							array('title' => '公告管理', 'route' => 'notice', 'desc' => '商城公告管理'),
 							array('title' => '评价管理', 'route' => 'comment', 'desc' => '商城商品评价管理'),
-							array('title' => '退货地址', 'route' => 'refundaddress', 'desc' => '商城退货地址管理')
+							array('title' => '退货地址', 'route' => 'refundaddress', 'desc' => '退换货地址管理'),
+							)
+						),
+					array(
+						'title' => '配送方式',
+						'items' => array(
+							array('title' => '普通配送', 'route' => 'dispatch', 'desc' => '普通配送方式管理'),
+							array('title' => '同城配送', 'route' => 'cityexpress', 'desc' => '同城配送管理'),
 							)
 						),
 					)
@@ -534,6 +489,7 @@ class System extends \think\Model
 					array('title' => '待付款', 'route' => 'olist0', 'desc' => '待付款订单管理'),
 					array('title' => '已完成', 'route' => 'olist3', 'desc' => '已完成订单管理'),
 					array('title' => '已关闭', 'route' => 'olist_1', 'desc' => '已关闭订单管理'),
+					array('title' => '核销订单', 'route' => 'olist6', 'desc' => '核销订单管理'),
 					array('title' => '全部订单', 'route' => 'olist_all', 'desc' => '全部订单列表'),
 					array(
 						'title' => '售后',
@@ -550,19 +506,7 @@ class System extends \think\Model
 					// 		)
 					// 	)
 					)
-				),	
-			'member'     => array(
-				'title'    => '会员',
-				'subtitle' => '会员管理',
-				'icon'     => 'member',
-				'items'    => array(
-					array('title' => '会员概述', 'route' => 'index'),
-					array('title' => '会员列表', 'route' => 'mlist'),
-					array('title' => '会员等级', 'route' => 'level'),
-					array('title' => '会员分组', 'route' => 'group'),
-					array('title' => '设置', 'route' => 'set'),
-					)
-				),	
+				),
 			'merch'      => array(
 				'title'    => '商户',
 				'subtitle' => '商户',
@@ -578,10 +522,10 @@ class System extends \think\Model
 					array(
 						'title' => '商户管理',
 						'items' => array(
-							array('title' => '待入驻', 'route' => 'store0'),
-							array('title' => '入驻中', 'route' => 'store1'),
-							array('title' => '暂停中', 'route' => 'store2'),
-							array('title' => '即将到期', 'route' => 'store3'),
+							array('title' => '待入驻', 'route' => 'user0'),
+							array('title' => '入驻中', 'route' => 'user1'),
+							array('title' => '暂停中', 'route' => 'user2'),
+							array('title' => '即将到期', 'route' => 'user3'),
 							array('title' => '商户分组', 'route' => 'group'),
 							array('title' => '商户分类', 'route' => 'category')
 							)
@@ -596,16 +540,34 @@ class System extends \think\Model
 					array(
 						'title' => '提现申请',
 						'items' => array(
-							array('title' => '待确认申请', 'route' => 'check0'),
-							array('title' => '待打款申请', 'route' => 'check1'),
-							array('title' => '已打款申请', 'route' => 'check2'),
+							array('title' => '待确认申请', 'route' => 'check1'),
+							array('title' => '待打款申请', 'route' => 'check2'),
+							array('title' => '已打款申请', 'route' => 'check3'),
 							array('title' => '无效申请', 'route' => 'check_1')
+							)
+						),
+					array(
+						'title' => '线下门店',
+						'items' => array(
+							array('title' => '门店管理', 'route' => 'store'),
+							array('title' => '店员管理', 'route' => 'saler')
 							)
 						),
 					array('title' => '基础设置', 'route' => 'set', 'desc' => '商户基础设置管理'),
 					)					
+				),	
+			'member'     => array(
+				'title'    => '会员',
+				'subtitle' => '会员管理',
+				'icon'     => 'member',
+				'items'    => array(
+					array('title' => '会员概述', 'route' => 'index'),
+					array('title' => '会员列表', 'route' => 'mlist'),
+					array('title' => '会员等级', 'route' => 'level'),
+					array('title' => '会员分组', 'route' => 'group'),
+					array('title' => '设置', 'route' => 'set'),
+					)
 				),
-			'plugins'    => array('title' => '应用', 'subtitle' => '应用管理', 'icon' => 'plugins'),
 			// 'sale'       => array(
 			// 	'title'    => '营销',
 			// 	'subtitle' => '营销设置',
@@ -701,7 +663,8 @@ class System extends \think\Model
 							)
 						)
 					)
-				),
+				),	
+			'plugins'    => array('title' => '应用', 'subtitle' => '应用管理', 'icon' => 'plugins'),
 			'sysset'     => array(
 				'title'    => '设置',
 				'subtitle' => '商城设置',
@@ -741,9 +704,9 @@ class System extends \think\Model
 					// array(
 					// 	'title' => '工具',
 					// 	'items' => array(
-					// 		array('title' => '七牛存储', 'route' => 'qiniu', 'iscom' => 'qiniu'),
-					// 		array('title' => '清理缓存', 'route' => 'goodsprice'),
-					// 		array('title' => '数据库优化', 'route' => 'funbar')
+					// 		// array('title' => '七牛存储', 'route' => 'qiniu', 'iscom' => 'qiniu'),
+					// 		// array('title' => '清理缓存', 'route' => 'goodsprice'),
+					// 		// array('title' => '数据库优化', 'route' => 'funbar')
 					// 		)
 					// 	)
 					)
@@ -783,6 +746,188 @@ class System extends \think\Model
 			);
 
 		return $shopmenu;
+	}
+
+	/**
+     * 定义 商城 菜单
+     * @return array
+     */
+	protected function merchMenu()
+	{
+		$merchmenu = array(
+			'shop'       => array(
+				'title'    => '店铺',
+				'subtitle' => '店铺首页',
+				'icon'     => 'store',
+				'items'    => array(
+					// array(
+					// 	'title' => '首页',
+					// 	'route' => '',
+					// 	'items' => array(
+					// 		array('title' => '幻灯片', 'route' => 'banner', 'desc' => '商城首页幻灯片管理'),
+					// 		array('title' => '导航图标', 'route' => 'nav', 'desc' => '商城首页导航图标管理'),
+					// 		array('title' => '广告', 'route' => 'adv', 'desc' => '商城首页广告管理'),
+					// 		array('title' => '魔方推荐', 'route' => 'cube', 'desc' => '商城首页魔方推荐管理'),
+					// 		array('title' => '商品推荐', 'route' => 'recommand', 'desc' => '商城首页商品推荐管理'),
+					// 		array('title' => '排版设置', 'route' => 'composition', 'desc' => '商城首页排版设置')
+					// 		)
+					// 	),
+					array(
+						'title' => '商城',
+						'items' => array(
+							array('title' => '公告管理', 'route' => 'notice', 'desc' => '商城公告管理'),
+							array('title' => '评价管理', 'route' => 'comment', 'desc' => '商城商品评价管理'),
+							array('title' => '退货地址', 'route' => 'refundaddress', 'desc' => '退换货地址管理'),
+							)
+						),
+					array(
+						'title' => '配送方式',
+						'items' => array(
+							array('title' => '普通配送', 'route' => 'dispatch', 'desc' => '普通配送方式管理'),
+							array('title' => '同城配送', 'route' => 'cityexpress', 'desc' => '同城配送管理'),
+							)
+						),
+					array(
+						'title' => 'O2O',
+						'items' => array(
+							array('title' => '门店管理', 'route' => 'store', 'desc' => '门店管理'),
+							array('title' => '店员管理', 'route' => 'saler', 'desc' => '店员管理'),
+							)
+						),
+					)
+				),
+			'goods'      => array(
+				'title'    => '商品',
+				'subtitle' => '商品管理',
+				'icon'     => 'goods',
+				'items'    => array(
+					array('title' => '出售中', 'route' => 'sale', 'desc' => '出售中商品管理', 'extend' => 'goods/sale', 'perm' => 'goods.main'),
+					array('title' => '审核中', 'route' => 'check', 'desc' => '多商户待审核商品管理', 'perm' => 'goods.main'),
+					array('title' => '已售罄', 'route' => 'out', 'desc' => '待上架商品', 'perm' => 'goods.main'),
+					array('title' => '仓库中', 'route' => 'stock', 'desc' => '仓库中商品管理', 'perm' => 'goods.main'),
+					array('title' => '回收站', 'route' => 'cycle', 'desc' => '回收站/已删除商品管理', 'perm' => 'goods.main'),
+					array('title' => '商品分类', 'route' => 'category'),
+					// array('title' => '标签管理', 'route' => 'label', 'extend' => 'goods.label.style'),
+					)
+				),	
+			'order'      => array(
+				'title'    => '订单',
+				'subtitle' => '订单管理',
+				'icon'     => 'order',
+				'items'    => array(
+					array('title' => '订单概述', 'route' => 'index', 'desc' => '订单概述'),
+					array('title' => '待发货', 'route' => 'olist1', 'desc' => '待发货订单管理'),
+					array('title' => '待收货', 'route' => 'olist2', 'desc' => '待收货订单管理'),
+					array('title' => '待付款', 'route' => 'olist0', 'desc' => '待付款订单管理'),
+					array('title' => '已完成', 'route' => 'olist3', 'desc' => '已完成订单管理'),
+					array('title' => '已关闭', 'route' => 'olist_1', 'desc' => '已关闭订单管理'),
+					array('title' => '核销订单', 'route' => 'olist6', 'desc' => '核销订单管理'),
+					array('title' => '全部订单', 'route' => 'olist_all', 'desc' => '全部订单列表'),
+					array(
+						'title' => '售后',
+						'items' => array(
+							array('title' => '售后申请', 'route' => 'refund4', 'desc' => '维权申请管理'),
+							array('title' => '售后完成', 'route' => 'refund5', 'desc' => '维权完成管理')
+							)
+						)
+					)
+				),
+			// 'sale'       => array(
+			// 	'title'    => '营销',
+			// 	'subtitle' => '营销设置',
+			// 	'icon'     => 'yingxiao',
+			// 	'items'    => array(
+			// 		array(
+			// 			'title' => '基本功能',
+			// 			'items' => array(
+			// 				array('title' => '满额立减', 'route' => 'enough', 'desc' => '满额立减设置', 'keywords' => '营销'),
+			// 				array('title' => '满额包邮', 'route' => 'enoughfree', 'desc' => '满额包邮设置', 'keywords' => '营销'),
+			// 				array('title' => '抵扣设置', 'route' => 'deduct', 'desc' => '抵扣设置', 'keywords' => '营销'),
+			// 				array('title' => '充值优惠', 'route' => 'recharge', 'desc' => '充值优惠设置', 'keywords' => '营销'),
+			// 				array('title' => '积分优惠', 'route' => 'credit1', 'desc' => '积分优惠设置', 'keywords' => '营销'),
+			// 				array('title' => '套餐管理', 'route' => 'package', 'keywords' => '营销'),
+			// 				array('title' => '赠品管理', 'route' => 'gift', 'keywords' => '营销'),
+			// 				array('title' => '全返管理', 'route' => 'fullback', 'keywords' => '营销'),
+			// 				array('title' => '找人代付', 'route' => 'peerpay', 'keywords' => '营销'),
+			// 				array('title' => '绑定送积分', 'route' => 'bindmobile', 'keywords' => '营销')
+			// 				)
+			// 			),
+			// 		array(
+			// 			'title' => '优惠券',
+			// 			'route' => 'coupon',
+			// 			'iscom' => 'coupon',
+			// 			'items' => array(
+			// 				array('title' => '全部优惠券'),
+			// 				array('title' => '手动发送', 'route' => 'sendcoupon', 'desc' => '手动发送优惠券'),
+			// 				array(
+			// 					'title'   => '购物送券',
+			// 					'route'   => 'shareticket',
+			// 					'extends' => array('sale/coupon/goodssend', 'sale/coupon/usesendtask', 'sale/coupon/goodssend/add', 'sale/coupon/usesendtask/add')
+			// 					),
+			// 				array('title' => '发放记录', 'route' => 'log', 'desc' => '优惠券发放记录'),
+			// 				array('title' => '分类管理', 'route' => 'category', 'desc' => '优惠券分类管理'),
+			// 				array('title' => '其他设置', 'route' => 'set', 'desc' => '优惠券设置')
+			// 				)
+			// 			)
+			// 		)
+			// 	),
+			'statistics' => array(
+				'title'    => '数据',
+				'subtitle' => '数据统计',
+				'icon'     => 'statistics',
+				'items'    => array(
+					array(
+						'title' => '销售统计',
+						'items' => array(
+							array('title' => '销售统计', 'route' => 'sale_census'),
+							array('title' => '销售指标', 'route' => 'sale_analysis'),
+							)
+						),
+					array(
+						'title' => '商品统计',
+						'items' => array(
+							array('title' => '销售明细', 'route' => 'goods_detailed'),
+							array('title' => '销售排行', 'route' => 'goods_rank'),
+							array('title' => '销售转化率', 'route' => 'goods_trans')
+							)
+						),
+					array(
+						'title' => '会员统计',
+						'items' => array(
+							array('title' => '消费排行', 'route' => 'member_cost'),
+							array('title' => '增长趋势', 'route' => 'member_increase')
+							)
+						)
+					)
+				),	
+			'perm'      => array(
+				'title'    => '权限',
+				'subtitle' => '权限管理',
+				'icon'     => 'heimingdan2',
+				'items'    => array(
+					array('title' => '角色', 'route' => 'role', 'desc' => '角色管理', 'extend' => 'perm/index', 'perm' => 'perm.main'),
+					array('title' => '操作员', 'route' => 'user', 'desc' => '操作员管理', 'perm' => 'perm.main'),
+					array('title' => '操作员日志', 'route' => 'log', 'desc' => '操作员日志管理', 'perm' => 'perm.main'),
+					)
+				),	
+			'apply'      => array(
+				'title'    => '结算',
+				'subtitle' => '结算管理',
+				'icon'     => '31',
+				'items'    => array(
+					array('title' => '结算', 'route' => 'index', 'desc' => '结算管理', 'extend' => 'apply/index', 'perm' => 'apply.main'),
+					array('title' => '待审核申请', 'route' => 'status1', 'desc' => '待审核申请管理', 'perm' => 'apply.main'),
+					array('title' => '待结算申请', 'route' => 'status2', 'desc' => '待结算申请管理', 'perm' => 'apply.main'),
+					array('title' => '已结算申请', 'route' => 'status3', 'desc' => '已结算申请管理', 'perm' => 'apply.main'),
+					array('title' => '无效结算申请', 'route' => 'status_1', 'desc' => '无效结算申请管理', 'perm' => 'apply.main'),
+					array('title' => '申请结算', 'route' => 'add', 'desc' => '申请结算管理', 'perm' => 'apply.main'),
+					)
+				),
+			'plugins'    => array('title' => '应用', 'subtitle' => '应用管理', 'icon' => 'plugins'),
+			'sysset'    => array('title' => '设置', 'subtitle' => '设置管理', 'icon' => 'sysset'),
+			);
+
+		return $merchmenu;
 	}
 
 	/**
@@ -866,8 +1011,9 @@ class System extends \think\Model
 				'title'    => '团购',
 				'subtitle' => '团购管理',
 				'icon'     => 'page',
+				'extend' => 'admin/plugins/index',
 				'items'    => array(
-					array('title' => '商品管理', 'route' => 'goods'),
+					array('title' => '商品管理', 'route' => 'goods', 'extend' => 'admin/plugins/index'),
 					array('title' => '分类管理', 'route' => 'category'),
 					array('title' => '幻灯片管理', 'route' => 'banner'),
 					array(
@@ -944,28 +1090,28 @@ class System extends \think\Model
 				'subtitle' => '拍卖管理',
 				'icon'     => 'page',
 				'items'    => array(
-					array('title' => '商品管理', 'route' => 'goods'),
-					array('title' => '分类管理', 'route' => 'category'),
+					array('title' => '拍品管理', 'route' => 'goods'),
+					array('title' => '拍品分类', 'route' => 'category'),
 					array('title' => '幻灯片管理', 'route' => 'banner'),
 					array(
 						'title'  => '竞拍管理',
-						'extend' => 'auction/teamdetail',
+						'extend' => 'auction/auctiondetail',
 						'items'  => array(
 							array(
 								'title' => '竞拍成功',
-								'route' => 'teamsuccess'
+								'route' => 'auctionsuccess'
 								),
 							array(
 								'title' => '竞拍中',
-								'route' => 'teaming'
+								'route' => 'auctioning'
 								),
 							array(
 								'title' => '竞拍失败',
-								'route' => 'teamerror'
+								'route' => 'auctionerror'
 								),
 							array(
 								'title' => '全部竞拍',
-								'route' => 'teamall'
+								'route' => 'auctionall'
 								)
 							)
 						),
@@ -1001,7 +1147,7 @@ class System extends \think\Model
 						),
 					array(
 						'title'  => '维权设置',
-						'extend' => 'groups.refund.detail',
+						'extend' => 'auction.refund.detail',
 						'items'  => array(
 							array(
 								'title' => '维权申请',
@@ -1049,7 +1195,7 @@ class System extends \think\Model
 					array(
 						'title' => '核销管理',
 						'items' => array(
-							array('title' => '全部核销', 'route' => 'verify'),
+							array('title' => '全部核销', 'route' => 'allverify'),
 							array('title' => '待核销', 'route' => 'verifying'),
 							array('title' => '已核销', 'route' => 'verifyover')
 							)
@@ -1076,6 +1222,24 @@ class System extends \think\Model
 						)
 				)
 			),
+			'treasure'    => array(
+				'title'    => '众筹夺宝',
+				'subtitle' => '众筹夺宝管理',
+				'icon'     => 'page',
+				'items'     => array(
+					array('title' => '商品管理', 'route' => 'goods'),
+					array('title' => '商品分类', 'route' => 'category'),
+					array('title' => '幻灯片管理', 'route' => 'banner'),
+					array(
+						'title' => '订单',
+						'items' => array(
+							array('title' => '待发货', 'route' => 'order'),
+							array('title' => '待收货', 'route' => 'convey'),
+							array('title' => '已完成', 'route' => 'finish')
+						)
+					)
+				)
+			),
 			'article' => array(
 				'title'    => '文章',
 				'subtitle' => '文章营销',
@@ -1083,6 +1247,17 @@ class System extends \think\Model
 				'items'    => array(
 					array('title' => '文章管理', 'route' => 'index'),
 					array('title' => '分类管理', 'route' => 'category'),
+				)
+			),
+			'taobao' => array(
+				'title'    => '商品助手',
+				'subtitle' => '商品助手',
+				'icon'     => 'page',
+				'items'    => array(
+					array('title' => '淘宝助手', 'route' => 'index'),
+					array('title' => '京东助手', 'route' => 'jingdong'),
+					array('title' => '1688助手', 'route' => 'one688'),
+					// array('title' => '淘宝CSV上传', 'route' => 'taobaocsv'),
 				)
 			),
 		);

@@ -2,8 +2,8 @@
 	.fui-goods-list{width:100%;border-bottom: 1px dashed #e1ecee;padding-top:5px;padding-bottom:5px;}
 	.fui-goods-list span{display: block;padding:0;}
 </style>
-<form class="form-horizontal form-validate" action="{if $edit_flag==1}{:url('merch/order/op',array('op'=>'changeExpress'))}{else}{:url('merch/order/op',array('ops'=>'send','id'=>$item['id']))}{/if}" method="post" enctype="multipart/form-data">
-	<input type='hidden' name='id' value='{$id}' />
+<form class="form-horizontal form-validate" action="{if $edit_flag==1}{:url('admin/order/op',array('op'=>'changeexpress'))}{else}{:url('admin/order/op',array('ops'=>'send','id'=>$item['id']))}{/if}" method="post" enctype="multipart/form-data">
+	<input type='hidden' name='id' value='{$item['id']}' />
 	<div class="modal-dialog">
            <div class="modal-content">
             <div class="modal-header">

@@ -24,7 +24,7 @@ ul, li {
     -webkit-flex-direction: column;
   justify-content: space-around;
 }
-/*select2*/
+
 .select2-container .select2-choice .select2-arrow{
     cursor: pointer;
     border-left:none !important;
@@ -66,13 +66,13 @@ textarea:focus{
     margin: 0;
     border: none;
     overflow: hidden;
-    padding-top: 25px;
+    padding-top: 15px;
 }
 .page-header:before {
     content: " ";
     position: absolute;
     left: 0;
-    top: 32px;
+    top: 22px;
     width: 2px;
     height: 16px;
     border-left: 2px solid #44abf7;
@@ -80,6 +80,35 @@ textarea:focus{
     -webkit-transform-origin: 0 0;
     -ms-transform-origin: 0 0;
     transform-origin: 0 0;
+}
+.wxcode_box{
+    position: relative;
+}
+.wx_code{
+    width:164px;
+    height:185px;
+    background: #fff;
+    position: absolute;
+    left:0;
+    top:50px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .1);
+    display: none;
+}
+.wxcode_box:hover .wx_code{
+    display: block;
+}
+.wx_code img{
+    width:150px;
+    height:145px;
+}
+.wx_code .text{
+    text-align: center;
+    line-height: 40px;
+    height:40px;
+    background: #f5f7f9;
+    color: #333;
+    
 }
 .page-content{
     width: 100%;
@@ -118,7 +147,7 @@ textarea:focus{
 .caret {
     border: 0;
 }
-/*btn*/
+
 .btn {
     outline: none !important;
     padding: 8px 16px;
@@ -475,7 +504,7 @@ textarea:focus{
     color: #000 !important;
 }
 
-/*label*/
+
 .label {
     background-color: #d1dade;
     color: #fff;
@@ -526,7 +555,7 @@ textarea:focus{
 .control-label{
     color: #666;
 }
-/*progress*/
+
 .progress {
     height: 10px;
     margin: 0;
@@ -566,7 +595,7 @@ textarea:focus{
 .progress-bar-danger{
     background: #eb6060;
 }
-/*alert*/
+
 .alert{
     border-radius: 2px;
 }
@@ -607,7 +636,7 @@ textarea:focus{
 .alert a:hover{
     color:#333 !important;
 }
-/*panel*/
+
 .panel{
     border-radius: 2px;
     border-color: #efefef;
@@ -680,6 +709,12 @@ textarea:focus{
 }
 
 /*表单*/
+.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+    background-color: #ddd;
+}
+.input-group-addon.disabled{
+    background-color: #ddd;
+}
 .form-group-title{
     height: 65px;
     line-height:80px;;
@@ -896,7 +931,6 @@ select.form-control.select-lg {
 .has-error .input-group-btn .btn,
 .has-error .control-label {
     color:#eb6060 !important;
-    
 }
 .has-error .input-group-addon,
 .has-error .input-group-btn .btn,
@@ -1271,6 +1305,11 @@ select.form-control.select-lg {
 }
 
 fieldset[disabled] input[type=checkbox], fieldset[disabled] input[type=radio], input[type=checkbox].disabled, input[type=checkbox][disabled], input[type=radio].disabled, input[type=radio][disabled] {
+    cursor: not-allowed;
+    opacity: 0.4;
+    background: #f5f5f5;
+}
+fieldset[readonly] input[type=checkbox], fieldset[readonly] input[type=radio], input[type=checkbox].readonly, input[type=checkbox][readonly], input[type=radio].readonly, input[type=radio][readonly] {
     cursor: not-allowed;
     opacity: 0.4;
     background: #f5f5f5;
@@ -2220,7 +2259,7 @@ modal
 .multi-item{
     margin-top: 0.5em;
 }
-/*pop*/
+
 .popover{
     border: 1px solid #efefef;
     border: 1px solid #efefef;
@@ -2299,3 +2338,5 @@ img.goodslist_img{
 select.we7-select {
     height: 30px !important;
 }
+
+

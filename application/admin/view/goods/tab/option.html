@@ -244,7 +244,7 @@
 	}
 	function addSpecItem(specid){
 	    $("#add-specitem-" + specid).html("正在处理...").attr("disabled", "true");
-		var url = "{:url('admin/goods/tpl',array('tpl'=>'specitem'))}" + "?specid=" + specid;
+		var url = "{:url('admin/goods/tpl')}" + "?tpl=specitem&specid=" + specid;
 		$.ajax({
 			"url": url,
 			success:function(data){

@@ -10,12 +10,12 @@
 <div class="page-content">
 	<div class="page-sub-toolbar">
 		<span class=''>
-			<a class="btn btn-primary btn-sm" href="{:url('admin/goods/categoryadd')}">添加新分类</a>
+			<a class="btn btn-primary btn-sm" href="{:url('merch/goods/categoryadd')}">添加新分类</a>
 		</span>
 	</div>
 <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data" >
 
-	{if !empty($item['url'])}
+	<!-- {if !empty($item['url'])}
 	<div class="form-group">
 		<label class="col-sm-2 control-label">分类链接(点击复制)</label>
 		<div class="col-sm-9 col-xs-12">
@@ -28,7 +28,7 @@
 			</p>
 		</div>
 	</div>
-	{/if}
+	{/if} -->
 
 
 	{if !empty($parentid)}
@@ -69,10 +69,10 @@
 	</div> 
 	{if $level<=2}
 	<div class="form-group">
-		<label class="col-sm-2 control-label">{if intval($_W['shopset']['category']['level'])==1}分类图片{else}分类广告{/if}</label>
+		<label class="col-sm-2 control-label">{if intval($shopset['category']['level'])==1}分类图片{else}分类广告{/if}</label>
 		<div class="col-sm-9 col-xs-12">
 			{:tpl_form_field_image2('advimg', $item['advimg'])}
-			<span class="help-block">{if intval($_W['shopset']['category']['level'])==1}建议尺寸: 100*100，或正方型图片 {else}建议尺寸: 640*320 {/if}</span>
+			<span class="help-block">{if intval($shopset['category']['level'])==1}建议尺寸: 100*100，或正方型图片 {else}建议尺寸: 640*320 {/if}</span>
 		</div>
 	</div>
 	<div class="form-group">

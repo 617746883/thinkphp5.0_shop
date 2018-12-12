@@ -40,16 +40,15 @@ class Goods extends Base
 		}
 		$category = Db::name('shop_goods_category')->where('enabled',1)->where('level',1)->order('displayorder','desc')->select();
 		if (0 < $merchid) {
-			$merch_data = model('common')->getPluginset('store');
+			$merch_data = model('common')->getPluginset('merch');
 			if ($merch_data['is_openmerch']) {
 				$is_openmerch = 1;
-			}
-			else {
+			} else {
 				$is_openmerch = 0;
 			}
 
 			if ($is_openmerch) {
-				$category = Db::name('shop_store_goods_category')->where('merchid',$merchid)->where('level',1)->where('enabled',1)->order('parentid','asc')->order('displayorder','desc')->select();
+				$category = Db::name('shop_merch_goods_category')->where('merchid',$merchid)->where('level',1)->where('enabled',1)->order('parentid','asc')->order('displayorder','desc')->select();
 			}
 		}
 		$category = set_medias($category,'advimg');
@@ -73,31 +72,28 @@ class Goods extends Base
 		$category_set = $shopset['category'];
 		$category_set['advimg'] = tomedia($category_set['advimg']);
 		$category = array();
-		$merch_data = model('common')->getPluginset('store');
+		$merch_data = model('common')->getPluginset('merch');
 		if ($merch_data['is_openmerch']) {
 			$is_openmerch = 1;
-		}
-		else {
+		} else {
 			$is_openmerch = 0;
 		}
 		if ($category_set['level'] == -1) {
 			$this->result(0,'暂时未开启分类');
 		}
-		if($category_set['level'] > 1)
-		{
+		if($category_set['level'] > 1) {
 			if(0 < $merchid && $is_openmerch) {
-				$category = Db::name('shop_store_goods_category')->where('merchid',$merchid)->where('enabled',1)->where('parentid',$parentid)->order('displayorder','desc')->select();
+				$category = Db::name('shop_merch_goods_category')->where('merchid',$merchid)->where('enabled',1)->where('parentid',$parentid)->order('displayorder','desc')->select();
 			} else {
 				$category = Db::name('shop_goods_category')->where('enabled',1)->where('parentid',$parentid)->order('displayorder','desc')->select();
 			}
 		}
-		if($category_set['level'] == 3)
-		{
+		if($category_set['level'] == 3) {
 			foreach ($category as &$row) {
 				$row['thumb'] = tomedia($row['thumb']);
 				$row['advimg'] = tomedia($row['advimg']);
 				if(0 < $merchid && $is_openmerch) {
-					$row['children'] = Db::name('shop_store_goods_category')->where('enabled',1)->where('merchid',$merchid)->where('parentid',$row['id'])->order('displayorder','desc')->select();
+					$row['children'] = Db::name('shop_merch_goods_category')->where('enabled',1)->where('merchid',$merchid)->where('parentid',$row['id'])->order('displayorder','desc')->select();
 				} else {
 					$row['children'] = Db::name('shop_goods_category')->where('enabled',1)->where('parentid',$row['id'])->order('displayorder','desc')->select();
 				}
@@ -128,7 +124,7 @@ class Goods extends Base
 		$category = Db::name('shop_goods_category')->where('enabled',1)->order('parentid','asc')->order('displayorder','desc')->select();
 
 		if (0 < $merchid) {
-			$merch_data = model('common')->getPluginset('store');
+			$merch_data = model('common')->getPluginset('merch');
 			if ($merch_data['is_openmerch']) {
 				$is_openmerch = 1;
 			}
@@ -137,7 +133,7 @@ class Goods extends Base
 			}
 
 			if ($is_openmerch) {
-				$category = Db::name('shop_store_goods_category')->where('merchid',$merchid)->where('enabled',1)->order('parentid','asc')->order('displayorder','desc')->select();
+				$category = Db::name('shop_merch_goods_category')->where('merchid',$merchid)->where('enabled',1)->order('parentid','asc')->order('displayorder','desc')->select();
 			}
 		}
 		$category = model('goods')->getCategoryTree($category, $category_set['level']);
@@ -172,11 +168,10 @@ class Goods extends Base
 			$order = '';
 		}
 		$args = array('page' => $page, 'pagesize' => $pagesize, 'isnew' => $isnew, 'ishot' => $ishot, 'isrecommand' => trim($isrecommand), 'isdiscount' => trim($isdiscount), 'istime' => trim($istime), 'issendfree' => trim($issendfree), 'keyword' => trim($keyword), 'cate' => trim($cate), 'order' => trim($order), 'by' => trim($by), 'startprice' => $startprice, 'endprice' => $endprice);
-		$merch_data = model('common')->getPluginset('store');
+		$merch_data = model('common')->getPluginset('merch');
 		if ($merch_data['is_openmerch']) {
 			$is_openmerch = 1;
-		}
-		else {
+		} else {
 			$is_openmerch = 0;
 		}
 
@@ -208,19 +203,19 @@ class Goods extends Base
         {           
             $mid = $this->mid;
         }
-        $merch_data = model('common')->getPluginset('store');
+        $merch_data = model('common')->getPluginset('merch');
         if ($merch_data['is_openmerch']) {
 			$is_openmerch = 1;
 		}
 		 else {
 			$is_openmerch = 0;
 		}
-		$goods = Db::name('shop_goods')->where('id',$id)->field('id,title,subtitle,thumb,type,status,unit,content,productprice,marketprice,minprice,maxprice,sales,salesreal,thumb_url,merchid,thumb_first,labelname,cannotrefund,hasoption,dispatchtype,dispatchid,dispatchprice,province,city,deleted,quality,seven,repair,total')->find();
+		$goods = Db::name('shop_goods')->where('id',$id)->find();
 		if(empty($goods) || $goods['status'] != 1 || $goods['deleted'] == 1) {
 			$this->result(0,'您访问的商品不存在');
 		}
 		if ($is_openmerch == 1) {
-			$set = Db::name('shop_store')->where('id',$goods['merchid'])->find();
+			$set = Db::name('shop_merch')->where('id',$goods['merchid'])->find();
 
 			if ($set['status'] != 1) {
 				$is_openmerch = 0;
@@ -228,7 +223,7 @@ class Goods extends Base
 		}
 		$merchinfo = array('id'=>0,'logo'=>$shopset['shop']['logo'],'merchname'=>$shopset['shop']['name']);
 		if($is_openmerch) {
-			$merchinfo = Db::name('shop_store')->where('id',$goods['merchid'])->field('id,logo,merchname')->find();
+			$merchinfo = Db::name('shop_merch')->where('id',$goods['merchid'])->field('id,logo,merchname')->find();
 		}
 		$merchinfo['logo'] = tomedia($merchinfo['logo']);
 		$goods['merch'] = $merchinfo;
@@ -290,14 +285,15 @@ class Goods extends Base
 
 		if (json_decode($goods['labelname'], true)) {
 			$labelname = json_decode($goods['labelname'], true);
-		}
-		else {
+		} else {
 			$labelname = unserialize($goods['labelname']);
 		}
 
 		$member = model('member')->getMember($mid);
 		$showgoods = model('goods')->visit($goods, $member);
-
+		if (empty($goods) || empty($showgoods)) {
+			$this->result(0,'您没有访问权限');
+		}
 		$seckillinfo = false;
 		$seckill = model('common')->getPluginset('seckill');
 
@@ -344,6 +340,10 @@ class Goods extends Base
 			$quality = '正品保证';
 			array_unshift($goods['label'], $quality);
 		}
+		if(!empty($goods['isverify']) && $goods['isverify'] == 2) {
+			$quality = '核销商品';
+			array_unshift($goods['label'], $quality);
+		}
 		if(!empty($goods['seven'])) {
 			$seven = '7天无理由退换';
 			array_unshift($goods['label'], $seven);
@@ -358,8 +358,7 @@ class Goods extends Base
 		{
 			$shop_dispatch = Db::name('shop_dispatch')->where('id',$goods['dispatchid'])->find();
 			$dispatch = $shop_dispatch['dispatchname'] . $shop_dispatch['firstprice'];
-		}
-		else {
+		} else {
 			if($goods['dispatchprice'] == 0)
 			{
 				$dispatch = '包邮';
@@ -368,6 +367,87 @@ class Goods extends Base
 			}			
 		}
 		$goods['dispatch'] = $dispatch;
+		$minprice = $goods['minprice'];
+		$maxprice = $goods['maxprice'];
+		$level = model('member')->getLevel($mid);
+		$memberprice = model('goods')->getMemberPrice($goods, $level);
+		if ($goods['isdiscount'] && (time() <= $goods['isdiscount_time'])) {
+			$goods['oldmaxprice'] = $maxprice;
+			$prices = array();
+			$isdiscount_discounts = json_decode($goods['isdiscount_discounts'], true);
+			if (!(isset($isdiscount_discounts['type'])) || empty($isdiscount_discounts['type'])) {
+				$prices_array = model('order')->getGoodsDiscountPrice($goods, $level, 1);
+				$prices[] = $prices_array['price'];
+			}
+			 else {
+				$goods_discounts = model('order')->getGoodsDiscounts($goods, $isdiscount_discounts, $levelid);
+				$prices = $goods_discounts['prices'];
+			}
+
+			$minprice = min($prices);
+			$maxprice = max($prices);
+		} else {
+			if (isset($options) && (0 < count($options)) && $goods['hasoption']) {
+				$optionids = array();
+
+				foreach ($options as $val ) {
+					$optionids[] = $val['id'];
+				}
+
+				$sql = 'update ' . tablename('shop_goods') . ' g set' . "\r\n" . ' g.minprice = (select min(marketprice) from ' . tablename('shop_goods_option') . ' where goodsid = ' . $id . '),' . "\r\n" . '        g.maxprice = (select max(marketprice) from ' . tablename('shop_goods_option') . ' where goodsid = ' . $id . ')' . "\r\n" . '        where g.id = ' . $id . ' and g.hasoption=1';
+				Db::query($sql);
+			}
+			 else {
+				$sql = 'update ' . tablename('shop_goods') . ' set minprice = marketprice,maxprice = marketprice where id = ' . $id . ' and hasoption=0;';
+				Db::query($sql);
+			}
+
+			$goods_price = Db::name('shop_goods')->where('id',$id)->field('minprice,maxprice')->find();
+			$maxprice = (double) $goods_price['maxprice'];
+			$minprice = (double) $goods_price['minprice'];
+
+			if ($islive) {
+				$minprice = $islive['minprice'];
+				$maxprice = $islive['maxprice'];
+			}
+
+		}
+
+		if (!(empty($is_task_goods))) {
+			if (isset($options) && (0 < count($options)) && $goods['hasoption']) {
+				$prices = array();
+
+				foreach ($task_goods['spec'] as $k => $v ) {
+					$prices[] = $v['marketprice'];
+				}
+
+				$minprice2 = min($prices);
+				$maxprice2 = max($prices);
+
+				if ($minprice2 < $minprice) {
+					$minprice = $minprice2;
+				}
+
+
+				if ($maxprice < $maxprice2) {
+					$maxprice = $maxprice2;
+				}
+
+			}
+			 else {
+				$minprice = $task_goods['marketprice'];
+				$maxprice = $task_goods['marketprice'];
+			}
+		}
+
+
+		if ((0 < $goods['ispresell']) && $goods['hasoption'] && (($goods['preselltimeend'] == 0) || (time() < $goods['preselltimeend']))) {
+			$presell = Db::name('shop_goods_option')->where('goodsid',$id)->field('min(presellprice) as minprice,max(presellprice) as maxprice')->find();
+			$minprice = $presell['minprice'];
+			$maxprice = $presell['maxprice'];
+		}
+		$goods['minprice'] = $minprice;
+		$goods['maxprice'] = $maxprice;
 		$goods['isfavorite'] = 0;
 		if(!empty($mid)) {
 			$favorite_count = Db::name('shop_goods_favorite')->where('goodsid',$goods['id'])->where('mid',$mid)->field('id,deleted')->find();
@@ -596,7 +676,7 @@ class Goods extends Base
 			$merchinfo = array('id'=>0,'logo'=>$shopset['logo'],'merchname'=>$shopset['name']);
 			if(!empty($val['merchid']))
 			{
-				$merchinfo = Db::name('shop_store')->where('id',$val['merchid'])->field('id,logo,merchname')->find();
+				$merchinfo = Db::name('shop_merch')->where('id',$val['merchid'])->field('id,logo,merchname')->find();
 			}
 			$merchinfo['logo'] = tomedia($merchinfo['logo']);
 			$val['merchinfo'] = $merchinfo;
@@ -631,7 +711,7 @@ class Goods extends Base
 		$page = input('page/d',1);
 		$pagesize = input('pagesize/d',10);
 		$mid = $this->getMemberId();
-		$merch_data = model('common')->getPluginset('store');
+		$merch_data = model('common')->getPluginset('merch');
 		$condition = ' f.mid = ' . $mid . ' and f.deleted = 0 ';
 		if ($merch_data['is_openmerch']) {
 			$condition = ' f.mid = ' . $mid . ' and f.deleted=0 and f.type=0';
@@ -651,7 +731,7 @@ class Goods extends Base
 			if(empty($val['id'])) {
 				Db::name('shop_goods_favorite')->where('id',$val['collectid'])->setField('deleted',1);
 			}
-			$merch_user = Db::name('shop_store')->where('id',$row['merchid'])->find();
+			$merch_user = Db::name('shop_merch')->where('id',$row['merchid'])->find();
 			$shopset = $this->shopset;
 			$row['merchname'] = $merch_user['merchname'] ? $merch_user['merchname'] : $shopset['shop']['name'];
 			$collect_count = Db::name('shop_goods_favorite')->where('goodsid',$row['id'])->count();
@@ -724,7 +804,7 @@ class Goods extends Base
 
 	protected function merchData()
 	{
-		$merch_data = model('common')->getPluginset('store');
+		$merch_data = model('common')->getPluginset('merch');
 		if ($merch_data['is_openmerch']) {
 			$is_openmerch = 1;
 		}

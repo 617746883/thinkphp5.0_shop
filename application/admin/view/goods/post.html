@@ -56,11 +56,12 @@
                 <li {if $_GET['tab']=='buy'}class="active"{/if} ><a href="#tab_buy">购买权限</a></li>
                 <li {if $_GET['tab']=='sale'}class="active"{/if} ><a href="#tab_sale">营销</a></li>
                 <li {if $_GET['tab']=='discount'}class="active"{/if} ><a href="#tab_discount">会员折扣</a></li>
+                <li {if $_GET['tab']=='notice'}class="active"{/if} ><a href="#tab_notice">卖家通知</a></li>
 				{if $merchid == 0 }
 				<li {if $_GET['tab']=='verify'}class="active"{/if} id="tab_nav_verify" {if $item['type']==3||$item['type']==5||($item['type']==2&&!empty($item['virtualsend']))}style="display:none;"{/if}><a href="#tab_verify">线下核销</a></li>
 				{/if}
                 {if $merchid == 0}
-                <li {if $_GET['tab']=='detaildiy'}class="active"{/if}><a href="#tab_detaildiy">店铺信息</a></li>
+                <li {if $_GET['tab']=='detaildiy'}class="active"{/if} style="display: none;"><a href="#tab_detaildiy">店铺信息</a></li>
                 {/if}
 				<li {if $item['type'] != 5}style="display:none;"{/if}   class="showverifygoods" {if $_GET['tab']=='verifygoods'}class="active"{/if} ><a href="#tab_verifygoods">核销设置</a></li>
             </ul>
@@ -73,6 +74,7 @@
                 <div class="tab-pane {if $_GET['tab']=='buy'}active{/if}" id="tab_buy"> <div class="panel-body">{include file='goods/tab/buy'}</div></div>
                 <div class="tab-pane {if $_GET['tab']=='sale'}active{/if}" id="tab_sale" > <div class="panel-body" >{include file='goods/tab/sale'}</div></div>
                 <div class="tab-pane {if $_GET['tab']=='discount'}active{/if}" id="tab_discount"> <div class="panel-body">{include file='goods/tab/discount'}</div></div>
+                <div class="tab-pane  {if $_GET['tab']=='notice'}active{/if}" id="tab_notice"> <div class="panel-body">{include file='goods/tab/notice'}</div></div>
                 {if $merchid == 0}
                 <div class="tab-pane {if $_GET['tab']=='verify'}active{/if}" id="tab_verify"> <div class="panel-body">{include file='goods/tab/verify'}</div></div>
                 {/if}

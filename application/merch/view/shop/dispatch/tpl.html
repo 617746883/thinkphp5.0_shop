@@ -1,0 +1,19 @@
+<tr class='{$random}'>
+    <td style="word-break:break-all;width:80px;padding:10px;line-height:22px;overflow:hidden; white-space: normal;">
+        <span class='cityshtml'>{$row['citys']}</span>
+        <input type="hidden" name="random[]" value="{$random}" />
+        <input type="hidden" class='citys' name="citys[{$random}]" value="{$row['citys']}" />
+        <a href='javascript:;' onclick='editArea(this)' random="{$random}">编辑</a>
+        <input type="hidden" class='citys_code' name="citys_code[{$random}]" value="{$row['citys_code']}" />
+    </td>
+    <td class="show_h text-center" valign='top' style="padding-top:10px;"><input type="text" value="{$row['firstweight']}" class="form-control" name="firstweight[{$random}]" style="width:80px;"></td>
+    <td class="show_h text-center" valign='top' style="padding-top:10px;"><input type="text" value="{$row['firstprice']}" class="form-control" name="firstprice[{$random}]" style="width:80px;"></td>
+    <td class="show_h text-center"  valign='top' style="padding-top:10px;"><input type="text" value="{$row['secondweight']?$row['secondweight']:1000}" class="form-control" name="secondweight[{$random}]" style="width:80px;"></td>
+    <td class="show_h text-center" valign='top'  style="padding-top:10px;"><input type="text" value="{$row['secondprice']}" class="form-control" name="secondprice[{$random}]" style="width:80px;"></td>
+    <td class="show_n text-center" valign='top' style="padding-top:10px;"><input type="number" value="{$row['firstnum']?$row['firstnum']:1}" class="form-control" name="firstnum[{$random}]" style="width:80px;"></td>
+    <td class="show_n text-center" valign='top' style="padding-top:10px;"><input type="text" value="{$row['firstnumprice']}" class="form-control" name="firstnumprice[{$random}]" style="width:80px;"></td>
+    <td class="show_n text-center" valign='top' style="padding-top:10px;"><input type="number" value="{$row['secondnum']?$row['secondnum']:1}" class="form-control" name="secondnum[{$random}]" style="width:80px;"></td>
+    <td class="show_n text-center" valign='top' style="padding-top:10px;"><input type="text" value="{$row['secondnumprice']}" class="form-control" name="secondnumprice[{$random}]" style="width:80px;"></td>
+    <td class="text-center" valign='top' style="padding-top:10px;"><input type="text" value="{$row['freeprice']}" class="form-control" name="freeprice[{$random}]" style="width:80px;"></td>
+    <td style='text-align: center;padding-top:10px;' valign='top' ><a href='javascript:;' class='btn btn-default btn-sm' onclick='$(this).parent().parent().remove()'><i class='fa fa-remove'></i></td>
+</tr> 

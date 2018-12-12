@@ -1,163 +1,159 @@
 {include file='_header'}
+<style>
+    .ibox-content h3{
+        font-size:14px;
+        line-height: 20px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .ibox-content p{
+        line-height: 1.5;
+    }
+</style>
+<div class="page-header">当前位置：<span class="text-primary">首页</span></div>
 
-<div class="page-heading">
-    <span class='pull-right'>
-        <a class='btn btn-primary btn-sm' href="{:url('merch/goods/add')}"><i class='fa fa-plus'></i> 添加商品</a>
-    </span>
-    <h2>商城概述</h2>
-</div>
-{if count($notice)>0}
-<div class="row">
-    <div class="col-md-12 col-sm-12">
-        <div id="w0" class="list-group">
-            <a class="list-group-item" href="#w0-1" data-toggle="collapse" data-parent="#w0" id="notice">
-                <span style="padding-left: 2rem;">{$notice[0]['title']}</span><b class="caret pull-right" style="margin-top: 8px;"></b>
-            </a>
-            <div id="w0-1" class="submenu panel-collapse collapse">
-                {foreach name='notice' key='key' item='value'}
-                <a class="list-group-item" href="javascript:" data-toggle="ajaxModal" data-href="{:url('merch/index/view',array('id'=>$value['id']));}">
-                    <span style="padding-left: 2rem;">{$value['title']}</span>
-                </a>
-                {/foreach}
-            </div>
-        </div>
-    </div>
-    {/if}
-    <div class="col-md-12 col-sm-12">
-        <div class="contact-box">
-            <div class="col-sm-1" style="padding:0">
-                <img onerror="this.src='/public/static/images/nopic100.jpg'" src="{if empty($merch['logo'])}/public/static/images/nopic100.jpg{else}{$merch['logo']}{/if}" style="width:65px;height:65px;border-radius:5px">
-            </div>
-            <div class="col-sm-10"  style="padding-left:10px">
-                <h3 >{$merch['merchname']}</h3>
-                <p >{$merch['desc']}</p>
-            </div>
-            <div class="col-sm-1" style="padding-left: 0"><a class="btn btn-primary btn-sm" href="{:url('merch/sysset/index')}" style="color: #fff"> 点击修改</a></div>
-        <div class="clearfix"></div>
-        </div>
-    </div>
-
-        <div class="col-md-12 col-sm-12">
-        <div class="contact-box" style="border: 1px solid #e7eaec">
-            <div class="forum-item">
-                <div class="row">
-                    <a href="{:url('merch/goods/out')}">
-                        <div class="col-sm-3 forum-info">
-                            <span class="views-number">
-                                {$goods_totals}
-                            </span>
-                            <div>
-                                <small>已售罄商品</small>
-                            </div>
-                        </div>
-                    </a>
-
-                    <a href="{:url('merch/order/olist1')}">
-                        <div class="col-sm-3 forum-info">
-                            <span class="views-number">
-                                {$order_totals['status1']}
-                            </span>
-                            <div>
-                                <small>待发货订单</small>
-                            </div>
-                        </div>
-                        </a>
-
-                    <a href="{:url('merch/order/refund4')}">
-                        <div class="col-sm-3 forum-info">
-                            <span class="views-number">
-                                {$order_totals['status4']}
-                            </span>
-                            <div>
-                                <small>维权中订单</small>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="{:url('merch/order/olist3')}">
-                        <div class="col-sm-3 forum-info">
-                            <span class="views-number">
-                                {$order_totals['status3']}
-                            </span>
-                            <div>
-                                <small>已完成订单</small>
-                            </div>
-                        </div>
-                    </a>
+<div class="page-content transparent">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5><i class="icow icow-shop"></i>店铺信息</h5>
+                    <ul>
+                        <a href="{:url('merch/sysset/index')}" class="text-primary">修改</a>
+                    </ul>
+                </div>
+                <div class="ibox-content" style="height: 107px;">
+                    <div class="col-sm-2" style="padding:0">
+                        <img onerror="this.src='__STATIC__/images/nopic.png'" src="{$merch['logo']}" style="width:65px;height:65px;border-radius:5px">
+                    </div>
+                    <div class="col-sm-10"  style="padding-left:30px">
+                        <h3>{$merch['merchname']}</h3>
+                        <p>{$merch['desc']}</p>
+                        <p class=''>
+                            店铺链接: <a href='javascript:;' class="js-clip text-primary" title='点击复制链接' data-url="{php echo $url}" >点击复制</a>
+                            <span style="cursor: pointer;" data-toggle="popover" data-trigger="hover" data-html="true"
+                                  data-content="<img src='{$qrcode}' width='130' alt='链接二维码'>" data-placement="auto right">
+                            <i class="glyphicon glyphicon-qrcode"></i>
+                        </span>
+                        </p>
+                    </div>
                 </div>
             </div>
-    </div>
-</div>
-
-    <div class="col-md-12 col-sm-12">
-        {if count($order_ok)>0}
-        <div class="ibox float-e-margins" style="border: 1px solid #e7eaec">
-            <div class="ibox-title">
-                <h5>用户购买待发货订单</h5>
-            </div>
-            <div class="ibox-content">
-                <table class="table table-hover no-margins">
-                    <thead>
-                    <tr>
-                        <th class="col-sm-1">状态</th>
-                        <th class="col-sm-2">日期</th>
-                        <th class="col-sm-1">金额</th>
-                        <th class="col-sm-2">用户</th>
-                        <th class="col-sm-3">订单号</th>
-                        <th class="col-sm-2">操作</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {foreach name='order_ok' key='key' item="value"}
-                    <tr>
-                        <td><span class="label label-warning">待发货</span>
-                        </td>
-                        <td>{:date('Y-m-d H:i',$value['createtime'])}</td>
-                        <td class="text-navy">{$value['price']}</td>
-                        <td>{$value['address']['realname'] ? $value['address']['realname'] : $value['invoicename']}</td>
-                        <td class="text-navy">{$value['ordersn']}</td>
-                        <td><a href="{:url('merch/order/detail',array('id'=>$value['id']))}" class="btn btn-xs btn-primary">查看详情</a></td>
-                    </tr>
-                    {/foreach}
-                    </tbody>
-                </table>
+        </div>
+        <div class="col-md-8">
+            <div class="ibox">
+                <div class="ibox-content no-border">
+                    <ul class="fui-list-group noborder">
+                        <li class="fui-list">
+                            <a href="{:url('merch/goods/out')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-info icow-goodsL"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="goods_totals">--</h5>
+                                    <p>已售罄商品</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="fui-list">
+                            <a href="{:url('merch/order/status1')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-green icow-fahuo"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="status1">--</h5>
+                                    <p>待发货订单</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="fui-list">
+                            <a href="{:url('merch/order/status4')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-primary icow-tuihuo"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="status4">--</h5>
+                                    <p>维权中订单</p>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-        {else}
-        <div class="panel panel-default">
-            <div class="panel-body" style="text-align: center;padding:30px;">
-                暂时没有任何待处理订单!
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5><i class="icow icow-shop"></i>订单信息</h5>
+                    <ul>
+                        <a href="{:url('merch/order/list')}" class="text-primary">更多</a>
+                    </ul>
+                </div>
+                <div class="ibox-content">
+                    {if empty($order_ok)}
+                    <p style="line-height: 100px;" class="text-center">暂时没有任何待处理订单</p>
+                    {else}
+                    <table class="table table-hover no-margins">
+                        <thead>
+                        <tr>
+                            <th style="width: 100px">状态</th>
+                            <th style="width: 200px">日期</th>
+                            <th style="width: 200px">金额</th>
+                            <th>用户</th>
+                            <th>订单号</th>
+                            <th style="width: 80px">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {foreach name='order_ok' key='key' item='value'}
+                        <tr>
+                            <td><span class="label label-warning">待发货</span>
+                            </td>
+                            <td>{php echo date('Y-m-d H:i',$value['createtime'])}</td>
+                            <td class="text-navy">{$value['price']}</td>
+                            <td>{php echo !empty($value['address']['realname']) ? $value['address']['realname'] : $value['invoicename']}</td>
+                            <td class="text-navy">{$value['ordersn']}</td>
+                            <td>
+                                <a href="{:url('merch/order/detail',array('id'=>$value['id']))}" class="btn btn-xs btn-primary">查看详情</a>
+                            </td>
+                        </tr>
+                        {/foreach}
+                        </tbody>
+                    </table>
+                    {/if}
+                </div>
             </div>
         </div>
-        {/if}
     </div>
 </div>
-<input type="hidden" name="len" value="0">
-<input type="hidden" name="index" value="0">
 
 <script type="text/javascript">
-    function AutoScroll(obj,len){
-        var text = $(obj).find("a span");
-        var index = $("input[name='index']").val();
-        $("input[name='index']").val(parseInt(index)+1);
-        $("input[name='len']").val(text.length);
-        if (text.length > index) {
-            $("#notice span").text($(text[index]).text());
-        } else {
-            $("input[name='index']").val(parseInt(0));
-            $("#notice span").text($(text[0]).text());
-        }
-    }
     $(document).ready(function(){
-        var scrollDiv = setInterval('AutoScroll("#w0-1")',3000);
-        $("#w0").hover(
-            function () {
-                clearInterval(scrollDiv);
-            },
-            function () {
-                scrollDiv = setInterval('AutoScroll("#w0-1")',3000);
+        $.ajax({
+            type: "GET",
+            url: "{:url('merch/order/ajaxgettotals')}",
+            dataType: "json",
+            success: function (data) {
+                shopajax();
+                var res = data.result;
+                $("h5.status1").text(res.status1);
+                $("h5.status4").text(res.status4);
             }
-        );
+        });
+
+        function shopajax() {
+            $.ajax({
+                type: "GET",
+                url: "{:url('merch/shop/ajax')}",
+                dataType: "json",
+                success: function (data) {
+                    var res = data.result;
+                    $("h5.goods_totals").text(res.goods_totals);
+                }
+            });
+        }
     });
 </script>
-
 {include file='_footer'}

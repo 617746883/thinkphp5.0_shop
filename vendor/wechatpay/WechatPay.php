@@ -170,7 +170,11 @@ class WechatPay {
         $config=$this->config;
         $unified_order=$this->unifiedOrder($order);
         if(empty($unified_order) || !is_array($unified_order) || $unified_order['result_code'] == 'FAIL') {
-            return $unified_order['err_code_des'];
+            if(isset($unified_order['err_code_des'])) {
+                return $unified_order['err_code_des'];
+            } else {
+                return '支付参数出错';
+            }
         }
         $data['appid'] = $config['APPID'];
         $data['partnerid'] = $config['MCHID'];
@@ -183,6 +187,66 @@ class WechatPay {
      }
 
     /**
+     * 获取jssdk需要用到的数据
+     * @return array jssdk需要用到的数据
+     */
+    public function getJsapiPayParams($order){
+        // 统一下单 获取prepay_id
+        $config = $this->config;
+        // 组合获取openid的url
+        
+        if(isset($order['openid']) && !empty($order['openid'])) {
+
+        } else {
+            $order['openid']=$this->GetOpenid();
+        }
+        
+        $unified_order = $this->unifiedOrder($order);
+        if(empty($unified_order) || (!empty($unified_order) && (!is_array($unified_order) || $unified_order['result_code'] == 'FAIL'))) {
+            if(isset($unified_order['err_code_des'])) {
+                return $unified_order['err_code_des'];
+            } else {
+                return $unified_order;
+            } 
+            return '支付出错';           
+        }
+        $data['appId'] = $config['APPID'];
+        $data['package'] = 'prepay_id='.$unified_order['prepay_id'];// 预支付交易会话标识
+        $data['nonceStr'] = $unified_order['nonce_str'];// 随机字符串
+        $data['timeStamp'] = strval($this->getMillisecond());
+        $data['signType'] = 'MD5';
+        $data['paySign'] = $this->makeSign( $data ); 
+        return $data;
+    }
+
+    /**
+     * 获取H5需要用到的数据
+     * @return array H5需要用到的数据
+     */
+    public function getMwebPayParams($order){
+        // 统一下单 获取prepay_id
+        $config = $this->config;
+        
+        $unified_order = $this->unifiedOrder($order);
+        if(empty($unified_order) || (!empty($unified_order) && (!is_array($unified_order) || $unified_order['result_code'] == 'FAIL'))) {
+            if(isset($unified_order['err_code_des'])) {
+                return $unified_order['err_code_des'];
+            } else {
+                return $unified_order;
+            } 
+            return '支付出错';           
+        }
+        $data['appid'] = $config['APPID'];
+        $data['partnerid'] = $config['MCHID'];
+        $data['prepayid'] = $unified_order['prepay_id'];
+        $data['package'] = "Sign=WXPay";// 预支付交易会话标识
+        $data['noncestr'] = $unified_order['nonce_str'];// 随机字符串
+        $data['timestamp'] = $this->getMillisecond();
+        $data['sign'] = $this->makeSign( $data ); 
+        return $data;
+    }
+
+    /**
      * 生成支付二维码
      * @param  array $order 订单 必须包含支付所需要的参数 body(产品描述)、total_fee(订单金额)、out_trade_no(订单号)、product_id(产品id)、trade_type(类型：JSAPI，NATIVE，APP)
      */
@@ -192,6 +256,110 @@ class WechatPay {
         $decodeurl=urldecode($result['code_url']);
         return $decodeurl;
         // qrcode($decodeurl);
+    }
+
+    /**
+     * 
+     * 通过跳转获取用户的openid，跳转流程如下：
+     * 1、设置自己需要调回的url及其其他参数，跳转到微信服务器https://open.weixin.qq.com/connect/oauth2/authorize
+     * 2、微信服务处理完成之后会跳转回用户redirect_uri地址，此时会带上一些参数，如：code
+     * 
+     * @return 用户的openid
+     */
+    public function GetOpenid()
+    {
+        //通过code获得openid
+        if (!isset($_GET['code'])){
+            //触发微信返回code码
+            $baseUrl = urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].$_SERVER['QUERY_STRING']);
+            $url = $this->_CreateOauthUrlForCode($baseUrl);
+            Header("Location: $url");
+            exit();
+        } else {
+            //获取code码，以获取openid
+            $code = $_GET['code'];
+            $openid = $this->getOpenidFromMp($code);
+            return $openid;
+        }
+    }
+
+    /**
+     * 
+     * 构造获取code的url连接
+     * @param string $redirectUrl 微信服务器回跳的url，需要url编码
+     * 
+     * @return 返回构造好的url
+     */
+    private function _CreateOauthUrlForCode($redirectUrl)
+    {
+        $config = $this->config;
+        $urlObj["appid"] = 'wx1daf30a5ae26e09e';
+        $urlObj["redirect_uri"] = "$redirectUrl";
+        $urlObj["response_type"] = "code";
+        $urlObj["scope"] = "snsapi_base";
+        $urlObj["state"] = "STATE"."#wechat_redirect";
+        $bizString = $this->ToUrlParams($urlObj);
+        return "https://open.weixin.qq.com/connect/oauth2/authorize?".$bizString;
+    }
+
+    /**
+     * 
+     * 构造获取open和access_toke的url地址
+     * @param string $code，微信跳转带回的code
+     * 
+     * @return 请求的url
+     */
+    private function __CreateOauthUrlForOpenid($code)
+    {
+        $config = $this->config;
+        $urlObj["appid"] = 'wx1daf30a5ae26e09e';
+        $urlObj["secret"] = '993981ce0f28be38d59bb48706b18db8';
+        $urlObj["code"] = $code;
+        $urlObj["grant_type"] = "authorization_code";
+        $bizString = $this->ToUrlParams($urlObj);
+        return "https://api.weixin.qq.com/sns/oauth2/access_token?".$bizString;
+    }
+
+    /**
+     * 
+     * 通过code从工作平台获取openid机器access_token
+     * @param string $code 微信跳转回来带上的code
+     * 
+     * @return openid
+     */
+    public function GetOpenidFromMp($code)
+    {
+        $url = $this->__CreateOauthUrlForOpenid($code);
+
+        //初始化curl
+        $ch = curl_init();
+        $curlVersion = curl_version();
+        $config = $this->config;
+        $ua = "WXPaySDK/3.0.9 (".PHP_OS.") PHP/".PHP_VERSION." CURL/".$curlVersion['version']." ".$config['MCHID'];
+
+        //设置超时
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,FALSE);
+        curl_setopt($ch, CURLOPT_USERAGENT, $ua);
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+        $proxyHost = "0.0.0.0";
+        $proxyPort = 0;
+        if($proxyHost != "0.0.0.0" && $proxyPort != 0){
+            curl_setopt($ch,CURLOPT_PROXY, $proxyHost);
+            curl_setopt($ch,CURLOPT_PROXYPORT, $proxyPort);
+        }
+        //运行curl，结果以jason形式返回
+        $res = curl_exec($ch);
+        curl_close($ch);
+        //取出openid
+        $data = json_decode($res,true);
+        $this->data = $data;
+        $openid = $data['openid'];
+        return $openid;
     }
 
     /**

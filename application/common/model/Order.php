@@ -620,18 +620,15 @@ class Order extends \think\Model
 		if (empty($new_area)) {
 			if (!empty($address)) {
 				$user_city = $user_city_code = $address['city'];
-			}
-			else {
+			} else {
 				if (!empty($member['city'])) {
 					if (!strexists($member['city'], '市')) {
 						$member['city'] = $member['city'] . '市';
 					}
-
 					$user_city = $user_city_code = $member['city'];
 				}
 			}
-		}
-		else {
+		} else {
 			if (!empty($address)) {
 				$user_city = $address['city'] . $address['area'];
 				$user_city_code = $address['datavalue'];
@@ -660,8 +657,7 @@ class Order extends \think\Model
 			
 			if (!empty($g['issendfree'])) {
 				$sendfree = true;
-			}
-			else {
+			} else {
 				if ($seckillinfo && ($seckillinfo['status'] == 0)) {
 				}
 				else {
@@ -1428,9 +1424,9 @@ class Order extends \think\Model
 	{
 		$merch = intval($merch);
 		$condition = ' 1 and isparent=0';
-		if ($merch < 0) {
+		if ($merch == 0) {
 			$condition .= ' and merchid=0';
-		} else {
+		} elseif($merch > 0) {
 			$condition .= ' and merchid= ' . $merch;
 		}
 		$totals['all'] = Db::name('shop_order')->where($condition)->where('ismr=0 and deleted=0')->count();
@@ -1466,6 +1462,143 @@ class Order extends \think\Model
 		}
 
 		return $credits;
+	}
+
+	public static function checkhaveverifygoodlog($orderid) 
+	{
+		$num = Db::name('shop_verifygoods_log')->alias('vl')->join('shop_verifygoods v','vl.verifygoodsid = v.id','inner')->where('v.orderid = ' . $orderid)->count();
+		$num = intval($num);
+		if( 0 < $num ) 
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public static function getOrderVirtual($order = array( )) 
+	{
+		if( empty($order) ) {
+			return false;
+		}
+		if( empty($order["virtual_info"]) ) {
+			return $order["virtual_str"];
+		}
+		$ordervirtual = array( );
+		$virtual_type = Db::name('shop_virtual_type')->where('id = ' . $order['virtual'] . ' and merchid = ' . $order["merchid"])->field('fields')->find();
+		if( !empty($virtual_type) ) 
+		{
+			$virtual_type = iunserializer($virtual_type["fields"]);
+			$virtual_info = ltrim($order["virtual_info"], "[");
+			$virtual_info = rtrim($virtual_info, "]");
+			$virtual_info = explode(",", $virtual_info);
+			if( !empty($virtual_info) ) 
+			{
+				foreach( $virtual_info as $index => $virtualinfo ) 
+				{
+					$virtual_temp = iunserializer($virtualinfo);
+					if( !empty($virtual_temp) ) 
+					{
+						foreach( $virtual_temp as $k => $v ) 
+						{
+							$ordervirtual[$index][] = array( "key" => $virtual_type[$k], "value" => $v, "field" => $k );
+						}
+						unset($k);
+						unset($v);
+					}
+				}
+				unset($index);
+				unset($virtualinfo);
+			}
+		}
+		return $ordervirtual;
+	}
+
+	public function getOrderCommission($orderid, $agentid = 0) 
+	{
+		if( empty($agentid) ) 
+		{
+			$item = Db::query("select agentid from " . tablename("shop_order") . " where id=" . $orderid . " Limit 1");
+			if( !empty($item) ) 
+			{
+				$agentid = $item["agentid"];
+			}
+		}
+		$level = 0;
+		// $pc = model('commission');
+		$pc = false;
+		if( $pc ) {
+			$pset = $pc->getSet();
+			$level = intval($pset["level"]);
+		}
+		$commission1 = 0;
+		$commission2 = 0;
+		$commission3 = 0;
+		$m1 = false;
+		$m2 = false;
+		$m3 = false;
+		if( !empty($level) && !empty($agentid) ) 
+		{
+			$m1 = model("member")->getMember($agentid);
+			if( !empty($m1["agentid"]) ) 
+			{
+				$m2 = model("member")->getMember($m1["agentid"]);
+				if( !empty($m2["agentid"]) ) 
+				{
+					$m3 = model("member")->getMember($m2["agentid"]);
+				}
+			}
+		}
+
+		$order_goods = Db::name('shop_order_goods')->alias('og')->join('shop_goods g','g.id=og.goodsid','left')->where("og.orderid= " . $orderid)->field('g.id,g.title,g.thumb,g.goodssn,og.goodssn as option_goodssn, g.productsn,og.productsn as option_productsn, og.total,og.price,og.optionname as optiontitle,og.realprice,og.changeprice,og.oldprice,og.commission1,og.commission2,og.commission3,og.commissions')->select();
+		foreach( $order_goods as &$og ) 
+		{
+			if( !empty($level) && !empty($agentid) ) 
+			{
+				$commissions = iunserializer($og["commissions"]);
+				if( !empty($m1) ) 
+				{
+					if( is_array($commissions) ) 
+					{
+						$commission1 += (isset($commissions["level1"]) ? floatval($commissions["level1"]) : 0);
+					}
+					else 
+					{
+						$c1 = iunserializer($og["commission1"]);
+						$l1 = $pc->getLevel($m1["openid"]);
+						$commission1 += (isset($c1["level" . $l1["id"]]) ? $c1["level" . $l1["id"]] : $c1["default"]);
+					}
+				}
+				if( !empty($m2) ) 
+				{
+					if( is_array($commissions) ) 
+					{
+						$commission2 += (isset($commissions["level2"]) ? floatval($commissions["level2"]) : 0);
+					}
+					else 
+					{
+						$c2 = iunserializer($og["commission2"]);
+						$l2 = $pc->getLevel($m2["openid"]);
+						$commission2 += (isset($c2["level" . $l2["id"]]) ? $c2["level" . $l2["id"]] : $c2["default"]);
+					}
+				}
+				if( !empty($m3) ) 
+				{
+					if( is_array($commissions) ) 
+					{
+						$commission3 += (isset($commissions["level3"]) ? floatval($commissions["level3"]) : 0);
+					}
+					else 
+					{
+						$c3 = iunserializer($og["commission3"]);
+						$l3 = $pc->getLevel($m3["openid"]);
+						$commission3 += (isset($c3["level" . $l3["id"]]) ? $c3["level" . $l3["id"]] : $c3["default"]);
+					}
+				}
+			}
+		}
+		unset($og);
+		$commission = $commission1 + $commission2 + $commission3;
+		return $commission;
 	}
 
 }

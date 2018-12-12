@@ -54,7 +54,7 @@ class Cart extends Base
             }
             else
             {
-            	$merch = Db::name('shop_store')->where('id',$k)->field('id,logo,merchname')->find();
+            	$merch = Db::name('shop_merch')->where('id',$k)->field('id,logo,merchname')->find();
             }
             $merch['logo'] = tomedia($merch['logo']);
             $merch['carts'] = $v;
@@ -127,8 +127,7 @@ class Cart extends Base
 			$this->result(0,'商品未找到');
 		}
 		$goods['unit'] = $goods['unit'] ? $goods['unit'] : '件';
-		if(!empty($goods['hasoption']) && empty($optionid))
-		{
+		if(!empty($goods['hasoption']) && empty($optionid)) {
 			$this->result(0,'请选择规格');
 		}
 		if(!empty($optionid)) {
@@ -137,16 +136,16 @@ class Cart extends Base
 			{
 				$this->result(0,'商品规格不存在');
 			}
-			if(($option['stock'] !== -1) && $option['stock'] < $goodstotal) {
+			if(($option['stock'] !== -1) && ($option['stock'] < $goodstotal)) {
 				$this->result(0,'商品库存不足');
 			}
-		} else if(($goods['total'] !== -1) && $goods['total'] < $goodstotal) {
+		} else if(($goods['total'] !== -1) && ($goods['total'] < $goodstotal)) {
 			$this->result(0,'商品库存不足');
 		}
-		if(!empty($goods['maxbuy']) && $goods['maxbuy'] < $goodstotal) {
+		if(!empty($goods['maxbuy']) && ($goods['maxbuy'] < $goodstotal)) {
 			$this->result(0,'最多购买'.$goods['maxbuy'].$goods['unit']);
 		}
-		if(!empty($goods['minbuy']) && $goods['minbuy'] > $goodstotal) {
+		if(!empty($goods['minbuy']) && ($goods['minbuy'] > $goodstotal)) {
 			$this->result(0,'最少购买'.$goods['minbuy'].$goods['unit']);
 		}
 
@@ -186,28 +185,25 @@ class Cart extends Base
 		if (($goods['isverify'] == 2) || ($goods['type'] == 2) || ($goods['type'] == 3) || !empty($goods['cannotrefund'])) {
 			$this->result(0,'此商品不可加入购物车,请直接点击立刻购买');
 		}
-		if(!empty($goods['hasoption']) && empty($optionid))
-		{
+		if(!empty($goods['hasoption']) && empty($optionid)) {
 			$this->result(0,'请选择规格');
 		}
 		if(!empty($optionid)) {
 			$option = Db::name('shop_goods_option')->where('id',$optionid)->where('goodsid',$id)->find();
-			if(empty($option))
-			{
+			if(empty($option)) {
 				$this->result(0,'商品规格不存在');
 			}
-			if(($option['stock'] !== -1) && $option['stock'] < $total) {
+			if(($option['stock'] !== -1) && ($option['stock'] < $total)) {
 				$this->result(0,'商品库存不足');
 			}
-		} 
-		else if(($goods['total'] !== -1) && $goods['total'] < $total) {
+		} else if(($goods['total'] !== -1) && ($goods['total'] < $total)) {
 			$this->result(0,'商品库存不足');
 		}
 		$goods['unit'] = $goods['unit'] ? $goods['unit'] : '件';
-		if(!empty($goods['maxbuy']) && $goods['maxbuy'] < $total) {
+		if(!empty($goods['maxbuy']) && ($goods['maxbuy'] < $total)) {
 			$this->result(0,'最多购买'.$goods['maxbuy'].$goods['unit']);
 		}
-		if(!empty($goods['minbuy']) && $goods['minbuy'] > $total) {
+		if(!empty($goods['minbuy']) && ($goods['minbuy'] > $total)) {
 			$this->result(0,'最少购买'.$goods['minbuy'].$goods['unit']);
 		}
 

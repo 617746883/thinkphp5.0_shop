@@ -1,0 +1,176 @@
+{include file='_header'}
+<div class="page-heading"> 
+    <span class='pull-right'><a href="{php echo webUrl('shop/comment')}" class='btn btn-default'>返回列表</a></span>
+    <h2>回复评价</h2>
+</div>
+<form id="dataform" action="" method="post" class="form-horizontal form-validate" >
+    <input type="hidden" name="id" value="{$item['id']}" />
+    <input type="hidden" name="type" id="post_type" value="{$type}" />
+    <input type="hidden" name="has_reply" id="has_reply" value="{if !empty($item['append_reply_content'])}1{else}0{/if}" />
+    <div class="form-group">
+        <label class="col-sm-2 control-label">订单号</label>
+        <div class="col-sm-9 col-xs-12">
+            <div class='form-control-static'>{$order['ordersn']}</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">评价商品</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="goods" value="{if !empty($goods)}[{$goods['id']}]{$goods['title']}{/if}" id="goods" class="form-control" readonly />
+            <span id="goodsthumb" class='help-block' {if empty($goods)}style="display:none"{/if}><img  style="width:100px;height:100px;border:1px solid #ccc;padding:1px" src="{$goods['thumb']}"/></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">评价者</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="nickname" value="{$item['nickname']}" id="nickname" class="form-control" readonly />
+            <span id="nicknamethumb" class='help-block' ><img  style="width:100px;height:100px;border:1px solid #ccc;padding:1px" src="{$item['headimgurl']}"/></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">评分等级</label>
+        <div class="col-sm-9 col-xs-12">
+            <div class="form-control-static" style='color:#ff6600'>
+                {if $item['level']>=1}<i class='fa fa-star'></i>{else}<i class='fa fa-star-o'></i>{/if}
+                {if $item['level']>=2}<i class='fa fa-star'></i>{else}<i class='fa fa-star-o'></i>{/if}
+                {if $item['level']>=3}<i class='fa fa-star'></i>{else}<i class='fa fa-star-o'></i>{/if}
+                {if $item['level']>=4}<i class='fa fa-star'></i>{else}<i class='fa fa-star-o'></i>{/if}
+                {if $item['level']>=5}<i class='fa fa-star'></i>{else}<i class='fa fa-star-o'></i>{/if}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><span style='color:red'>*</span> 首次评价</label>
+        <div class="col-sm-9 col-xs-12">
+            <div class="form-control-static">{$item['content']}</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"></label>
+        <div class="col-sm-9 col-xs-12">
+            <div class="input-group multi-img-details">
+                {foreach name='images' item='img'}
+                <div class="multi-item" style="min-height: 100px; height: auto; max-width: none; max-height: none;">
+                    <a href='{$img}' target='_blank'>
+                        <img class="img-responsive img-thumbnail" src='{$img}' onerror="this.src='/public/static/images/nopic.jpg'; this.title='图片未找到.'">
+                    </a>
+                </div>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+
+    {if $type == 1}
+        <div class="form-group">
+            <label class="col-sm-2 control-label">首次评价审核状态 </label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'><input type='radio' name='checked' value='0' {if empty($item['checked'])}checked{/if}/> 通过</label>
+                <label class='radio-inline'><input type='radio' name='checked' value='2' {if $item['checked']=='2'}checked{/if} /> 不通过</label>
+                <label class='radio-inline'><input type='radio' name='checked' value='1' {if $item['checked']=='1'}checked{/if} /> 审核中</label>
+            </div>
+        </div>
+        <br>
+    {/if}
+
+    {if $type == 0}
+        <div class="form-group">
+            <label class="col-sm-2 control-label">首次回复</label>
+            <div class="col-sm-9 col-xs-12">
+                <textarea name='reply_content' class="form-control">{$item['reply_content']}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                {php echo tpl_form_field_multi_image('reply_images',iunserializer($item['reply_images']))}
+            </div>
+        </div>
+    {/if}
+
+        {if !empty($item['append_content'])}
+        <div class="form-group">
+            <label class="col-sm-2 control-label">追加评价</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="form-control-static">{$item['append_content']}</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="input-group multi-img-details">
+                    {foreach name='append_images' item='img'}
+                    <div class="multi-item" style="min-height: 100px; height: auto; max-width: none; max-height: none;">
+                        <a href='{$img}' target='_blank'>
+                            <img class="img-responsive img-thumbnail" src='{$img}' onerror="this.src='/public/static/images/nopic.jpg'; this.title='图片未找到.'">
+                        </a>
+                    </div>
+                    {/foreach}
+                </div>
+            </div>
+        </div>
+
+    {if $type == 0}
+        <div class="form-group">
+            <label class="col-sm-2 control-label">追加回复</label>
+            <div class="col-sm-9 col-xs-12">
+                <textarea name='append_reply_content' class="form-control">{$item['append_reply_content']}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                {:tpl_form_field_multi_image('append_reply_images',iunserializer($item['append_reply_images']))}
+            </div>
+        </div>
+        {/if}
+    {/if}
+
+    {if $type == 1 && !empty($item['append_content'])}
+        <div class="form-group">
+            <label class="col-sm-2 control-label">追加评价审核状态 </label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'><input type='radio' name='replychecked' value='0' {if empty($item['replychecked'])}checked{/if}/> 通过</label>
+                <label class='radio-inline'><input type='radio' name='replychecked' value='2' {if $item['replychecked']=='2'}checked{/if} /> 不通过</label>
+                <label class='radio-inline'><input type='radio' name='replychecked' value='1' {if $item['replychecked']=='1'}checked{/if} /> 审核中</label>
+            </div>
+        </div>
+    {/if}
+
+    <div class="form-group"></div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"></label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="submit" value="提交" class="btn btn-primary"  />
+            <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+        </div>
+    </div>
+ 
+</form>
+
+<script language='javascript'>
+    $('form').submit(function(){
+        var post_type = $('#post_type').val();
+        var has_reply = $('#has_reply').val();
+
+        if (post_type == 0) {
+            if ($.trim($('textarea[name=reply_content]').val()) == ''){
+                $('form').attr('stop',1),tip.msgbox.err('请填写首次回复内容!');
+                $('textarea[name=reply_content]').focus();
+                return false;
+            }
+
+            if (has_reply > 0) {
+                if ($.trim($('textarea[name=append_reply_content]').val()) == ''){
+                    $('form').attr('stop',1),tip.msgbox.err('请填写追加回复内容!');
+                    $('textarea[name=append_reply_content]').focus();
+                    return false;
+                }
+            }
+            $('form').removeAttr('stop');
+        }
+        return true;
+    });
+</script>
+{include file='_footer'}

@@ -69,9 +69,9 @@ class Finance extends Base
 			$endtime = time();
 		}
 
-		if (!empty($_POST['time']['start']) && !empty($_POST['time']['end'])) {
-			$starttime = strtotime($_POST['time']['start']);
-			$endtime = strtotime($_POST['time']['end']);
+		if (!empty($_GET['time']['start']) && !empty($_GET['time']['end'])) {
+			$starttime = strtotime($_GET['time']['start']);
+			$endtime = strtotime($_GET['time']['end']);
 			$condition .= ' AND log.createtime >= ' . $starttime . ' AND log.createtime <= ' . $endtime;
 		}
 		$level = input('level');
@@ -126,9 +126,9 @@ class Finance extends Base
 			$endtime = time();
 		}
 
-		if (!empty($_POST['time']['start']) && !empty($_POST['time']['end'])) {
-			$starttime = strtotime($_POST['time']['start']);
-			$endtime = strtotime($_POST['time']['end']);
+		if (!empty($_GET['time']['start']) && !empty($_GET['time']['end'])) {
+			$starttime = strtotime($_GET['time']['start']);
+			$endtime = strtotime($_GET['time']['end']);
 			$condition .= ' AND log.createtime >= ' . $starttime . ' AND log.createtime <= ' . $endtime;
 		}
 		$level = input('level');
@@ -160,10 +160,10 @@ class Finance extends Base
 	public function downloadbill()
 	{
 		if (Request::instance()->isPost()) {
-			$starttime = strtotime($_POST['time']['start']);
-			$endtime = strtotime($_POST['time']['end']);
-			$type = trim($_POST['type']);
-			$datatype = intval($_POST['datatype']);
+			$starttime = strtotime($_GET['time']['start']);
+			$endtime = strtotime($_GET['time']['end']);
+			$type = trim($_GET['type']);
+			$datatype = intval($_GET['datatype']);
 			$result = model('finance')->downloadbill($starttime, $endtime, $type, $datatype);
 
 			if (is_error($result)) {

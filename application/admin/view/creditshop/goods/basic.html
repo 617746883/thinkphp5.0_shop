@@ -8,9 +8,10 @@
     <label class="col-lg control-label must">商品类型</label>
     <div class="col-sm-9 col-xs-12">
             <label class="radio-inline"><input type="radio" name='goodstype' value="0" {if empty($item['goodstype'])}checked{/if} {if !empty($item)} disabled{/if} />商品</label>
-            <label class="radio-inline"><input type="radio" name='goodstype' value="1" {if $item['goodstype']==1}checked{/if} {if !empty($item)} disabled{/if} />优惠券</label>
-            <label class="radio-inline"><input type="radio" name='goodstype' value="2" {if $item['goodstype']==2}checked{/if} {if !empty($item)} disabled{/if} />余额</label>
-            <label class="radio-inline"><input type="radio" name='goodstype' value="3" {if $item['goodstype']==3}checked{/if} {if !empty($item)} disabled{/if} />红包</label>
+            <label class="radio-inline" style="display: none;"><input type="radio" name='goodstype' value="1" {if $item['goodstype']==1}checked{/if} {if !empty($item)} disabled{/if} />优惠券</label>
+            <label class="radio-inline" style="display: none;"><input type="radio" name='goodstype' value="2" {if $item['goodstype']==2}checked{/if} {if !empty($item)} disabled{/if} />余额</label>
+            <label class="radio-inline" style="display: none;"><input type="radio" name='goodstype' value="3" {if $item['goodstype']==3}checked{/if} {if !empty($item)} disabled{/if} />虚拟物品</label>
+            <label class="radio-inline" style="display: none;"><input type="radio" name='goodstype' value="4" {if $item['goodstype']==4}checked{/if} {if !empty($item)} disabled{/if} />红包</label>
             <div class='help-block cgt cgt-0' {if !empty($item['goodstype'])}style="display:none"{/if}>保存后商品类型不可更改</div>
             <div class='help-block cgt cgt-1' {if $item['goodstype']!=1}style="display:none"{/if}>设置为优惠券类型，则无需进行领取，兑换或抽中直接发送到优惠券账户(保存后商品类型不可更改)</div>
             <div class='help-block cgt cgt-2' {if $item['goodstype']!=2}style="display:none"{/if}>设置为余额类型，则无需进行领取，兑换或抽中直接发送到用户账户(保存后商品类型不可更改)</div>
@@ -147,8 +148,8 @@
     <label class="col-lg control-label">兑换限制</label>
     <div class="col-sm-9 col-xs-12">
         <div class="input-group fixmore-input-group">
-            <!--<span class="input-group-addon">每人每天</span>
-            <input type='text' class='form-control' value="{$item['chanceday']}" name='chanceday' />-->
+            <span class="input-group-addon">每人每天</span>
+            <input type='text' class='form-control' value="{$item['chanceday']}" name='chanceday' />
             <span class="input-group-addon" style="border-right: 0;">每人共</span>
             <input type='text' class='form-control' value="{$item['chance']}" name='chance' />
             <span class="input-group-addon">次，每天提供</span>

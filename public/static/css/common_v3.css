@@ -52,7 +52,6 @@ h1 {
 }
 h2 {
     font-size: 16px;
-
 }
 /*h4{*/
     /*color: #333;*/
@@ -91,6 +90,9 @@ a {
 
 a:hover {
     color: #333
+}
+.block{
+    display: block;
 }
 a.full {
     display: inline-block;
@@ -209,7 +211,7 @@ select, input:focus, input {
 
 .table tr:hover .revise, .table tr:hover .title-revise {
     visibility: visible;
-} 
+}
 
 .table tbody tr:hover td .omit_show .iconfont {
     position: relative;
@@ -224,14 +226,13 @@ select, input:focus, input {
     left:0;
     right:0;
     width: 100%;
-    height: 60px;
+    height: 50px;
     background: #fff;
     display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
     z-index: 102 !important;
-    z-index: 101;
 }
 
 .wb-header .logo {
@@ -240,7 +241,7 @@ select, input:focus, input {
     border-bottom: 1px solid #222d39;
     width: 130px;
     text-align: center;
-    line-height: 60px;
+    line-height: 44px;
     color: #fff;
     font-size: 20px;
     -webkit-transition: all 0.3s;
@@ -266,11 +267,11 @@ select, input:focus, input {
 
 .wb-header > ul > li {
     float: left;
-    width: 80px;
+    padding: 0 20px;
     height: 100%;
     text-align: center;
     border-left: 1px solid #efefef;
-    line-height: 55px;
+    line-height: 50px;
     cursor: pointer;
 }
 .wb-header > ul > li a {
@@ -291,14 +292,7 @@ select, input:focus, input {
 .wb-header ul li.dropdown {
     width: 160px;
 }
-.wb-header ul li.dropdown.auto {
-    width: auto;
-    max-width: 240px;
-    padding: 0 20px;
-}
-.wb-header .dropdown:hover .dropdown-menu {
-    display: block;
-}
+
 .iconplug{
     width: 20px;
     height: 20px;
@@ -314,18 +308,18 @@ select, input:focus, input {
     margin-left: 10px;
 }
 .wb-header .dropdown-menu {
+    overflow: hidden;
     position: absolute;
-    top: 57px;
-    left: 0;
+    padding: 0 20px;
+    top: 48px;
+    left: auto;
+    right:-57px;
     z-index: 102 !important;
-    display: none;
     float: left;
-    min-width: 160px;
-    width: 100%;
+    width: 300px;
+    /*height:365px;*/
     margin: 2px 0 0;
-    padding: 0;
     font-size: 12px;
-    text-align: left;
     list-style: none;
     background-color: #fff;
     -webkit-background-clip: padding-box;
@@ -335,14 +329,60 @@ select, input:focus, input {
     -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .1);
     box-shadow: 0 6px 12px rgba(0, 0, 0, .1);
     text-align: center;
+    visibility: hidden;
+    transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    display: block;
+}
+.wb-header .dropdown:hover .dropdown-menu {
+    visibility: visible;
+    transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+
 }
 .wb-header .dropdown-menu li:hover {
-    background: #f9f9f9;
+   color: #00aeff;
 }
-.wb-header .dropdown-menu > li > a {
-    padding: 17px 20px;
+.wb-header .dropdown-menu li:hover a{
+    color: #00aeff;
+}
+.wb-header .dropdown-menu > li i{
+    color: #558eb9;
+}
+.wb-header .dropdown-menu > li{
+    width:33.3%;
+    line-height: 38px;
+    float: left;
+    text-align: center;
+    margin-top: 20px;
+}
+.wb-header .dropdown-menu> li:last-child{
+    width:100%;
+    height: 58px;
+    line-height: 58px;
+    text-align: center;
+    float: left;
+    position: relative;
+}
+.wb-header .dropdown-menu> li:last-child:before{
+    content:'' ;
+    position: absolute;
+    border-top:1px solid #efefef;
+    top:0;
+    left:-20px;
+    right:-20px;
+}
+.wb-header .dropdown-menu > li > a{
+    padding: 5px 0;
+}
+.wb-header .dropdown-menu > li > a>span {
+    padding: 10px 20px;
     font-size: 12px;
-    /* line-height: 50px; */
+    color: #333;
+    width:100%;
+}
+.dropdown-menu>li>a:hover{
+    background: #fff;
 }
 .wb-header .dropdown-menu .divider {
     height: 1px;
@@ -405,7 +445,7 @@ select, input:focus, input {
     position: relative;
 }
 .wb-topbar-search .input-group .form-control {
-    height: 60px;
+    height: 50px;
     border: 0;
     background: transparent !important;
     padding-left: 0;
@@ -443,8 +483,8 @@ select, input:focus, input {
     box-shadow: none;
     display: block;
     cursor: pointer;
-    height:60px;
-    line-height: 60px;
+    height:50px;
+    line-height: 50px;
     color: #333;
 }
 .wb-topbar-search .input-group .input-group-btn .btn.wb-header-btn i{
@@ -483,7 +523,7 @@ select, input:focus, input {
 .wb-nav {
     position: fixed;
     left:0;
-    top:60px;
+    top:50px;
     bottom: 0;
     width: 130px;
     background: #24303c;
@@ -492,7 +532,74 @@ select, input:focus, input {
     z-index: 10;
     -webkit-transition: all 0.3s;
     transition: all 0.3s;
-    z-index: 100;
+    z-index: 101;
+}
+.wb-nav .sysset{
+    display: block;
+    position: absolute;
+    bottom:0;
+    height: 50px;
+    width:100%;
+    line-height: 50px;
+    text-align: center;
+    background: #1e2937;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
+.wb-nav .sysset .syssetsub{
+    visibility: hidden;
+    position: absolute;
+    bottom: 6px;
+    left:145px;
+    width:110px;
+    height:258px;
+    background: #fff;
+    -webkit-box-shadow: 0 0px 12px rgba(0, 0, 0, .1);
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, .1);
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+
+}
+.wb-nav .sysset .syssetsub .syssettitle{
+    height:32px;
+    line-height: 32px;
+    text-align: center;
+    background: #e7f0f9 ;
+    color: #333;
+}
+.wb-nav .sysset:hover .syssetsub{
+    visibility: visible;
+    transition: all 1s;
+    -webkit-transition: all 1s;
+}
+
+.wb-nav.fold .sysset .syssetsub{
+    left:70px
+}
+.wb-nav .sysset .syssetsub .syssettips{
+    position: absolute;
+    border:8px solid transparent;
+    border-right:8px solid #fff;
+    filter:drop-shadow(5px 5px 10px  #999);
+    left:-15px;
+    bottom:15px;
+
+}
+.wb-nav .sysset .syssetsub a{
+    height:36px;
+    line-height: 36px;
+    display:block;
+    color: #333;
+}
+.wb-nav .sysset .syssetsub a:hover{
+    background: #f8fcff;
+}
+.wb-nav .sysset .syssetsub a .icow{
+    margin-right: 10px;
+    color: #558eb9;
+}
+.wb-nav .sysset a{
+    color: #cacaca;
 }
 .wb-nav.fold {
     width: 60px;
@@ -510,7 +617,19 @@ select, input:focus, input {
     -webkit-transition: all 0.3s;
     transition: all 0.3s;
 }
-
+.wb-nav .wb-nav-title.point{
+    position: relative;
+}
+.wb-nav .wb-nav-title.point:after{
+    position: absolute;
+    content: '';
+    width:4px;
+    height:4px;
+    border-radius: 50%;
+    left:32px;
+    top:4px;
+    border:2px solid red;
+}
 .wb-nav.fold ul li:hover .wb-nav-tip {
     display: block;
 }
@@ -598,9 +717,9 @@ select, input:focus, input {
 
 /*二级菜单*/
 .wb-subnav {
-    width: 110px;
+    width: 115px;
     left: 130px;
-    top:60px;
+    top:50px;
     bottom: 0;
     color: #333;
     border-right: 1px solid #efefef;
@@ -656,8 +775,36 @@ select, input:focus, input {
 .menu-header.data-active:not(.active){
     background: #f5f5f5;
 }
+.menu-header.point{
+    position: relative;
+}
+.menu-header.point:after{
+    position: absolute;
+    content: '';
+    width:4px;
+    height:4px;
+    border-radius: 50%;
+    left:77px;
+    top:20px;
+    border:2px solid red;
+}
+
 .wb-subnav ul li.active, .wb-subnav ul li:hover {
     background: #edf6ff;
+}
+
+.threemenu.point{
+    position: relative;
+}
+.threemenu.point:after{
+    position: absolute;
+    content: '';
+    width:4px;
+    height:4px;
+    border-radius: 50%;
+    left:100px;
+    top:20px;
+    border:2px solid red;
 }
 
 .wb-subnav ul li.active a {
@@ -697,7 +844,7 @@ select, input:focus, input {
 /*右侧面板*/
 .wb-panel {
     position: fixed;
-    top: 60px;
+    top: 50px;
     bottom: 0;
     width: 170px;
     right:-170px;
@@ -786,7 +933,7 @@ select, input:focus, input {
 
 /*箭头*/
 .panel-title span, .dropdown-toggle span {
- /*position: relative;*/
+    /*position: relative;*/
     margin-left: 3px;
 }
 
@@ -847,7 +994,6 @@ select, input:focus, input {
 .wb-panel .panel-body .panel-list.small .panel-list-text {
     font-size: 12px;
 }
-
 /*内容区域*/
 .wb-container {
    margin: 60px 170px 0 130px;
@@ -896,7 +1042,7 @@ select, input:focus, input {
     display: none;
     background: #fff;
     position: fixed;
-    top:60px;
+    top:50px;
     padding:  0 30px;
     height:40px;
     line-height: 40px;
@@ -1815,7 +1961,7 @@ keygen, select, select[size="0"], select[size="1"] {
 
 /*富文本编辑器*/
 .edui-editor{
-    z-index: 99 !important;
+    z-index: 99;
 
 }
 .table-responsive .label{
@@ -1898,7 +2044,6 @@ keygen, select, select[size="0"], select[size="1"] {
 .col-lg.control-label,.col-lger.control-label{
     color: #000;
     font-weight:normal;
-    padding-right: 9px;
 }
 .line2{
     overflow: hidden;
@@ -1936,7 +2081,7 @@ a.form-control-static{
     user-select:none;
     cursor: pointer;
     position: relative;
-    margin: 15px 20px 0 0;
+    margin: 12px 20px 0 0;
     display: block;
 }
 .switch-version:before {
@@ -2010,4 +2155,16 @@ a.form-control-static{
     width:auto;
     padding: 0 30px;
     min-width: 160px;
+    position: relative;
+}
+
+/*分辨率低情况下  一级菜单显示不全*/
+.wb-navheight{
+    height: 550px;
+    overflow: auto;
+    padding-bottom: 51px;
+}
+/*分辨率低情况下  顶部导航不兼容*/
+.wb-topbar-search.expand-search.wb-navwidth{
+    width: 200px !important;
 }

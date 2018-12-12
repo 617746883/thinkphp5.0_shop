@@ -1,0 +1,277 @@
+{include file='_header'}
+<div class="page-header">
+    当前位置：<span class="text-primary">操作员管理 </span>
+</div>
+<div class="page-content">
+   <form action="" method="get" class="form-horizontal" user="form">
+        <div class="page-toolbar m-b-sm m-t-sm">
+            <div class="col-sm-4">
+                <span class="pull-left">
+                    <a class='btn btn-primary btn-sm' href="{:url('merch/perm/useradd')}"><i class="fa fa-plus"></i> 添加新操作员</a>
+                </span>
+            </div>
+            <div class="col-sm-6 pull-right">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name="roleid" class='form-control'>
+                            <option value="" {if $roleid==''} selected{/if}>角色</option>
+                            <option value="0" {if $roleid=='0'} selected{/if}>无角色</option>
+                            {foreach name='roles' item='role'}
+                            <option value="{$role['id']}" {if $roleid== $role['id']} selected{/if}>{$role['rolename']}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="input-group-select">
+                        <select name="status" class='form-control'>
+                            <option value="" {if $status == ''} selected{/if}>状态</option>
+                            <option value="1" {if $status== '1'} selected{/if}>启用</option>
+                            <option value="0" {if $status == '0'} selected{/if}>禁用</option>
+                        </select>
+                    </div>
+                    <input type="text" class="input-sm form-control" name='keyword' value="{$keyword}" placeholder="请输入关键词">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit"> 搜索</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+            {if count($list)>0}
+            <div class="page-table-header">
+
+                <input type="checkbox">
+
+                <div class="btn-group">
+                    <button class="btn btn-default btn-sm btn-op btn-operation" type="button" data-toggle='batch' data-href="{:url('merch/perm/userstatus',array('status'=>1))}">
+
+                        <i class='icow icow-qiyong'></i> 启用</button>
+
+                    <button class="btn btn-default btn-sm btn-op btn-operation" type="button" data-toggle='batch'  data-href="{:url('merch/perm/userstatus',array('status'=>0))}">
+
+                        <i class='icow icow-jinyong'></i> 禁用</button>
+                    <button class="btn btn-default btn-sm btn-op btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('merch/perm/userdelete')}">
+
+                        <i class='icow icow-shanchu1'></i> 删除</button>
+                </div>
+
+            </div>
+
+            <table class="table table-hover table-responsive">
+
+                <thead>
+
+                    <tr>
+
+                         <th style="width:25px;"></th>
+
+                        <th>登录ID</th>
+
+                        <th>角色</th>
+
+                        <th>姓名</th>
+
+                        <th>手机</th>
+
+                        <th style='width:80px'>状态</th>
+
+                        <th style="width: 65px;">操作</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {foreach name='list' item='row'}
+
+                    <tr>
+
+                         <td><input type='checkbox'   value="{$row['id']}"/></td>
+
+                        <td>{$row['username']}</td>
+
+                        <td>{if !empty($row['rolename'])}{$row['rolename']}{else}无{/if}</td>
+
+                        <td>{$row['realname']}</td>
+
+                        <td>{$row['mobile']}</td>
+
+                        <td>
+
+                           <span class='label {if $row['status']==1}label-primary{else}label-default{/if}' 
+
+										  data-toggle='ajaxSwitch' 
+
+										  data-switch-value='{$row['status']}'
+
+										  data-switch-value0='0|禁用|label label-default|{:url('merch/perm/userstatus',array('status'=>1,'id'=>$row['id']))}'  
+
+										  data-switch-value1='1|启用|label label-primary|{:url('merch/perm/userstatus',array('status'=>0,'id'=>$row['id']))}'  
+
+										>
+
+										  {if $row['status']==1}启用{else}禁用{/if}</span>
+
+                        </td>
+
+                        <td>
+
+                            <a class='btn btn-default btn-sm btn-op btn-operation' href="{:url('merch/perm/useredit', array('id' => $row['id']))}">
+
+                            <span data-toggle="tooltip" data-placement="top" title="" data-original-title="编辑">
+
+                                 <i class='icow icow-bianji2'></i>
+
+                            </span>
+
+                            </a>
+                            <a class='btn btn-default btn-sm btn-op btn-operation'  data-toggle='ajaxRemove'  href="{:url('merch/perm/userdelete', array('id' => $row['id']))}" data-confirm="确认删除此操作员吗？">
+
+                               <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+
+                                     <i class='icow icow-shanchu1'></i>
+
+                                </span>
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {/foreach}
+
+                </tbody>
+
+                <tfoot>
+
+                    <tr>
+
+                        <td>
+
+                            <input type="checkbox">
+
+                        </td>
+
+                        <td colspan="2">
+
+                            <div class="btn-group">
+                                <button class="btn btn-default btn-sm btn-op btn-operation" type="button" data-toggle='batch' data-href="{:url('merch/perm/userstatus',array('status'=>1))}">
+
+                                    <i class='icow icow-qiyong'></i> 启用</button>
+
+                                <button class="btn btn-default btn-sm btn-op btn-operation" type="button" data-toggle='batch'  data-href="{:url('merch/perm/userstatus',array('status'=>0))}">
+
+                                    <i class='icow icow-jinyong'></i> 禁用</button>
+                                <button class="btn btn-default btn-sm btn-op btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('merch/perm/userdelete')}">
+
+                                    <i class='icow icow-shanchu1'></i> 删除</button>
+                            </div>
+
+                        </td>
+
+                        <td colspan="4" class="text-right">
+
+                            {$pager}
+
+                        </td>
+
+                    </tr>
+
+                </tfoot>
+
+            </table>
+
+          {else}
+
+<div class='panel panel-default'>
+
+	<div class='panel-body' style='text-align: center;padding:30px;'>
+
+		 暂时没有任何操作员!
+
+	</div>
+
+</div>
+
+
+
+</form>
+
+{/if}
+
+</div>
+
+<script language='javascript'>
+    function search_users() {
+
+		$("#module-menus1").html("正在搜索....")
+
+		$.get('{:url('merch/perm/user',array('op'=>'query'));}', {
+
+			keyword: $.trim($('#search-kwd1').val())
+
+		}, function(dat){
+
+			$('#module-menus1').html(dat);
+
+		});
+
+	}
+
+	function select_user(o) {
+
+		$("#userid").val(o.id);
+
+		$("#user").val( o.username );
+
+                                var perms = o.perms.split(',');
+
+                                $(':checkbox')
+
+                                $(':checkbox').removeAttr('disabled').removeAttr('checked').each(function(){
+
+                                    
+
+                                    var _this = $(this);
+
+                                    var perm = '';
+
+                                    if( _this.data('group') ){
+
+                                        perm+=_this.data('group');
+
+                                    }
+
+                                    if( _this.data('child') ){
+
+                                        perm+="." +_this.data('child');
+
+                                    }
+
+                                    if( _this.data('op') ){
+
+                                        perm+="." +_this.data('op');
+
+                                    }
+
+                                    if( $.arrayIndexOf(perms,perm)!=-1){
+
+                                        $(this).attr('disabled',true).get(0).checked =true;
+
+                                    }
+
+                                     
+
+                                });
+
+		$(".close").click();
+
+	}
+
+    </script>
+
+{include file='_footer'}
+
+ 
+

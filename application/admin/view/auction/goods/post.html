@@ -12,19 +12,87 @@
         </span>
     </div>
 <form id="dataform" action="" method="post" class="form-horizontal form-validate">
-    <input type='hidden' id='tab' name='tab' value='basic' />
     <input type='hidden' id='gid' name='gid' value="{$item['gid']}" />
-    <ul class="nav nav-arrow-next nav-tabs" id="myTab">
-        <li {if $tab=='basic' || empty($tab)}class="active"{/if} ><a href="#tab_basic">商品</a></li>
-        <li {if $tab=='stock'}class="active"{/if} ><a href="#tab_stock">库存及编码</a></li>
-        <li {if $tab=='info'}class="active"{/if} ><a href="#tab_info">详情</a></li>
-    </ul>
-    <div class="tab-content">
-        <div class="tab-pane  {if $tab=='basic' || empty($tab)}active{/if}" id="tab_basic">{include file='auction/goods/basic'}</div>
-        <div class="tab-pane  {if $tab=='stock'}active{/if}" id="tab_stock">{include file='auction/goods/stock'}</div>
-        <div class="tab-pane  {if $tab=='info'}active{/if}" id="tab_info">{include file='auction/goods/info'}</div>
+    <div class="form-group">
+        <label class="col-lg control-label">商品标题</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="goods[title]" class="form-control" value="{$item['title']}" />
+        </div>
     </div>
-    <div class="form-group"></div>
+    <div class="form-group">
+        <label class="col-lg control-label">拍卖时间</label>
+        <div class="col-sm-4 col-xs-6">{:tpl_form_field_date('goods[starttime]', !empty($item['starttime']) ? date('Y-m-d H:i',$item['starttime']) : date('Y-m-d H:i'), 1)}</div>
+        <div class="col-sm-4 col-xs-6">{:tpl_form_field_date('goods[endtime]', !empty($item['endtime']) ? date('Y-m-d H:i',$item['endtime']) : date('Y-m-d H:i'), 1)}</div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">商品图片</label>
+        <div class="col-sm-9 col-xs-12">
+            {:tpl_form_field_image2('goods[thumb]',$item['thumb'])}
+            <span class="help-block">图片建议为正方形</span>
+        </div>        
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label"><span style='color:red'>*</span>拍品分类</label>
+        <div class="col-sm-8 col-xs-12">
+            <select name="goods[category]" class="form-control">
+            {foreach name='category' item='row'}
+                <option value="{$row['id']}" {if $item['categoryid']==$row['id']}selected="selected"{/if}>{$row['name']}</option>
+            {/foreach}}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">起拍价格</label>
+        <div class="col-sm-9 col-xs-12">
+            <div class="input-group">
+                <input type="text" name="goods[shprice]" class="form-control" value="{$item['shprice']}" {if !empty($item['starttime'])}{if time()>$item['starttime']}readonly="readonly"{/if}{/if}>
+                <span class="input-group-addon">元</span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">加价幅度</label>
+        <div class="col-sm-9 col-xs-12">
+            <div class="input-group">
+                <input type="text" name="goods[addprice]" class="form-control" value="{$item['addprice']}" {if !empty($item['starttime'])}{if time()>$item['starttime']}readonly="readonly"{/if}{/if}>
+                <span class="input-group-addon">元</span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">保证金</label>
+        <div class="col-sm-9 col-xs-12">
+            <div class="input-group">
+                <input type="text" name="goods[bond]" class="form-control" value="{$item['bond']}" {if !empty($item['starttime'])}{if time()>$item['starttime']}readonly="readonly"{/if}{/if}>
+                <span class="input-group-addon">元</span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">商品详情</label>
+        <div class="col-sm-9 col-xs-12">
+            {:tpl_ueditor('goods[content]',$item['content'],array('height'=>200))}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">状态</label>
+        <div class="col-sm-9 col-xs-12">
+            <label class="radio radio-inline">
+                <input type="radio" name="goods[status]" value="0" {if intval($item['status']) != 1}checked="checked"{/if}> 下架
+            </label>
+            <label class="radio radio-inline">
+                <input type="radio" name="goods[status]" value="1" {if intval($item['status']) == 1}checked="checked"{/if}> 上架
+            </label>
+        </div>
+    </div>
+    {if !empty($id)}
+    <div class="form-group">
+        <label class="col-lg control-label">添加日期</label>
+        <div class="col-sm-9 col-xs-12">
+            <p class="form-control-static">{:date('Y-m-d', $item['createtime']);}</p>
+        </div>
+    </div>
+    {/if}
     <div class="form-group">
         <label class="col-lg control-label"></label>
         <div class="col-sm-9 col-xs-12">
@@ -32,72 +100,31 @@
             <a class="btn btn-default " href="{:url('admin/auction/goods')}">返回列表</a>
         </div>
     </div>
-    </form>
+</form>
 </div>
-<script language='javascript'>
-    require(['bootstrap'],function(){
-        $('#myTab a').click(function (e) {
-            e.preventDefault();
-            $('#tab').val( $(this).attr('href'));
-            $(this).tab('show');
-        })
-    });
-    $('form').submit(function(){
-        if($(':radio[name=goodstype]:checked').val()=='0'){
-            if($(':input[name=goodsid_text]').val()==''){
+<script type="text/javascript">
+    $(function(){
+        $('#form').submit(function(){
+            if($('input[name="goods[title]"]').val() == ''){
+                util.message('请填写拍品名称.');
                 return false;
             }
-        }
-        if($('select[name=category]').val()==''){
-            $('#myTab a[href="#tab_basic"]').tab('show');
-            return false;
-        }
-        return true;
+            if($('input[name="goods[thumb]"]').val() == ''){
+                util.message('请上传拍品图片.');
+                return false;
+            }
+            var addprice = parseFloat($('input[name="goods[addprice]"]').val());
+            if(isNaN(addprice)){
+                util.message('请填写拍品默认加价价格.');
+                return false;
+            }
+            var shprice = parseFloat($('input[name="goods[shprice]"]').val());
+            if(isNaN(shprice)){
+                util.message('请填写商品起拍价格.');
+                return false;
+            }
+            return true;
+        });
     });
-    function toimgsrc(src) {
-        if(typeof src != 'string') {
-            return '';
-        }
-        if(src.indexOf('http://')==0 || src.indexOf('https://')==0 || src.indexOf('/public')==0) {
-            return src;
-        }
-    }
-    function select_goods(o){
-        var $thumb = '';
-        /*商品缩略图*/
-        if(o.thumb){
-            $thumb += '<div class="multi-item"><img src="'+ toimgsrc(o.thumb)+'" ' +
-                    'onerror="this.src=\'./resource/images/nopic.jpg\'; this.title=\'图片未找到.\'" class="img-responsive img-thumbnail">' +
-                    '<input type="hidden" name="thumbs[0]" value="'+ o.thumb+'">' +
-                    '<em class="close" title="删除这张图片" onclick="deleteMultiImage(this)">×<\/em></div>';
-        }
-        /*商品幻灯片*/
-        if(o.thumb_url){
-            $.each(o.thumb_url,function(index,value){
-                var i = index++;
-                $thumb += '<div class="multi-item"><img src="'+ toimgsrc(value)+'" ' +
-                        'onerror="this.src=\'./resource/images/nopic.jpg\'; this.title=\'图片未找到.\'" class="img-responsive img-thumbnail">' +
-                        '<input type="hidden" name="thumbs['+i+']" value="'+value+'">' +
-                        '<em class="close" title="删除这张图片" onclick="deleteMultiImage(this)">×<\/em></div>';
-            });
-        }
-        $(".multi-img-details").html($thumb);
-        $(":input[name=gid]").val(o.gid);
-        $(":input[name=total]").val(o.total);
-        $(":input[name=description]").val(o.subtitle);
-        $(":input[name=price]").val(o.marketprice);
-        $(":input[name=goodssn]").val(o.goodssn);
-        $(":input[name=productsn]").val(o.productsn);
-        $("textarea[name=followtext]").val(o.followtip);
-        $("textarea[name=followurl]").val(o.followurl);
-        var ue = UE.getEditor('content', {
-            autoHeight: false
-        });
-        ue.ready(function() {
-            //设置编辑器的内容
-            ue.setContent(o.content);
-        });
-    }
 </script>
-
 {include file='_footer'}

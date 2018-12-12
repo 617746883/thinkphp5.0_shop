@@ -4,7 +4,7 @@
         <div class="form-group notice">
             <label class="col-sm-2 control-label">商家通知</label>
             <div class="col-sm-9 col-xs-12">
-                {:tpl_selector('noticeopenid',array('key'=>'openid','text'=>'nickname','multi'=>1,'thumb'=>'avatar','placeholder'=>'昵称/姓名/手机号','buttontext'=>'选择通知人', 'items'=>$salers,'url'=>url('admin/member/query') ))}
+                {:tpl_selector('noticemid',array('key'=>'id','text'=>'nickname','multi'=>1,'thumb'=>'avatar','placeholder'=>'昵称/姓名/手机号','buttontext'=>'选择通知人', 'items'=>$salers,'url'=>url('admin/member/query') ))}
             </div>
         </div>
         <div class="form-group">

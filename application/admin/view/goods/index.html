@@ -72,8 +72,21 @@
             <span class="pull-left" style="margin-right:30px;">
                 <a class='btn btn-sm btn-primary' href="{:url('admin/goods/add')}"><i class='fa fa-plus'></i> 添加商品</a>
                 <a class='btn btn-sm btn-primary' href="{:url('admin/goods/quick')}"><i class='fa fa-plus'></i> 快速添加商品</a>
+                <a class='btn btn-sm btn-primary' href="{:url('admin/taobao/index')}"><i class='fa fa-plus'></i> 导入商品</a>
             </span>
             <div class="input-group col-sm-6 pull-right">
+                <span class="input-group-select">
+                    <select name="attribute" class='form-control select2' style="width:200px;" data-placeholder="商品属性">
+                        <option value="" {if empty($attribute)}selected{/if}>商品属性</option>
+                        <option value="new" {if $attribute=='new'}selected{/if}>新品</option>
+                        <option value="hot" {if $attribute=='hot'}selected{/if} >热卖</option>
+                        <option value="recommand" {if $attribute=='recommand'}selected{/if} >推荐</option>
+                        <option value="discount" {if $attribute== 'discount'}selected{/if} >促销</option>
+                        <option value="sendfree" {if $attribute== 'sendfree'}selected{/if} >包邮</option>
+                        <option value="time" {if $attribute == 'time'}selected{/if} >限时卖</option>
+                        <option value="nodiscount" {if $attribute == 'nodiscount'}selected{/if} >不参与折扣</option>
+                    </select>
+                </span>
                 <span class="input-group-select">
                     <select name="cate" class='form-control select2' style="width:200px;" data-placeholder="商品分类">
                         <option value="" {if empty($cate)}selected{/if} >商品分类</option>

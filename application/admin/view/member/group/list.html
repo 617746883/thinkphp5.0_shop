@@ -55,11 +55,11 @@
                                     <input type='checkbox' value="{$row['id']}"/>
                                 {/if}
                             </td>
-                            <td style="cursor: pointer;" onclick='location="{:url('admin/member/list')}"'>{$row['groupname']}</td>
-                            <td style="cursor: pointer;" onclick='location="{:url('admin/member/list')}"'>{$row['membercount']}</td>
+                            <td style="cursor: pointer;" onclick='location="{:url('admin/member/mlist', array('groupid' => $row['id']))}"'>{$row['groupname']}</td>
+                            <td style="cursor: pointer;" onclick='location="{:url('admin/member/mlist', array('groupid' => $row['id']))}"'>{$row['membercount']}</td>
                             <td>{$row['description']}</td>
                             <td>
-                                <a class='btn btn-op btn-operation' href="{:url('admin/member/list', array('groupid' => $row['id']))}">
+                                <a class='btn btn-op btn-operation' href="{:url('admin/member/mlist', array('groupid' => $row['id']))}">
                                     <span data-toggle="tooltip" data-placement="top" data-original-title="分组会员">
                                             <i class='icow icow-member'></i>
                                         </span>

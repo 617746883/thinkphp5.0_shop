@@ -1105,7 +1105,7 @@ if (!function_exists('tpl_form_field_image')) {
 		if (isset($options['thumb'])) {
 			$options['thumb'] = !empty($options['thumb']);
 		}
-		$options['fileSizeLimit'] = intval($GLOBALS['_W']['setting']['upload']['image']['limit']) * 1024;
+		$options['fileSizeLimit'] = intval(config('UploadFile')['imageFileSize']);
 		$s = '';
 		if (!defined('TPL_INIT_IMAGE')) {
 			$s = '
@@ -1145,7 +1145,7 @@ if (!function_exists('tpl_form_field_image')) {
 
 		$s .= '
 			<div class="input-group ' . $options['class_extra'] . '">
-				<input type="text" name="' . $name . '" value="' . $value . '"' . ($options['extras']['text'] ? $options['extras']['text'] : '') . ' class="form-control" autocomplete="off">
+				<input type="text" name="' . $name . '" value="' . $value . '"' . ($options['extras']['text'] ? $options['extras']['text'] : '') . ' class="form-control ignore" autocomplete="off">
 				<span class="input-group-btn">
 					<button class="btn btn-default" type="button" onclick="showImageDialog(this);">选择图片</button>
 				</span>
@@ -1161,7 +1161,7 @@ if (!function_exists('tpl_form_field_image')) {
 function tpl_form_field_multi_image($name, $value = array(), $options = array()) {
 	$options['multiple'] = true;
 	$options['direct'] = false;
-	$options['fileSizeLimit'] = intval($GLOBALS['_W']['setting']['upload']['image']['limit']) * 1024;
+	$options['fileSizeLimit'] = intval(config('UploadFile')['imageFileSize']);
 	if (isset($options['dest_dir']) && !empty($options['dest_dir'])) {
 		if (!preg_match('/^\w+([\/]\w+)?$/i', $options['dest_dir'])) {
 			exit('图片上传目录错误,只能指定最多两级目录,如: "public","public/d1"');
@@ -1251,24 +1251,24 @@ if (!function_exists('tpl_selector')) {
 		}
 
 		$options['value'] = isset($options['value']) ? $options['value'] : $titles;
-		$readonly = ($options['readonly'] ? 'readonly' : '');
-		$required = ($options['required'] ? ' data-rule-required="true"' : '');
-		$callback = (!empty($options['callback']) ? ', ' . $options['callback'] : '');
-		$id = ($options['multi'] ? $name . '[]' : $name);
+		$readonly = $options['readonly'] ? 'readonly' : '';
+		$required = $options['required'] ? ' data-rule-required="true"' : '';
+		$callback = !empty($options['callback']) ? ', ' . $options['callback'] : '';
+		$id = $options['multi'] ? $name . '[]' : $name;
 		$html = '<div id=\'' . $name . "_selector' class='selector'\r\n                     data-type=\"" . $options['type'] . "\"\r\n                     data-key=\"" . $options['key'] . "\"\r\n                     data-text=\"" . $options['text'] . "\"\r\n                     data-thumb=\"" . $options['thumb'] . "\"\r\n                     data-multi=\"" . $options['multi'] . "\"\r\n                     data-callback=\"" . $options['callback'] . "\"\r\n                     data-url=\"" . $options['url'] . "\"\r\n                     data-nokeywords=\"" . $options['nokeywords'] . "\"\r\n                  data-autosearch=\"" . $options['autosearch'] . "\"\r\n\r\n                 >";
 
 		if ($options['input']) {
-			$html .= '<div class=\'input-group\'>' . '<input type=\'text\' id=\'' . $name . '_text\' name=\'' . $name . '_text\'  value=\'' . $options['value'] . '\' class=\'form-control text\'  ' . $readonly . '  ' . $required . '/>' . '<div class=\'input-group-btn\'>';
+			$html .= '<div class=\'input-group\'>' . ('<input type=\'text\' id=\'' . $name . '_text\' name=\'' . $name . '_text\'  value=\'' . $options['value'] . '\' class=\'form-control text\'  ' . $readonly . '  ' . $required . '/>') . '<div class=\'input-group-btn\'>';
 		}
 
-		$html .= '<button class=\'btn btn-primary\' type=\'button\' onclick=\'biz.selector.select(' . json_encode($options) . ');\'>' . $options['buttontext'] . '</button>';
+		$html .= '<button class=\'btn btn-primary\' type=\'button\' onclick=\'biz.selector.select(' . json_encode($options) . (');\'>' . $options['buttontext'] . '</button>');
 
 		if ($options['input']) {
 			$html .= '</div>';
 			$html .= '</div>';
 		}
 
-		$show = ($options['preview'] ? '' : ' style=\'display:none\'');
+		$show = $options['preview'] ? '' : ' style=\'display:none\'';
 
 		if ($options['type'] == 'image') {
 			$html .= '<div class=\'input-group multi-img-details container\' ' . $show . '>';
@@ -1291,19 +1291,25 @@ if (!function_exists('tpl_selector')) {
 
 		foreach ($options['items'] as $item) {
 			if ($options['type'] == 'image') {
-				$html .= '<div class=\'multi-item\' data-' . $options['key'] . '=\'' . $item[$options['key']] . '\' data-name=\'' . $name . "'>\r\n                                      <img class='img-responsive img-thumbnail' src='" . tomedia($item[$options['thumb']]) . "' onerror='this.src=\"/public/static/images/nopic.png\"'>\r\n                                      <div class='img-nickname'>" . $item[$options['text']] . "</div>\r\n                                     <input type='hidden' value='" . $item[$options['key']] . '\' name=\'' . $id . "'>\r\n                                     <em onclick='biz.selector.remove(this,\"" . $name . "\")'  class='close'>×</em>\r\n                            <div style='clear:both;'></div>\r\n                         </div>";
+				$html .= '<div class=\'multi-item\' data-' . $options['key'] . '=\'' . $item[$options['key']] . '\' data-name=\'' . $name . "'>\r\n                                      <img class='img-responsive img-thumbnail' src='" . tomedia($item[$options['thumb']]) . ("' onerror='this.src=\"../addons/ewei_shopv2/static/images/nopic.png\"' style='width:100px;height:100px;'>\r\n                                      <div class='img-nickname'>" . $item[$options['text']] . "</div>\r\n                                     <input type='hidden' value='" . $item[$options['key']] . '\' name=\'' . $id . "'>\r\n                                     <em onclick='biz.selector.remove(this,\"" . $name . "\")'  class='close'>×</em>\r\n                            <div style='clear:both;'></div>\r\n                         </div>");
 			}
 			else if ($options['type'] == 'coupon') {
-				$html .= "\r\n                <tr class='multi-product-item' data-" . $options['key'] . '=\'' . $item[$options['key']] . "'>\r\n                    <input type='hidden' class='form-control img-textname' readonly='' value='" . $item[$options['text']] . "'>\r\n                    <input type='hidden' value='" . $item[$options['key']] . "' name='couponid[]'>\r\n                    <td style='width:80px;'>\r\n                        <img src='" . tomedia($item[$options['thumb']]) . "' style='width:70px;border:1px solid #ccc;padding:1px'>\r\n                    </td>\r\n                    <td style='width:220px;'>" . $item[$options['text']] . "</td>\r\n                    <td>\r\n                        <input class='form-control valid' type='text' value='" . $item['coupontotal'] . '\' name=\'coupontotal' . $item[$options['key']] . "'>\r\n                    </td>\r\n                    <td>\r\n                        <input class='form-control valid' type='text' value='" . $item['couponlimit'] . '\' name=\'couponlimit' . $item[$options['key']] . "'>\r\n                    </td>\r\n                    <td>\r\n                        <button class='btn btn-default' onclick='biz.selector.remove(this,\"" . $name . "\")' type='button'><i class='fa fa-remove'></i></button>\r\n                    </td>\r\n                </tr>\r\n                ";
+				$html .= "\r\n                <tr class='multi-product-item' data-" . $options['key'] . '=\'' . $item[$options['key']] . "'>\r\n                    <input type='hidden' class='form-control img-textname' readonly='' value='" . $item[$options['text']] . "'>\r\n                    <input type='hidden' value='" . $item[$options['key']] . "' name='couponid[]'>\r\n                    <td style='width:80px;'>\r\n                        <img src='" . tomedia($item[$options['thumb']]) . ("' style='width:70px;border:1px solid #ccc;padding:1px'>\r\n                    </td>\r\n                    <td style='width:220px;'>\r\n                    " . $item[$options['text']]);
+
+				if (!empty($item['merchname'])) {
+					$html .= '<br /><label class=\'label label-info\'>[' . $item['merchname'] . ']</label>';
+				}
+
+				$html .= "</td>\r\n                    <td>\r\n                        <input class='form-control valid' type='text' value='" . $item['coupontotal'] . '\' name=\'coupontotal' . $item[$options['key']] . "'>\r\n                    </td>\r\n                    <td>\r\n                        <input class='form-control valid' type='text' value='" . $item['couponlimit'] . '\' name=\'couponlimit' . $item[$options['key']] . "'>\r\n                    </td>\r\n                    <td>\r\n                        <button class='btn btn-default' onclick='biz.selector.remove(this,\"" . $name . "\")' type='button'><i class='fa fa-remove'></i></button>\r\n                    </td>\r\n                </tr>\r\n                ";
 			}
 			else if ($options['type'] == 'coupon_cp') {
-				$html .= "\r\n                    <tr class='multi-product-item setticket' data-" . $options['key'] . '=\'' . $item[$options['key']] . "'>\r\n                        <input type='hidden' class='form-control img-textname' readonly='' value='" . $item[$options['text']] . "'>\r\n                        <input type='hidden' value='" . $item[$options['key']] . "' name='couponid[]'>\r\n                        <td style='width:80px;'>\r\n                            <img src='" . tomedia($item[$options['thumb']]) . "' style='width:70px;border:1px solid #ccc;padding:1px'>\r\n                        </td>\r\n                        <td style='width:220px;'>" . $item[$options['text']] . "</td>\r\n                        <td>\r\n                        </td>\r\n                        <td>\r\n                        </td>\r\n                        <td>\r\n                            <button class='btn btn-default' onclick='biz.selector.remove(this,\"" . $name . "\")' type='button'><i class='fa fa-remove'></i></button>\r\n                        </td>\r\n                    </tr>\r\n                    ";
+				$html .= "\r\n                    <tr class='multi-product-item setticket' data-" . $options['key'] . '=\'' . $item[$options['key']] . "'>\r\n                        <input type='hidden' class='form-control img-textname' readonly='' value='" . $item[$options['text']] . "'>\r\n                        <input type='hidden' value='" . $item[$options['key']] . "' name='couponid[]'>\r\n                        <td style='width:80px;'>\r\n                            <img src='" . tomedia($item[$options['thumb']]) . ("' style='width:70px;border:1px solid #ccc;padding:1px'>\r\n                        </td>\r\n                        <td style='width:220px;'>" . $item[$options['text']] . "</td>\r\n                        <td>\r\n                        </td>\r\n                        <td>\r\n                        </td>\r\n                        <td>\r\n                            <button class='btn btn-default' onclick='biz.selector.remove(this,\"" . $name . "\")' type='button'><i class='fa fa-remove'></i></button>\r\n                        </td>\r\n                    </tr>\r\n                    ");
 			}
 			else if ($options['type'] == 'coupon_share') {
-				$html .= "\r\n                    <tr class='multi-product-item shareticket' data-" . $options['key'] . '=\'' . $item[$options['key']] . "'>\r\n                        <input type='hidden' class='form-control img-textname' readonly='' value='" . $item[$options['text']] . "'>\r\n                        <input type='hidden' value='" . $item[$options['key']] . "' name='couponid[]'>\r\n                        <td style='width:80px;'>\r\n                            <img src='" . tomedia($item[$options['thumb']]) . "' style='width:70px;border:1px solid #ccc;padding:1px'>\r\n                        </td>\r\n                        <td style='width:220px;'>" . $item[$options['text']] . "</td>\r\n                        <td>\r\n                        </td>\r\n                        <td>\r\n                            <input class='form-control valid' type='text' value='" . $item['couponnum' . $item['id']] . '\' name=\'couponnum' . $item[$options['key']] . "'>\r\n                        </td>\r\n                        <td>\r\n                            <button class='btn btn-default' onclick='biz.selector.remove(this,\"" . $name . "\")' type='button'><i class='fa fa-remove'></i></button>\r\n                        </td>\r\n                    </tr>\r\n                    ";
+				$html .= "\r\n                    <tr class='multi-product-item shareticket' data-" . $options['key'] . '=\'' . $item[$options['key']] . "'>\r\n                        <input type='hidden' class='form-control img-textname' readonly='' value='" . $item[$options['text']] . "'>\r\n                        <input type='hidden' value='" . $item[$options['key']] . "' name='couponid[]'>\r\n                        <td style='width:80px;'>\r\n                            <img src='" . tomedia($item[$options['thumb']]) . ("' style='width:70px;border:1px solid #ccc;padding:1px'>\r\n                        </td>\r\n                        <td style='width:220px;'>" . $item[$options['text']] . "</td>\r\n                        <td>\r\n                        </td>\r\n                        <td>\r\n                            <input class='form-control valid' type='text' value='" . $item['couponnum' . $item['id']] . '\' name=\'couponnum' . $item[$options['key']] . "'>\r\n                        </td>\r\n                        <td>\r\n                            <button class='btn btn-default' onclick='biz.selector.remove(this,\"" . $name . "\")' type='button'><i class='fa fa-remove'></i></button>\r\n                        </td>\r\n                    </tr>\r\n                    ");
 			}
 			else if ($options['type'] == 'coupon_shares') {
-				$html .= "\r\n                    <tr class='multi-product-item sharesticket' data-" . $options['key'] . '=\'' . $item[$options['key']] . "'>\r\n                        <input type='hidden' class='form-control img-textname' readonly='' value='" . $item[$options['text']] . "'>\r\n                        <input type='hidden' value='" . $item[$options['key']] . "' name='couponids[]'>\r\n                        <td style='width:80px;'>\r\n                            <img src='" . tomedia($item[$options['thumb']]) . "' style='width:70px;border:1px solid #ccc;padding:1px'>\r\n                        </td>\r\n                        <td style='width:220px;'>" . $item[$options['text']] . "</td>\r\n                        <td>\r\n                        </td>\r\n                        <td>\r\n                            <input class='form-control valid' type='text' value='" . $item['couponsnum' . $item['id']] . '\' name=\'couponsnum' . $item[$options['key']] . "'>\r\n                        </td>\r\n                        <td>\r\n                            <button class='btn btn-default' onclick='biz.selector.remove(this,\"" . $name . "\")' type='button'><i class='fa fa-remove'></i></button>\r\n                        </td>\r\n                    </tr>\r\n                    ";
+				$html .= "\r\n                    <tr class='multi-product-item sharesticket' data-" . $options['key'] . '=\'' . $item[$options['key']] . "'>\r\n                        <input type='hidden' class='form-control img-textname' readonly='' value='" . $item[$options['text']] . "'>\r\n                        <input type='hidden' value='" . $item[$options['key']] . "' name='couponids[]'>\r\n                        <td style='width:80px;'>\r\n                            <img src='" . tomedia($item[$options['thumb']]) . ("' style='width:70px;border:1px solid #ccc;padding:1px'>\r\n                        </td>\r\n                        <td style='width:220px;'>" . $item[$options['text']] . "</td>\r\n                        <td>\r\n                        </td>\r\n                        <td>\r\n                            <input class='form-control valid' type='text' value='" . $item['couponsnum' . $item['id']] . '\' name=\'couponsnum' . $item[$options['key']] . "'>\r\n                        </td>\r\n                        <td>\r\n                            <button class='btn btn-default' onclick='biz.selector.remove(this,\"" . $name . "\")' type='button'><i class='fa fa-remove'></i></button>\r\n                        </td>\r\n                    </tr>\r\n                    ");
 			}
 			else {
 				$html .= '<div class=\'multi-audio-item \' data-' . $options['key'] . '=\'' . $item[$options['key']] . "' >\r\n                       <div class='input-group'>\r\n                       <input type='text' class='form-control img-textname' readonly='' value='" . $item[$options['text']] . "'>\r\n                       <input type='hidden'  value='" . $item[$options['key']] . '\' name=\'' . $id . "'>\r\n                       <div class='input-group-btn'><button class='btn btn-default' onclick='biz.selector.remove(this,\"" . $name . "\")' type='button'><i class='fa fa-remove'></i></button>\r\n                       </div></div></div>";
@@ -2252,5 +2258,80 @@ if (!function_exists('tablename')) {
 		$database = config('database');
 		$tablepre = $database['prefix'];
 		return (strpos($table, $tablepre) === 0 || strpos($table, 'suliss_') === 0) ? $table : "`{$tablepre}{$table}`";
+	}
+}
+
+
+if (!function_exists('redis')) {
+	function redis()
+	{
+		static $redis;
+
+		if (is_null($redis)) {
+			if (!extension_loaded('redis')) {
+				return errormsg(-1, 'PHP 未安装 redis 扩展');
+			}
+
+			if (null !== config('redis')) {
+				return errormsg(-1, '未配置 redis, 请检查 config.php 中参数设置');
+			}
+
+			$config = config('redis');
+
+			if (empty($config['server'])) {
+				$config['server'] = '127.0.0.1';
+			}
+
+			if (empty($config['port'])) {
+				$config['port'] = '6379';
+			}
+
+			$redis_temp = new Redis();
+
+			if ($config['pconnect']) {
+				$connect = $redis_temp->pconnect($config['server'], $config['port'], $config['timeout']);
+			}
+			else {
+				$connect = $redis_temp->connect($config['server'], $config['port'], $config['timeout']);
+			}
+
+			if (!$connect) {
+				return errormsg(-1, 'redis 连接失败, 请检查 data/config.php 中参数设置');
+			}
+
+			if (!empty($config['requirepass'])) {
+				$redis_temp->auth($config['requirepass']);
+			}
+
+			try {
+				$ping = $redis_temp->ping();
+			}
+			catch (ErrorException $e) {
+				return errormsg(-1, 'redis 无法正常工作，请检查 redis 服务');
+			}
+
+			if ($ping != '+PONG') {
+				return errormsg(-1, 'redis 无法正常工作，请检查 redis 服务');
+			}
+
+			$redis = $redis_temp;
+		}
+		else {
+			try {
+				$ping = $redis->ping();
+			}
+			catch (ErrorException $e) {
+				$redis = NULL;
+				$redis = redis();
+				$ping = $redis->ping();
+			}
+
+			if ($ping != '+PONG') {
+				$redis = NULL;
+				$redis = redis();
+			}
+		}
+
+		return $redis;
 	}
 }

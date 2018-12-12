@@ -121,6 +121,8 @@
 							<span class='label label-warning'>余额</span>
 						{elseif $row['goodstype'] == 3}
 							<span class='label label-danger'>红包</span>
+						{elseif $row['goodstype'] == 4}
+							<span class='label label-danger'>虚拟物品</span>
 						{/if}
 					{/if}
 				</td>
@@ -128,7 +130,7 @@
 					<img class="radius50" src="{$row['avatar']}" style='width:30px;height:30px;padding1px;border:1px solid #ccc'  onerror="this.src='/public/static/images/noface.png'"/> {$row['nickname']}
 				</td>
 				<td>
-					{:empty($row['realname'])?$row['mrealname']:$row['realname']}<br /> {php echo empty($row['mobile'])?$row['mmobile']:$row['mobile']}
+					{:empty($row['realname'])?$row['mrealname']:$row['realname']}<br /> {:empty($row['mobile'])?$row['mmobile']:$row['mobile']}
 				</td>
 				<td>
 					{if $row['paytype']==-1}
@@ -136,9 +138,9 @@
 					{else}
 					{if $row['paytype']==0}
 					{if $row['paystatus']==0}
-						<span><i class="icow icow-yue text-default"></i>余额未支付</span>
+						<span><i class="icow icow-yue text-default"></i>无需支付</span>
 					{else}
-						<span><i class="icow icow-yue text-warning"></i>余额已支付</span>
+						<span><i class="icow icow-yue text-warning"></i>无需支付</span>
 					{/if}
 					{elseif $row['paytype']==1}
 					{if $row['paystatus']==0}<span class='text-default'><i class="icow icow-weixin"></i>微信未支付</span>{else}<span class='text-default'><i class="icow icow-weixin text-success"></i>微信已支付</span>{/if}
@@ -151,27 +153,34 @@
 					{elseif $row['dispatchstatus']==0}<span class='text-default'>未支付运费</span>
 					{elseif $row['dispatchstatus']==1}<span class='text-primary'>已支付运费</span> {/if}
 				</td>
-				<td>{if $row['credit']>0}-{$row['credit']}积分<br/>{/if} {if $row['money']>0 || $row['dispatch'] > 0} -{php echo number_format($row['money'] + $row['dispatch'],2)}现金 {/if}
+				<td>{if $row['credit']>0}-{$row['credit']}积分<br/>{/if} {if $row['money']>0 || $row['dispatch'] > 0} -{:number_format($row['money'] + $row['dispatch'],2)}现金 {/if}
 				</td>
 				<td>
-					<a class='text-primary' href="{php echo webUrl('creditshop/log/detail',array('id' => $row['id']));}">
+					<a class='text-primary' href="{:url('admin/creditshop/detail',array('id' => $row['id']));}">
 						查看详情
 					</a>
 					{if $row['addressid']!=0 && $row['expresssn']>0}
 					<br/>
-					<a class='text-primary' data-toggle="ajaxModal" href="{php echo webUrl('util/express', array('id' => $row['id'],'express'=>$row['express'],'expresssn'=>$row['expresssn']))}">
+					<a class='text-primary' data-toggle="ajaxModal" href="{:url('admin/utility/express', array('id' => $row['id'],'express'=>$row['express'],'expresssn'=>$row['expresssn']))}">
 						 物流信息
 					</a>
 					{/if}
 					{if $row['canexchange']}
 					<br/>
-					<a class='text-primary' data-toggle='ajaxModal' href="{php echo webUrl('creditshop/log/doexchange',array('id' => $row['id'],'type'=>$row['goodstype']));}">
+					<a class='text-primary' data-toggle='ajaxModal' href="{:url('admin/creditshop/doexchange',array('id' => $row['id'],'type'=>$row['goodstype']));}">
 						兑换
 					</a>
 					{/if}
+					{if $row['isverify'] == 1 && $row['status'] == 2}
+					<br/>
+					<a class="btn btn-primary btn-xs" data-toggle='ajaxPost' href="{:url('admin/creditshop/logfinish', array('id' => $row['id'],'ops' => 'verify'))}" data-confirm="确认核销订单吗？">确认核销</a>
+					{elseif $row['status'] == 3 && !empty($row['expresssn']) && $row['time_finish'] == 0}
+					<br/>
+					<a class="btn btn-primary btn-xs" data-toggle='ajaxPost' href="{:url('admin/creditshop/logfinish', array('id' => $row['id'],'ops' => 'finish'))}" data-confirm="确认完成订单吗？">确认完成</a>
+					{/if}
 				</td>
 				<td style='line-height:22px;'>
-					{if $row['status'] ==1 && $row['type']==1}<span class='text-danger'>未中奖</span>{/if}
+					{if $row['status'] == 1 && $row['type']==1}<span class='text-danger'>未中奖</span>{/if}
 					{if $row['goodstype']==0}
 						{if $row['isverify']==1}
 							{if $row['status'] ==2}<span class='text-warning'>待核销</span>{/if}
@@ -221,9 +230,8 @@
 					 {/if}
 					<br/>
 				</td>
-
 			</tr>
-			{/loop}
+			{/foreach}
 		</tbody>
 		<tfoot>
 			<tr>

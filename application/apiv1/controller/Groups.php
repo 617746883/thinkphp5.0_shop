@@ -39,35 +39,28 @@ class Groups extends Base
 		$page = input('page/d',1);
 		$pagesize = input('pagesize/d',10);
 		$banner = array();
+		$category = array();
 		$goods = array();
 		if($page == 1)
 		{
 			$banner = Db::name('shop_groups_banner')->where('enabled',1)->order('displayorder','desc')->field('enabled,displayorder',true)->select();
-			foreach ($banner as &$val) {
-				$val['thumb'] = tomedia($val['thumb']);
-			}
-			unset($val);
+			$banner = set_medias($banner, 'thumb');
+			$category = Db::name('shop_groups_goods_category')->where('enabled=1')->order('displayorder desc')->field('id,name,thumb')->select();
+			$category = set_medias($category, 'thumb');
 		}		
 
-		$goods = Db::name('shop_goods')
-			->where('isgroups',1)
-			->where('isindex',1)
-			->where('status',1)
-			->where('deleted',0)
-			->where('total','>',0)
-			->order('displayorder','desc')
-			->field('id,title,thumb,description,groupsprice,marketprice,teamnum,sales,single,singleprice')
-			->page($page,$pagesize)
-			->select();
+		$goods = Db::name('shop_groups_goods')->field('id,title,is_ladder,thumb,price,groupnum,groupsprice,teamnum,single,singleprice,isindex,goodsnum,units,description')->where('status=1 and deleted=0')->order('displayorder desc,id DESC')->page($page,$pagesize)->select();
 		foreach ($goods as &$row) {
 			$row['thumb'] = tomedia($row['thumb']);
-			$team = Db::name('shop_groups_order')->where('paytime > 0 and heads = 1 and is_team = 1 and goodid = ' . $row['id'])->field('id,mid,teamid')->order('createtime','desc')->find();
+			$row["fightnum"] = Db::name('shop_groups_order')->where('goodsid = ' . $row['id'] . ' and deleted = 0 and is_team = 1 and status > 0 ')->count();
+			$row["fightnum"] = $row["teamnum"] + $goods["fightnum"];
+			$team = Db::name('shop_groups_order')->where('paytime > 0 and heads = 1 and is_team = 1 and goodsid = ' . $row['id'])->field('id,mid,teamid')->order('createtime','desc')->find();
 			$teams = Db::name('shop_groups_order')->alias('o')->join('member m','o.mid = m.id','left')->where('o.teamid',$team['teamid'])->field('o.id,m.avatar')->select();
 			$row['teams'] = $teams;
 		}
 		unset($row);
 		if($page == 1) {
-			$this->result(1,'success',array('banner'=>$banner,'goods'=>$goods,'page'=>$page,'pagesize'=>$pagesize));
+			$this->result(1,'success',array('banner'=>$banner,'category'=>$category,'goods'=>$goods,'page'=>$page,'pagesize'=>$pagesize));
 		} else {
 			$this->result(1,'success',array('goods'=>$goods,'page'=>$page,'pagesize'=>$pagesize));
 		}
@@ -97,7 +90,7 @@ class Groups extends Base
 		if (!empty($goods['thumb_url'])) {
 			$goods['thumb_url'] = array_values(set_medias(iunserializer($goods['thumb_url'])));
 		}
-		$goods['fightnum'] = Db::name('shop_groups_order')->where('goodid',$item['id'])->where('deleted',0)->where('is_team',1)->where('status','>',0)->count();
+		$goods['fightnum'] = Db::name('shop_groups_order')->where('goodsid',$item['id'])->where('deleted',0)->where('is_team',1)->where('status','>',0)->count();
 		$goods['fightnum'] = $goods['teamnum'] + $goods['fightnum'];
 		if (empty($goods)) {
 			$this->result(0,'商品已下架或被删除!');
@@ -168,7 +161,7 @@ class Groups extends Base
 		{
 			$this->result(0,'商品已下架或被删除!');
 		}
-		$condition = ' o.goodid = ' . $goodsid . ' and o.deleted = 0 and o.heads = 1 and o.paytime > 0 and o.success = 0 ';
+		$condition = ' o.goodsid = ' . $goodsid . ' and o.deleted = 0 and o.heads = 1 and o.paytime > 0 and o.success = 0 ';
 		$teams = array();
 		$mid = 0;
         if(!empty($this->mid))
@@ -182,9 +175,9 @@ class Groups extends Base
 		$teams = Db::name('shop_groups_order')
 			->alias('o')
 			->join('member m','m.id=o.mid','left')
-			->join('shop_goods g','g.id=o.goodid','left')
+			->join('shop_goods g','g.id=o.goodsid','left')
 			->where($condition)
-			->field('o.paytime,o.id,o.goodid,o.teamid,m.nickname,m.realname,m.mobile,m.avatar,g.endtime,g.groupnum')
+			->field('o.paytime,o.id,o.goodsid,o.teamid,m.nickname,m.realname,m.mobile,m.avatar,g.endtime,g.groupnum')
 			->order('o.createtime','desc')
 			->page($page,$pagesize)
 			->select();
@@ -221,7 +214,7 @@ class Groups extends Base
 		if (empty($goods)) {
 			$this->result(0,'商品已下架或被删除!');
 		}
-		$goods['fightnum'] = Db::name('shop_groups_order')->where('goodid',$goods['id'])->where('deleted',0)->where('is_team',1)->where('status','>',0)->count();
+		$goods['fightnum'] = Db::name('shop_groups_order')->where('goodsid',$goods['id'])->where('deleted',0)->where('is_team',1)->where('status','>',0)->count();
 		$goods['fightnum'] = $goods['teamnum'] + $goods['fightnum'];
 		$goods['thumb'] = tomedia($goods['thumb']);
 
@@ -242,11 +235,11 @@ class Groups extends Base
 		if (empty($teamid)) {
 			$this->result(0,'该团不存在!');
 		}
-		$team = Db::name('shop_groups_order')->where('id',$teamid)->field('id,goodid,mid,starttime,endtime')->find();
+		$team = Db::name('shop_groups_order')->where('id',$teamid)->field('id,goodsid,mid,starttime,endtime')->find();
 		if (empty($team)) {
 			$this->result(0,'该团不存在!');
 		}
-		$goods = Db::name('shop_goods')->where('id',$team['goodid'])->where('deleted',0)->find();
+		$goods = Db::name('shop_goods')->where('id',$team['goodsid'])->where('deleted',0)->find();
 		if ($goods['stock'] <= 0) {
 			$this->result(0,'您选择的商品已经下架，请浏览其他商品或联系商家!');
 		}
@@ -261,7 +254,7 @@ class Groups extends Base
 				$this->result(0,'该活动已结束，请浏览其他商品!');
 			}
 		}
-		$num = Db::name('shop_groups_order')->where('teamid',$teamid)->where('status','>',0)->where('goodid',$goods['id'])->count();
+		$num = Db::name('shop_groups_order')->where('teamid',$teamid)->where('status','>',0)->where('goodsid',$goods['id'])->count();
 
 		if ($num == $goods['groupnum']) {
 			$this->result(0,'该活动已成功组团，请浏览其他商品!');
@@ -301,7 +294,7 @@ class Groups extends Base
 				$single = 1;
 			}
 
-			$order['goodid'] = $value['goodid'];
+			$order['goodsid'] = $value['goodsid'];
 			$order['groupnum'] = $value['groupnum'];
 			$order['success'] = $value['success'];
 			$avatar = Db::name('member')->where('mid',$value['mid'])->field('mid,avatar,nickname')->find();
@@ -315,7 +308,7 @@ class Groups extends Base
 		}
 
 		$groupsset = Db::name('shop_groups_set')->field('description,groups_description,discount,headstype,headsmoney,headsdiscount')->limit(1)->find();
-		$goods = Db::name('shop_goods')->where('id',$order['goodid'])->find();
+		$goods = Db::name('shop_goods')->where('id',$order['goodsid'])->find();
 
 		if (!empty($goods['thumb_url'])) {
 			$goods['thumb_url'] = array_merge(iunserializer($goods['thumb_url']));
@@ -393,25 +386,25 @@ class Groups extends Base
 	 **/
 	public function confirm()
 	{
-		$goodid = input('goodid/d');
+		$goodsid = input('goodsid/d');
 		$type = input('type');
 		$heads = input('heads/d');
 		$teamid = input('teamid/d');
 		$mid = $this->getMemberId();
 		$isverify = false;
 		$address = array();
-		$goods = Db::name('shop_goods')->where('id',$goodid)->where('deleted',0)->field('id,title,thumb,unit,description,goodssn,productsn,marketprice,total,sales,category,groupsprice,single,singleprice,goodsnum,purchaselimit,teamnum,endtime,groupnum,discount,headstype,headsmoney,headsdiscount,isdiscount,merchid,checked,isverify,dispatchprice,storeids')->find();
+		$goods = Db::name('shop_goods')->where('id',$goodsid)->where('deleted',0)->field('id,title,thumb,unit,description,goodssn,productsn,marketprice,total,sales,category,groupsprice,single,singleprice,goodsnum,purchaselimit,teamnum,endtime,groupnum,discount,headstype,headsmoney,headsdiscount,isdiscount,merchid,checked,isverify,dispatchprice,storeids')->find();
 
 		if (empty($goods) || $goods['total'] <= 0) {
 			$this->result(0,'您选择的商品已经下架，请浏览其他商品！');
 		}
 
-		$ordernum = Db::name('shop_groups_order')->where('mid',$mid)->where('status','>=',0)->where('goodid',$goodid)->count();
+		$ordernum = Db::name('shop_groups_order')->where('mid',$mid)->where('status','>=',0)->where('goodsid',$goodsid)->count();
 		if (!empty($goods['purchaselimit']) && ($goods['purchaselimit'] <= $ordernum)) {
 			$this->result(0,'您已到达此商品购买上限，请浏览其他商品或联系商家！');
 		}
 
-		$order = Db::name('shop_groups_order')->where('goodid',$goodid)->where('status','>=',0)->where('success',0)->where('deleted',0)->where('is_team',1)->where('mid',$mid)->find();
+		$order = Db::name('shop_groups_order')->where('goodsid',$goodsid)->where('status','>=',0)->where('success',0)->where('deleted',0)->where('is_team',1)->where('mid',$mid)->find();
 		if ($order && ($order['status'] == 0)) {
 			$this->result(0,'您的订单已存在，请尽快完成支付！');
 		}
@@ -437,7 +430,7 @@ class Groups extends Base
 				}
 			}
 
-			$num = Db::name('shop_groups_order')->where('teamid',$teamid)->where('status','>',0)->where('goodid',$goods['id'])->count();
+			$num = Db::name('shop_groups_order')->where('teamid',$teamid)->where('status','>',0)->where('goodsid',$goods['id'])->count();
 
 			if ($num == $goods['groupnum']) {
 				$this->result(0,'该活动已成功组团，请浏览其他商品或联系商家！');
@@ -637,7 +630,7 @@ class Groups extends Base
 			}
 		}
  		$ordersn = model('common')->createNO('shop_groups_order', 'orderno', 'PT');
- 		$data = array('groupnum' => $groupnum, 'mid' => $mid, 'paytime' => 0, 'orderno' => $ordersn, 'credit' => intval(input('isdeduct')) ? input('credit') : 0, 'creditmoney' => intval(input('isdeduct')) ? input('creditmoney') : 0, 'price' => $price, 'freight' => $goods['freight'], 'status' => 0, 'goodid' => $goodid, 'teamid' => $teamid, 'is_team' => $is_team, 'heads' => $heads, 'discount' => !empty($heads) ? $goods['headsmoney'] : 0, 'addressid' => intval($addressid), 'address' => iserializer($order_address), 'message' => trim(input('message')), 'realname' => $isverify ? trim($realname) : '', 'mobile' => $isverify ? trim($mobile) : '', 'endtime' => $goods['endtime'], 'isverify' => intval($goods['isverify']), 'verifytype' => intval($goods['verifytype']), 'verifycode' => !empty($verifycode) ? $verifycode : 0, 'verifynum' => !empty($verifynum) ? $verifynum : 1, 'createtime' => time());
+ 		$data = array('groupnum' => $groupnum, 'mid' => $mid, 'paytime' => 0, 'orderno' => $ordersn, 'credit' => intval(input('isdeduct')) ? input('credit') : 0, 'creditmoney' => intval(input('isdeduct')) ? input('creditmoney') : 0, 'price' => $price, 'freight' => $goods['freight'], 'status' => 0, 'goodsid' => $goodsid, 'teamid' => $teamid, 'is_team' => $is_team, 'heads' => $heads, 'discount' => !empty($heads) ? $goods['headsmoney'] : 0, 'addressid' => intval($addressid), 'address' => iserializer($order_address), 'message' => trim(input('message')), 'realname' => $isverify ? trim($realname) : '', 'mobile' => $isverify ? trim($mobile) : '', 'endtime' => $goods['endtime'], 'isverify' => intval($goods['isverify']), 'verifytype' => intval($goods['verifytype']), 'verifycode' => !empty($verifycode) ? $verifycode : 0, 'verifynum' => !empty($verifynum) ? $verifynum : 1, 'createtime' => time());
 		$orderid = Db::name('shop_groups_order')->insertGetId($data);
 
 		if (!$orderid) {
@@ -666,7 +659,7 @@ class Groups extends Base
 		$teamid = input('teamid/d');
 		$order = Db::name('shop_groups_order')
 			->alias('o')
-			->join('shop_goods g','on g.id = o.goodid','left')
+			->join('shop_goods g','on g.id = o.goodsid','left')
 			->where('o.id',$orderid)
 			->order('o.createtime','desc')
 			->field('o.*,g.title,g.status as gstatus,g.deleted as gdeleted,g.total')
@@ -817,7 +810,7 @@ class Groups extends Base
 			$this->result(0,'订单不存在!');
 		}
 
-		$order_goods = Db::name('shop_goods')->where('id',$order['goodid'])->find();
+		$order_goods = Db::name('shop_goods')->where('id',$order['goodsid'])->find();
  
 		if (empty($order_goods)) {
 			$this->result(0,'商品不存在!');

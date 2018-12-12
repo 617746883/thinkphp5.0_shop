@@ -46,6 +46,11 @@
                             <input type="text" name="ordercount" class="form-control" value="{$level['ordercount']}" />
                             <span class='input-group-addon'>个</span>
                         {/if}
+                        {if $set['shop']['leveltype']==2}
+                            <span class='input-group-addon'>积分数量满</span>
+                            <input type="text" name="creditnum" class="form-control" value="{$level['creditnum']}" />
+                            <span class='input-group-addon'>个</span>
+                        {/if}
                     </div>
                     <span class='help-block'>会员升级条件，不填写默认为不自动升级, 设置<a href="{:url('admin/sysset/member')}">【会员升级依据】</a> </span>
                 </div>

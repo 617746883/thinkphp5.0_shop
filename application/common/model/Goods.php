@@ -217,7 +217,7 @@ class Goods extends \think\Model
 			}
 
 			if ($is_openmerch) {
-				$merch_category = model('store')->getSet('merch_category', $merchid);
+				$merch_category = model('merch')->getSet('merch_category', $merchid);
 
 				if (!empty($merch_category)) {
 					if (!empty($category['parent'])) {
@@ -334,23 +334,18 @@ class Goods extends \think\Model
 		}
 		$order = ((!(empty($args['order'])) ? $args['order'] . ' ' . ((empty($args['order']) ? '' : ((!(empty($args['by'])) ? $args['by'] : 'desc')))) : ' ' . $displayorder . ' desc,createtime desc '));
 		$orderby = ((empty($args['order']) ? '' : ((!(empty($args['by'])) ? $args['by'] : 'desc'))));
-		$merch_data = model('common')->getPluginset('store');
+		$merch_data = model('common')->getPluginset('merch');
 		if ($merch_data['is_openmerch']) {
 			$is_openmerch = 1;
-		}
-		else {
+		} else {
 			$is_openmerch = 0;
 		}
-		$condition = ' `deleted` = 0 and status = 1 ';
+		$condition = ' `deleted` = 0 and status = 1 and checked = 0 ';
 
-		if (!(empty($merchid))) {
+		if (!(empty($merchid)) && !(empty($is_openmerch))) {
 			$condition .= ' and merchid = ' . $merchid . ' and checked = 0 ';
-		}
-		else if ($is_openmerch == 0) {
+		} else if ($is_openmerch == 0) {
 			$condition .= ' and `merchid` = 0';
-		}
-		else {
-			$condition .= ' and `checked` = 0';
 		}
 
 		if (empty($args['type'])) {
@@ -441,7 +436,7 @@ class Goods extends \think\Model
 
 				$condition .= ' <>0 )';
 			} else {
-				$category = Db::name('shop_store_goods_category')->where('merchid',$merchid)->field('id,parentid,name,thumb')->select();
+				$category = Db::name('shop_merch_goods_category')->where('merchid',$merchid)->field('id,parentid,name,thumb')->select();
 				$catearr = array($args['cate']);
 
 				foreach ($category as $index => $row ) {
@@ -521,7 +516,7 @@ class Goods extends \think\Model
 			$merchinfo = array('id'=>0,'logo'=>$shopset['logo'],'merchname'=>$shopset['name']);
 			if(!empty($val['merchid']))
 			{
-				$merchinfo = Db::name('shop_store')->where('id',$val['merchid'])->field('id,logo,merchname')->find();
+				$merchinfo = Db::name('shop_merch')->where('id',$val['merchid'])->field('id,logo,merchname')->find();
 			}
 			$merchinfo['logo'] = tomedia($merchinfo['logo']);
 			$val['merchinfo'] = $merchinfo;
@@ -573,8 +568,7 @@ class Goods extends \think\Model
 				$showgoods = 1;
 			}
 
-		}
-		 else if (empty($showlevels) && empty($showgroups)) {
+		} else if (empty($showlevels) && empty($showgroups)) {
 			$showgoods = 1;
 		}
 
@@ -756,12 +750,130 @@ class Goods extends \think\Model
 			$condition .= ' and merchid = ' . $merch;
 		}
 		return array(
-			'sale' => Db::name('shop_goods')->where($condition)->where('status > 0 and checked=0 and deleted=0 and total>0 and  type !=30')->count(), 
-			'out' => Db::name('shop_goods')->where($condition)->where('status > 0 and deleted=0 and total=0 and type !=30')->count(), 
-			'stock' => Db::name('shop_goods')->where($condition)->where('(status=0 or checked=1) and deleted=0 and type !=30')->count(), 
-			'cycle' => Db::name('shop_goods')->where($condition)->where('deleted=1 and type !=30')->count(), 
-			'verify' => Db::name('shop_goods')->where($condition)->where('deleted=0  and type !=30 and merchid>0 and checked=1')->count(),
+			'sale' => Db::name('shop_goods')->where($condition . ' and status > 0 and checked=0 and deleted=0 and total>0 and type != 30')->count(), 
+			'out' => Db::name('shop_goods')->where($condition . ' and status > 0 and deleted=0 and total=0 and type !=30')->count(), 
+			'stock' => Db::name('shop_goods')->where($condition . ' and (status=0 or checked=1) and deleted=0 and type !=30')->count(), 
+			'cycle' => Db::name('shop_goods')->where($condition . ' and deleted=1 and type !=30')->count(), 
+			'verify' => Db::name('shop_goods')->where($condition . ' and deleted=0  and type !=30 and merchid>0 and checked=1')->count(),
 		);
+	}
+
+	public static function getMemberPrice($goods, $level)
+	{
+		if (!(empty($goods['isnodiscount']))) {
+			return (double) 0;
+		}
+
+
+		$liveid = intval($level['id']);
+
+
+		if (!(empty($level['id']))) {
+			$level = Db::name('member_level')->where('id = ' . $level['id'] . ' and enabled = 1')->find();
+			$level = ((empty($level) ? array() : $level));
+		}
+
+		$discounts = json_decode($goods['discounts'], true);
+		if (is_array($discounts)) {
+			$key = ((!(empty($level['id'])) ? 'level' . $level['id'] : 'default'));
+			if (!(isset($discounts['type'])) || empty($discounts['type'])) {
+				$memberprice = $goods['minprice'];
+
+				if (!(empty($discounts[$key]))) {
+					$dd = floatval($discounts[$key]);
+
+					if ((0 < $dd) && ($dd < 10)) {
+						$memberprice = round(($dd / 10) * $goods['minprice'], 2);
+					}
+				} else {
+					$dd = floatval($discounts[$key . '_pay']);
+					$md = floatval($level['discount']);
+					
+					if (!(empty($dd))) {
+						$memberprice = round($dd, 2);
+					} else if ((0 < $md) && ($md < 10)) {
+						$memberprice = round(($md / 10) * $goods['minprice'], 2);
+					}
+
+				}
+
+				if ($memberprice == $goods['minprice']) {
+					return (double) 0;
+				}
+
+
+				return $memberprice;
+			}
+
+
+			$options = model('goods')->getOptions($goods);
+			$marketprice = array();
+
+			foreach ($options as $option ) {
+				$discount = trim($discounts[$key]['option' . $option['id']]);
+
+				if ($discount == '') {
+					$discount = round(floatval($level['discount']) * 10, 2) . '%';
+				}
+
+
+				if (!(empty($liveid)) && !(empty($option['islive']))) {
+					if ((0 < $option['liveprice']) && ($option['liveprice'] < $option['marketprice'])) {
+						$option['marketprice'] = $option['liveprice'];
+					}
+
+				}
+
+
+				$optionprice = model('order')->getFormartDiscountPrice($discount, $option['marketprice']);
+				$marketprice[] = $optionprice;
+			}
+
+			$minprice = min($marketprice);
+			$maxprice = max($marketprice);
+			$memberprice = array('minprice' => (double) $minprice, 'maxprice' => (double) $maxprice);
+
+			if ($memberprice['minprice'] < $memberprice['maxprice']) {
+				$memberprice = $memberprice['minprice'] . '~' . $memberprice['maxprice'];
+			}
+			 else {
+				$memberprice = $memberprice['minprice'];
+			}
+
+			if ($memberprice == $goods['minprice']) {
+				return (double) 0;
+			}
+
+
+			return $memberprice;
+		}
+
+	}
+
+	public static function getOptions($goods)
+	{
+		$id = $goods['id'];
+		$specs = false;
+		$options = false;
+
+		if (!(empty($goods)) && $goods['hasoption']) {
+			$specs = Db::name('shop_goods_spec')->where('goodsid = ' . $id)->order('displayorder','asc')->select();
+
+			foreach ($specs as &$spec ) {
+				$spec['items'] = Db::name('shop_goods_spec_item')->where('specid',$spec['id'])->order('displayorder','asc')->select();
+			}
+
+			unset($spec);
+			$options = Db::name('shop_goods_option')->where('goodsid',$id)->order('displayorder','asc')->select();
+		}
+
+
+		if ((0 < $goods['ispresell']) && (($goods['preselltimeend'] == 0) || (time() < $goods['preselltimeend']))) {
+			$options['marketprice'] = $options['presellprice'];
+		}
+
+
+		return $options;
 	}
 
 }

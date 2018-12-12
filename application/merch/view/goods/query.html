@@ -3,15 +3,16 @@
     <tbody>   
         {foreach name='ds' item='row'}
         <tr>
-          <td>{$row['title']}</td>
-          <td style="width:80px;"><a href="javascript:;" onclick='biz.selector.set(this, {:json_encode($row);})'>选择</a></td>
+          <td><img src='{$row['thumb']}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' /> {$row['title']}</td>
+            <td style="width: 80px"><a class="text-primary" href="javascript:;" onclick='biz.selector.set(this, {:json_encode($row);})'>选择</a></td>
         </tr>
         {/foreach}
         {if count($ds)<=0}
         <tr> 
-            <td colspan='4' align='center'>未找到相关商品</td>
+            <td colspan='4' align='center'>未找到商品</td>
         </tr>
         {/if}
     </tbody>
 </table>
 </div>
+

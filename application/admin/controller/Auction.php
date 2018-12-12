@@ -121,7 +121,7 @@ class Auction extends Base
 
 	public function category()
 	{
-		$list = Db::name('shop_auction_category')->order('displayorder','desc')->select();
+		$list = Db::name('shop_auction_goods_category')->order('displayorder','desc')->select();
 		$this->assign(['list'=>$list]);
 		return $this->fetch('auction/category/index');
 	}
@@ -145,18 +145,18 @@ class Auction extends Base
 			$data = array('name' => trim(input('catename')), 'enabled' => intval(input('enabled')), 'isrecommand' => intval(input('isrecommand')), 'displayorder' => intval(input('displayorder')), 'thumb' => trim(input('thumb')));
 
 			if (!empty($id)) {
-				Db::name('shop_auction_category')->where('id',$id)->update($data);
+				Db::name('shop_auction_goods_category')->where('id',$id)->update($data);
 				model('shop')->plog('auction.category.edit', '修改积分商城分类 ID: ' . $id);
 			}
 			else {
-				$id = Db::name('shop_auction_category')->insertGetId($data);
+				$id = Db::name('shop_auction_goods_category')->insertGetId($data);
 				model('shop')->plog('auction.category.add', '添加积分商城分类 ID: ' . $id);
 			}
 
 			show_json(1, array('url' => url('admin/auction/category', array('op' => 'display'))));
 		}
 
-		$item = Db::name('shop_auction_category')->where('id',$id)->find();
+		$item = Db::name('shop_auction_goods_category')->where('id',$id)->find();
 		$this->assign(['item'=>$item]);
 		return $this->fetch('auction/category/post');
 	}
@@ -165,10 +165,10 @@ class Auction extends Base
 	{
 		$id = intval(input('id'));
 		$displayorder = intval(input('value'));
-		$item = Db::name('shop_auction_category')->where('id',$id)->field('id,name')->find();
+		$item = Db::name('shop_auction_goods_category')->where('id',$id)->field('id,name')->find();
 
 		if (!empty($item)) {
-			Db::name('shop_auction_category')->where('id',$id)->setField('displayorder',$displayorder);
+			Db::name('shop_auction_goods_category')->where('id',$id)->setField('displayorder',$displayorder);
 			model('shop')->plog('auction.category.delete', '修改分类排序 ID: ' . $item['id'] . ' 标题: ' . $item['name'] . ' 排序: ' . $displayorder . ' ');
 		}
 
@@ -178,12 +178,12 @@ class Auction extends Base
 	public function categorydelete()
 	{
 		$id = intval(input('id'));
-		$item = Db::name('shop_auction_category')->where('id',$id)->field('id,name')->find();
+		$item = Db::name('shop_auction_goods_category')->where('id',$id)->field('id,name')->find();
 
 		if (empty($item)) {
 			show_json(0,'抱歉，分类不存在或是已经被删除！');
 		}
-		Db::name('shop_auction_category')->where('id',$id)->delete();
+		Db::name('shop_auction_goods_category')->where('id',$id)->delete();
 		model('shop')->plog('auction.category.delete', '删除积分商城分类 ID: ' . $id . ' 标题: ' . $item['name'] . ' ');
 		show_json(1);
 	}
@@ -196,68 +196,38 @@ class Auction extends Base
 			$id = (is_array($_POST['ids']) ? implode(',', $_POST['ids']) : 0);
 		}
 
-		$items = Db::name('shop_auction_category')->where('id','in',$id)->field('id,name')->select();
+		$items = Db::name('shop_auction_goods_category')->where('id','in',$id)->field('id,name')->select();
 
 		foreach ($items as $item) {
-			Db::name('shop_auction_category')->where('id',$item['id'])->setField('enabled',$enabled);
+			Db::name('shop_auction_goods_category')->where('id',$item['id'])->setField('enabled',$enabled);
 			model('shop')->plog('auction.category.edit', ('修改商品分类<br/>ID: ' . $item['id'] . '<br/>标题: ' . $item['name'] . '<br/>状态: ' . $enabled) == 1 ? '显示' : '隐藏');
 		}
 
 		show_json(1, array('url' => referer()));
 	}
 
-	public function goodstotal()
-	{
-		$type = intval(input('type'));
-		$condition = ' isauction = 1 ';
-
-		if ($type == 1) {
-			$condition .= ' and deleted = 0 and total > 0 and status = 1 ';
-		} else if ($type == 2) {
-			$condition .= ' and deleted = 0 and total = 0 and status = 1';
-		} else if ($type == 3) {
-			$condition .= ' and deleted = 0 and status = 0 ';
-		} else {
-			if ($type == 4) {
-				$condition .= ' and deleted = 1 ';
-			}
-		}
-
-		$total = Db::name('shop_goods')->where($condition)->count();
-		echo json_encode($total);
-	}
-
 	public function goods()
 	{
 		$psize = 20;
-		$type = input('type');
 		$keyword = input('keyword');
 		$status = input('status');
 		$category = input('category');
-
-		$condition = ' g.isauction = 1 ';
-
-		switch ($type) {
-		case 'sale':
-			$condition .= ' and g.deleted = 0 and g.total > 0 and g.status = 1 ';
+		$condition = ' g.deleted = 0 ';
+		$type = input('type');
+		switch( $type ) 
+		{
+			case "sale": $condition .= " and g.status = 1 and g.q_mid = 0 and g.starttime < " . time() . " and g.endtime > " . time();
 			break;
-
-		case 'sold':
-			$condition .= ' and g.deleted = 0 and g.total <= 0 and g.status = 1 ';
+			case "wait": $condition .= " and g.status = 1 and g.q_mid = 0 and g.starttime > " . time();
 			break;
-
-		case 'store':
-			$condition .= ' and g.deleted = 0 and g.status = 0 ';
+			case "finish": $condition .= " and g.status = 1 and g.q_mid <> 0 ";
 			break;
-
-		case 'recycle':
-			$condition .= ' and g.deleted = 1 ';
+			case "auctions": $condition .= " and g.status = 1 and g.q_mid = 0 and g.endtime < " . time();
 			break;
-
-		default:
-			$condition .= ' and g.deleted = 0 and g.total > 0 and g.status = 1 ';
+			case "store": $condition .= " and g.status != 1 ";
+			break;
+			default: $condition .= " and g.status = 1 and g.q_mid = 0 and g.starttime < " . time() . " and g.endtime > " . time();
 		}
-
 		if (!empty($keyword)) {
 			$keyword = trim($keyword);
 			$condition .= ' and g.title like "%' . $keyword . '%"';
@@ -271,16 +241,16 @@ class Auction extends Base
 			$condition .= ' AND g.category = ' . $category;
 		}
 
-		$list = Db::name('shop_goods')
+		$list = Db::name('shop_auction_goods')
 			->alias('g')
-			->join('shop_goods_category c','g.category = c.id','left')
+			->join('shop_auction_goods_category c','g.category = c.id','left')
 			->where($condition)
 			->order("g.displayorder",'desc')
 			->field('g.*,c.name')
 			->paginate($psize);
 		$pager = $list->render();
-		$category = array();
-		$this->assign(['list'=>$list,'pager'=>$pager,'type'=>$type,'status'=>$status,'category'=>$category,'keyword'=>$keyword]);
+		$categorys = Db::name('shop_auction_goods_category')->order('displayorder','desc')->select();
+		$this->assign(['list'=>$list,'pager'=>$pager,'categorys'=>$categorys,'type'=>$type,'status'=>$status,'category'=>$category,'keyword'=>$keyword]);
 		return $this->fetch('auction/goods/index');
 	}
 
@@ -299,95 +269,51 @@ class Auction extends Base
 	protected function goodspost()
 	{
 		$id = input('id/d');
-		$item = Db::name('shop_goods')
+		$item = Db::name('shop_auction_goods')
 			->alias('g')
-			->join('shop_goods_category c','g.category = c.id','left')
+			->join('shop_auction_goods_category c','g.category = c.id','left')
 			->field('g.*,c.name')
 			->where('g.id',$id)
 			->find();
-		$category = array();
-
-		if (!empty($item['thumb'])) {
-			$piclist = array_merge(array($item['thumb']), iunserializer($item['thumb_url']));
-		}
-
-		$stores = array();
-
-		if (!empty($item['storeids'])) {
-			$stores = Db::name('shop_store')->where('id','in',$item['storeids'])->field('id,storename')->select();
-		}
-
-		$dispatch_data = Db::name('shop_dispatch')->where('enabled',1)->order('displayorder','desc')->select();
 
 		if (Request::instance()->isPost()) {
-			$data = array('isauction' => 1, 'displayorder' => input('displayorder'), 'gid' => input('gid'), 'title' => trim(input('title')), 'category' => intval(input('category')), 'thumb' => '', 'thumb_url' => '', 'marketprice' => input('marketprice/f'), 'auctionprice' => input('auctionprice/f'), 'single' => input('single/d'), 'singleprice' => input('singleprice/f'), 'goodsnum' => input('goodsnum/d') < 1 ? 1 : input('goodsnum/d'), 'purchaselimit' => input('purchaselimit/d'), 'unit' => trim(input('unit')), 'total' => input('total/d'), 'showtotal' => input('showtotal/d'), 'sales' => input('sales/d'), 'teamnum' => input('teamnum/s'), 'dispatchtype' => input('dispatchtype'), 'dispatchprice' => input('dispatchprice/f'), 'status' => input('status/d'), 'isindex' => input('isindex/d'), 'isrecommand' => input('isrecommand/d',0), 'groupnum' => input('groupnum/d'), 'endtime' => input('endtime'), 'description' => trim(input('description')), 'goodssn' => trim(input('goodssn')), 'productsn' => trim(input('productsn')), 'content' => model('common')->html_images(input('content')), 'createtime' => time(), 'goodsid' => input('gid/d',0), 'isdiscount' => input('isdiscount/d'), 'discount' => input('discount/d',0), 'headstype' => input('headstype/d'), 'headsmoney' => input('headsmoney/f'), 'headsdiscount' => input('headsdiscount/d'), 'storeids' => is_array($_POST['storeids']) ? implode(',', $_POST['storeids']) : '');
-
-			if ($data['auctionprice'] < $data['headsmoney']) {
-				$data['headsmoney'] = $data['auctionprice'];
+			$data = $_POST['goods'];
+			
+			if (empty($data['title'])) {
+				show_json(0, '请填写商品标题');
 			}
-
-			if (!empty($data['verifytype']) && ($data['verifynum'] < 1)) {
-				$data['verifynum'] = 1;
+			if (empty($data['thumb'])) {
+				show_json(0, '请上传商品图片');
 			}
-
-			if ($data['headsmoney'] < 0) {
-				$data['headsmoney'] = 0;
+			if (empty($data['endtime'])) {
+				show_json(0, '请填写商品结束时间');
 			}
-
-			if ($data['headsdiscount'] < 0) {
-				$data['headsdiscount'] = 0;
+			if (empty($data['shprice'])) {
+				show_json(0, '请填写商品起拍价格');
 			}
-
-			if (100 < $data['headsdiscount']) {
-				$data['headsdiscount'] = 100;
+			if (empty($data['bond'])) {
+				show_json(0, '请填写商品保证金');
 			}
-
-			if ($data['goodsnum'] < 0) {
-				show_json(0, '数量不能小于1！');
+			if (empty($data['addprice'])) {
+				show_json(0, '请填写商品默认加价价格');
 			}
-
-			if ($data['groupnum'] < 2) {
-				show_json(0, '开团人数至少为2人！');
+			if (empty($data['starttime'])) {
+				show_json(0, '请填写商品开始时间');
 			}
-
-			if ($data['endtime'] < 1) {
-				show_json(0, '组团限时不能小于1小时！');
-			}
-
-			if ($data['auctionprice'] <= 0) {
-				show_json(0, '拼团价格不符合要求！');
-			}
-
-			if (($data['singleprice'] <= 0) && ($data['single'] == 1)) {
-				show_json(0, '单购价格不符合要求！');
-			}
-
-			$data['title'] = empty($data['goodstype']) ? trim(input('goodsid_text')) : trim(input('couponid_text'));
-
-			if (is_array($_POST['thumbs'])) {
-				$thumbs = $_POST['thumbs'];
-				$thumb_url = array();
-
-				foreach ($thumbs as $th) {
-					$thumb_url[] = trim($th);
-				}
-
-				$data['thumb'] = $thumb_url[0];
-				unset($thumb_url[0]);
-				$data['thumb_url'] = iserializer($thumb_url);
-			}
-
+			$data['content'] = htmlspecialchars_decode($data['content']);
+			$data['starttime'] = strtotime($data['starttime']);
+			$data['endtime'] =strtotime($data['endtime']);
 			if (!empty($id)) {
-				$goods_update = Db::name('shop_goods')->where('id',$id)->update($data);
+				$goods_update = Db::name('shop_auction_goods')->where('id',$id)->update($data);
 
 				if (!$goods_update) {
 					show_json(0, '商品编辑失败！');
 				}
 
-				model('shop')->plog('auction.goods.edit', '编辑拼团商品 ID: ' . $id . ' <br/>商品名称: ' . $data['title']);
-			}
-			else {
-				$id = Db::name('shop_goods')->insertGetId($data);
+				model('shop')->plog('auction.goods.edit', '编辑拍卖商品 ID: ' . $id . ' <br/>商品名称: ' . $data['title']);
+			} else {
+				$data['createtime'] = time();
+				$id = Db::name('shop_auction_goods')->insertGetId($data);
 
 				if (!$id) {
 					show_json(0, '商品添加失败！');
@@ -395,17 +321,136 @@ class Auction extends Base
 				$gid = intval($data['gid']);
 
 				if ($gid) {
-					Db::name('shop_goods')->where('id',$id)->setField('auctiontype',1);
+					Db::name('shop_auction_goods')->where('id',$id)->setField('auctiontype',1);
 				}
 
-				model('shop')->plog('auction.goods.add', '添加拼团商品 ID: ' . $id . '  <br/>商品名称: ' . $data['title']);
+				model('shop')->plog('auction.goods.add', '添加拍卖商品 ID: ' . $id . '  <br/>商品名称: ' . $data['title']);
 			}
 
-			show_json(1, array('url' => url('admin/auction/goodsedit', array('op' => 'post', 'id' => $id, 'tab' => str_replace('#tab_', '', $_GET['tab'])))));
+			show_json(1, array('url' => url('admin/auction/goodsedit', array('id' => $id))));
 		}
-		$category = model('shop')->getFullCategory(true, true);
-		$this->assign(['item'=>$item,'category'=>$category,'stores'=>$stores,'dispatch_data'=>$dispatch_data,'piclist'=>$piclist]);
+		$category = array();
+		$category = Db::name('shop_auction_goods_category')->order('displayorder','desc')->select();
+		$this->assign(['item'=>$item,'category'=>$category]);
 		return $this->fetch('auction/goods/post');
+	}
+
+	public function goodsdelete()
+	{
+		$id = intval(input('id'));
+
+		if (empty($id)) {
+			$id = (is_array($_POST['ids']) ? implode(',', $_POST['ids']) : 0);
+		}
+
+		$items = Db::name('shop_auction_goods')->where('id','in',$id)->field('id,title')->select();
+
+		foreach ($items as $item) {
+			Db::name('shop_auction_goods')->where('id',$item['id'])->setField('deleted',1);
+			model('shop')->plog('auction.goods.delete', '删除积分商城商品 ID: ' . $item['id'] . '  <br/>商品名称: ' . $item['title'] . ' ');
+		}
+
+		show_json(1, array('url' => referer()));
+	}
+
+	public function goodsstatus()
+	{
+		$id = intval(input('id'));
+
+		if (empty($id)) {
+			$id = (is_array($_POST['ids']) ? implode(',', $_POST['ids']) : 0);
+		}
+
+		$status = intval(input('status'));
+		$items = Db::name('shop_auction_goods')->where('id','in',$id)->field('id,title')->select();
+
+		foreach ($items as $item) {
+			Db::name('shop_auction_goods')->where('id',$item['id'])->setField('status',$status);
+			model('shop')->plog('auction.goods.edit', '修改积分商城商品 ' . $item['id'] . ' <br /> 状态: ' . ($status == 0 ? '下架' : '上架'));
+		}
+
+		show_json(1, array('url' => referer()));
+	}
+
+	public function goodsproperty()
+	{
+		$id = intval(input('id'));
+		$type = trim(input('type'));
+		$value = intval(input('value'));
+
+		if (in_array($type, array('status', 'displayorder', 'title'))) {
+			Db::name('shop_auction_goods')->where('id',$id)->update(array($type => $value));
+			$statusstr = '';
+
+			if ($type == 'status') {
+				$typestr = '上下架';
+				$statusstr = ($value == 1 ? '上架' : '下架');
+			} else {
+				if ($type == 'displayorder') {
+					$typestr = '排序';
+					$statusstr = '序号 ' . $value;
+				}
+			}
+			model('shop')->plog('auction.goods.edit', '修改积分商城商品' . $typestr . '状态   ID: ' . $id . ' ' . $statusstr . ' ');
+		}
+
+		show_json(1);
+	}
+
+	public function goodstotal()
+	{
+		$type = intval($_GET["type"]);
+		$condition = " 1 ";
+		if( $type == 1 ) 
+		{
+			$condition .= " and status = 1 and q_mid = 0 and starttime < " . time() . " and endtime > " . time();
+		}
+		else 
+		{
+			if( $type == 2 ) 
+			{
+				$condition .= " and status = 1 and q_mid = 0 and starttime > " . time();
+			}
+			else 
+			{
+				if( $type == 3 ) 
+				{
+					$condition .= " and status = 1 and q_mid <> 0 ";
+				}
+				else 
+				{
+					if( $type == 4 ) 
+					{
+						$condition .= " and status = 1 and q_mid = 0 and endtime < " . time();
+					} 
+					else 
+					{
+						if( $type == 5 ) 
+						{
+							$condition .= " and status != 1 ";
+						} 
+					}
+				}
+			}
+		}
+		$total = Db::name('shop_auction_goods')->where($condition)->count();
+		echo json_encode($total);
+	}
+
+	public function set()
+	{
+		$data = model('common')->getPluginset('auction');
+		if (Request::instance()->isPost()) {
+			$data = (is_array($_POST['data']) ? $_POST['data'] : array());
+			$data['openauction'] = intval($_POST['data']['openauction']);
+			$data['explain'] = model('common')->html_images($_POST['data']['explain']);
+			model('common')->updatePluginset(array('auction' => $data));
+			model('shop')->plog('auction.set.edit', '修改积分商城基本设置');
+			show_json(1, array('url' => url('admin/auction/set', array('tab' => str_replace('#tab_', '', $_GET['tab'])))));
+		}
+
+		$this->assign(['data'=>$data]);
+		return $this->fetch('auction/set');
 	}
 
 }

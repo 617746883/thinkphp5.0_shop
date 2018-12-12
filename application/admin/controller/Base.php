@@ -64,19 +64,20 @@ class Base extends Controller
     {
     	$copyright = model('common')->getCopyright(1);
         $system = model('system')->init(false);
-        $sysmenus = model('system')->getMenu(true);
-        $shop_data = model('common')->getSysset('shop');
+        $sysmenus = model('system')->getMenu(true,0);
         $shopset = model('common')->getSysset();
+        $shop_data = $shopset['shop'];
+        $this->shopset = $shopset;
         $this->assign(['system'=>$system,'sysmenus'=>$sysmenus,'shopset'=>$shopset,'shop_data'=>$shop_data,'copyright'=>$copyright]);
     }
 
     public function checkAuth()
     {
         $request = Request::instance();
-        $mod = $request->module();
-        $ctl = $request->controller();
-        $act = $request->action();
-        $path = $mod . '/' . strtolower($ctl) . '/' . $act;
+        $mod = strtolower($request->module());
+        $ctl = strtolower($request->controller());
+        $act = strtolower($request->action());
+        $path = $mod . '/' . $ctl . '/' . $act;
         if($path == 'admin/index/index' || $path == 'admin/user/index' || $path == 'admin/system/loginout') {
             return true;
         }
@@ -95,9 +96,9 @@ class Base extends Controller
         }
     }
 
-    public function _empty()
-    {
-        $this->redirect(url('admin/index/error'));
-    }
+    // public function _empty()
+    // {
+    //     $this->redirect(url('admin/index/error'));
+    // }
 
 }

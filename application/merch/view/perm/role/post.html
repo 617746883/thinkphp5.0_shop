@@ -1,0 +1,61 @@
+{include file='_header'}
+<div class="page-header">
+	当前位置：<span class="text-primary">{if !empty($item['id'])}编辑{else}添加{/if}角色 <small>{if !empty($item['id'])}修改【{$item['rolename']}】{/if}</small></span>
+</div>
+ <div class="page-content">
+     <div class="page-sub-toolbar">
+         <span class=''>
+            <a class="btn btn-primary btn-sm" href="{php echo merchUrl('perm/role/add')}">添加新角色</a>
+        </span>
+     </div>
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$item['id']}" />
+                <div class="form-group">
+
+                    <label class="col-lg control-label must">角色</label>
+
+                    <div class="col-sm-10 col-xs-12">
+                        <input type="text" name="rolename" class="form-control" value="{$item['rolename']}" data-rule-required="true" />
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="col-lg control-label">状态</label>
+
+                    <div class="col-sm-10 col-xs-12">
+                        <label class='radio-inline'>
+
+                            <input type='radio' name='status' value=1' {if $item['status']==1}checked{/if} /> 启用
+
+                        </label>
+
+                        <label class='radio-inline'> 
+
+                            <input type='radio' name='status' value=0' {if $item['status']==0}checked{/if} /> 禁用
+
+                        </label>
+
+                        <span class="help-block">如果禁用，则当前角色的操作员全部会禁止使用</span>
+                    </div>
+
+                </div>
+
+            {include file='perm/perms'}
+            <div class="form-group"></div>
+
+            <div class="form-group">
+                <label class="col-lg control-label"></label>
+                <div class="col-sm-10 col-xs-12">
+                        <input type="submit" value="提交" class="btn btn-primary"  />
+                   <input type="button" name="back" onclick='history.back()' {ifp 'perm.role.add|perm.role.edit'}style='margin-left:10px;'{/if} value="返回列表" class="btn btn-default" />
+                </div>
+            </div>
+    </form>
+ </div>
+
+{include file='_footer'}
+
+
+

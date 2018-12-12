@@ -227,7 +227,7 @@ class Notice extends \think\Model
 			);
 		if (!(empty($order['merchid']))) {
 			$is_merch = 1;
-			$merch_tm = model('store')->getSet('notice', $order['merchid']);
+			$merch_tm = model('merch')->getSet('notice', $order['merchid']);
 		}
 		if ($delRefund) {
 			$r_type = array('退款', '退货退款', '换货');
@@ -455,7 +455,7 @@ class Notice extends \think\Model
 						$msg = '您的宝贝已经成功发货！';
 
 						if (0 < $order['merchid']) {
-							$merch_user = model('store')->getListUserOne($order['merchid']);
+							$merch_user = model('merch')->getListUserOne($order['merchid']);
 
 							if (!(empty($merch_user['mobile']))) {
 								$text .= " " . '商户电话：[商户电话]';
@@ -864,7 +864,7 @@ class Notice extends \think\Model
 	}
 
 	/**
-	 * 后台积分变动提示
+	 * 积分变动提示
 	 * @param type $mid
 	 * @param type $oldlevel
 	 * @param type $level
@@ -872,7 +872,6 @@ class Notice extends \think\Model
 	 */
 	public function sendMemberPointChange($mid, $pointchange = 0, $changetype = 0, $from = 0)
 	{
-		return;
 		$shopset = model('common')->getSysset();
 		$member = model('member')->getMember($mid);
 		$credit1 = model('member')->getCredit($mid);
@@ -883,12 +882,10 @@ class Notice extends \think\Model
 
 		$credittext = ((empty($shopset['trade']['credittext']) ? '积分' : $shopset['trade']['credittext']));
 		$pointtext = '';
-		$pointcolor = '';
 
 		if ($changetype == 0) {
 			$pointtext = '增加' . (double) $pointchange . $credittext;
-		}
-		 else if ($changetype == 1) {
+		} else if ($changetype == 1) {
 			$pointtext = '减少' . (double) $pointchange . $credittext;
 		}
 
@@ -898,7 +895,6 @@ class Notice extends \think\Model
 		} else if ($from == 1) {
 			$fromstr = '收银台积分变动提醒';
 		}
-
 
 		$datas = array(
 			array('name' => '商城名称', 'value' => $shopset['shop']['name']),
@@ -911,7 +907,7 @@ class Notice extends \think\Model
 		$remark = " " . '[' . $shopset['shop']['name'] . ']感谢您的支持，如有疑问请联系在线客服。';
 		$text = '亲爱的[' . $member['nickname'] . ']， 您的' . $credittext . '发生变动，具体内容如下：' . " " . '积分变动：[' . $pointtext . ']' . "" . '变动时间：[' . date('Y-m-d H:i', time()) . ']' . "" . '充值方式：' . $fromstr . "" . '当前积分余额：[积分余额] ' . "" . $remark;
 		
-		self::sendNotice(array('mid' => $mid, 'first' => $msg, 'default' => $text, 'datas' => $datas, 'type' => 'system', 'tid' => 0, 'id' => 0));
+		self::sendNotice(array('mid' => $mid, 'first' => $msg, 'default' => $text, 'datas' => $datas, 'type' => 'credit', 'tid' => 0, 'id' => 0));
 	}
 
 	public function sendStockWarnMessage($goodsid, $optionid)
@@ -919,7 +915,7 @@ class Notice extends \think\Model
 		return;
 		if (!(empty($order['merchid']))) {
 			$is_merch = 1;
-			$merch_tm = model('store')->getSet('notice', $order['merchid']);
+			$merch_tm = model('merch')->getSet('notice', $order['merchid']);
 		}
 
 		$goodsid = intval($goodsid);
@@ -945,7 +941,6 @@ class Notice extends \think\Model
 			if (!(empty($option))) {
 				$goodtitle = $goodtitle . '(' . $option['title'] . '}';
 			}
-
 		}
 
 
@@ -953,8 +948,7 @@ class Notice extends \think\Model
 
 		if (!(empty($data['stockwarn']))) {
 			$stockwarn = intval($data['stockwarn']) . '件';
-		}
-		 else {
+		} else {
 			$stockwarn = '5件';
 		}
 
@@ -1194,6 +1188,7 @@ class Notice extends \think\Model
 	 */
 	public static function sendMerchMessage($storeid = '0')
 	{
+		return;
 		if(empty($storeid)) {
 			return;
 		}
@@ -1249,6 +1244,180 @@ class Notice extends \think\Model
 			array('name' => '新等级', 'value' => $level['levelname'])
 			);
 		self::sendNotice(array('mid' => $member['id'], 'first' => $msg, 'default' => $text, 'datas' => $datas, 'type' => 'system', 'tid' => 0, 'id' => 0));
+	}
+
+	/**
+	 * 积分商城提醒
+	 * @param type $mid
+	 * @param type $oldlevel
+	 * @param type $level
+	 * @return type
+	 */
+	public static function sendCreditshopMessage($log_id = "") 
+	{
+		if( empty($id) ) {
+			return NULL;
+		}
+		$log = Db::name('shop_creditshop_log')->where('id',$id)->find();
+		if( empty($log) ) 
+		{
+			return NULL;
+		}
+		$member = model("member")->getMember($log["mid"]);
+		if( empty($member) ) 
+		{
+			return NULL;
+		}
+		$credit = intval($member["credit1"]);
+		$goods = model('creditshop')->getGoods($log["goodsid"], $member);
+		if( empty($goods["id"]) ) 
+		{
+			return NULL;
+		}
+		if( 0 < $log["optionid"] ) 
+		{
+			$goods_option = Db::name('shop_creditshop_goods_option')->where('id',$log['optionid'])->field('credit,money')->find();
+			$goods["credit"] = $goods_option["credit"];
+			$goods["money"] = $goods_option["money"];
+		}
+		$goods["credit"] *= $log["goods_num"];
+		$goods["money"] *= $log["goods_num"];
+		$type = $goods["type"];
+		$credits = "";
+		if( 0 < $goods["credit"] & 0 < $goods["money"] ) 
+		{
+			$credits = $goods["credit"] . "积分+" . $goods["money"] . "元";
+		}
+		else 
+		{
+			if( 0 < $goods["credit"] ) 
+			{
+				$credits = $goods["credit"] . "积分";
+			}
+			else 
+			{
+				if( 0 < $goods["money"] ) 
+				{
+					$credits = $goods["money"] . "元";
+				}
+				else 
+				{
+					$credits = "0";
+				}
+			}
+		}
+		$shopset = model('common')->getSysset();
+		$shop = $shopset['shop'];
+		$set = model('Common')->getPluginset('creditshop');
+		if( $log["status"] == 2 ) 
+		{
+			if( !empty($type) ) 
+			{
+				if( $log["status"] == 2 ) 
+				{
+					$remark = " 【" . $shop["name"] . "】期待您再次光顾！";
+					if( $goods["goodstype"] == 0 && $goods["isverify"] == 0 ) 
+					{
+						if( 0 < $goods["dispatch"] ) 
+						{
+							$remark = " 请您支付邮费后, 我们会尽快发货，【" . $shop["name"] . "】期待您再次光顾！";
+						}
+						else 
+						{
+							$remark = " 请您选择邮寄地址后, 我们会尽快发货，【" . $shop["name"] . "】期待您再次光顾！";
+						}
+					}
+					$msg = "恭喜您，您中奖啦~";
+				}
+			}
+			else 
+			{
+				if( $log["dispatchstatus"] != 1 ) 
+				{
+					$remark = " 【" . $shop["name"] . "】期待您再次光顾！";
+					if( $log["dispatchstatus"] != -1 ) 
+					{
+						if( 0 < $goods["dispatch"] ) 
+						{
+							$remark = " 请您支付邮费后, 我们会尽快发货，【" . $shop["name"] . "】期待您再次光顾！";
+						}
+						else 
+						{
+							$remark = " 请您选择邮寄地址后, 我们会尽快发货，【" . $shop["name"] . "】期待您再次光顾！";
+						}
+					}
+					$msg = "恭喜您，商品兑换成功~";
+				}
+			}
+			if( $log["dispatchstatus"] == 1 || $log["dispatchstatus"] == -1 ) 
+			{
+				$remark = "收货信息:  无需物流";
+				if( !empty($log["addressid"]) ) 
+				{
+					$address = Db::name('shop_member_address')->where('id',$log['addressid'])->find();
+					if( !empty($address) ) 
+					{
+						$remark = "收件人: " . $address["realname"] . " 联系电话: " . $address["mobile"] . " 收货地址: " . $address["province"] . $address["city"] . $address["area"] . " " . $address["address"];
+					}
+					$remark = " 【" . $shop["name"] . "】期待您再次光顾！";
+				}
+				$msg = "积分商城商品兑换成功~";
+			}
+		}
+		else 
+		{
+			if( $log["status"] == 3 ) 
+			{
+				$remark = "无需物流";
+				if( !empty($log["addressid"]) ) 
+				{
+					$address = Db::name('shop_member_address')->where('id',$log['addressid'])->find();
+					if( !empty($address) ) 
+					{
+						$remark = " 收件人: " . $address["realname"] . " 联系电话: " . $address["mobile"] . " 收货地址: " . $address["province"] . $address["city"] . $address["area"] . " " . $address["address"];
+					}
+				}
+				$msg = "您的积分兑换奖品已发货~";
+			}
+		}
+		$datas = array(
+			array('name' => '商城名称', 'value' => $shopset['shop']['name']),
+			array('name' => '粉丝昵称', 'value' => $member['nickname']),
+			array('name' => '商品名称', 'value' => $goods['title']),
+			);
+		self::sendNotice(array('mid' => $member['id'], 'first' => $msg, 'default' => $remark, 'datas' => $datas, 'type' => 'creditshop', 'tid' => $log['logno'], 'id' => $log['id']));
+	}
+
+	/**
+	 * 会员积分余额变动提醒
+	 * @param type $mid
+	 * @param type $oldlevel
+	 * @param type $level
+	 * @return type
+	 */
+	public static function sendMemberLogMessage($log_id = "", $channel = 0, $isback = false) 
+	{
+		$log_info = Db::name('member_credits_record')->where('id',$log_id)->find();
+		$member = model('member')->getMember($log_info['mid']);
+		$shopset = model('common')->getSysset();
+		$credittext = ((empty($shopset['trade']['credittext']) ? '积分' : $shopset['trade']['credittext']));
+		$datas = array(
+			array('name' => '商城名称', 'value' => $shopset['shop']['name']),
+			array('name' => '粉丝昵称', 'value' => $member['nickname']),
+			array('name' => '余额变动', 'value' => $log_info['num']),
+			array('name' => '赠送时间', 'value' => date('Y-m-d H:i', time())),
+			array('name' => '余额', 'value' => (double) $member['credit2'])
+			);
+		if (empty($from)) {
+			$fromstr = '管理员后台手动处理';
+		} else if ($from == 1) {
+			$fromstr = '收银台积分变动提醒';
+		}
+		$msg = '亲爱的' . $member['nickname'] . '，您的' . $credittext . '发生变动';
+		$remark = " " . '[' . $shopset['shop']['name'] . ']感谢您的支持，如有疑问请联系在线客服。';
+		$text = '亲爱的[' . $member['nickname'] . ']， 您的' . $credittext . '发生变动，具体内容如下：' . " " . '变动：[' . $log_info['num'] . ']' . "" . '变动时间：[' . date('Y-m-d H:i', time()) . ']' . "" . '充值方式：' . $fromstr . "" . '当前余额：[余额] ' . "" . $remark;
+		
+		self::sendNotice(array('mid' => $log_info['mid'], 'first' => $msg, 'default' => $text, 'datas' => $datas, 'type' => 'system', 'tid' => 0, 'id' => 0));
 	}
 
 	public static function sendNotice(array $params)

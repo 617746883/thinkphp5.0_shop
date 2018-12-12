@@ -11,7 +11,7 @@ class Payment extends \think\Model
      * @param int $type
      * @return array 唤起支付所需参数
      */
-	public static function wechat_build($params, $type = 0) 
+	public static function wechat_build($params, $devicetype, $type = 0, $openid = '') 
 	{
 		vendor('wechatpay.WechatPay');
         $param_title = trim($params['title']);
@@ -21,9 +21,15 @@ class Payment extends \think\Model
 
         $set = model('common')->getSec();
         $sec = iunserializer($set['sec']);
-		$config = array('APPID'=>$sec['app_wechat']['appid'], 'MCHID'=>$sec['app_wechat']['merchid'], 'KEY'=>$sec['app_wechat']['apikey'], 'APPSECRET'=>$sec['app_wechat']['appsecret'], 'MERCHNAME'=>$sec['app_wechat']['merchname'], 'NOTIFY_URL'=>getHttpHost() . '/payment/wechat/notify');
+        if($devicetype == 'iOS' || $devicetype == 'android') {
+            $config = array('APPID'=>$sec['app_wechat']['appid'], 'MCHID'=>$sec['app_wechat']['merchid'], 'KEY'=>$sec['app_wechat']['apikey'], 'APPSECRET'=>$sec['app_wechat']['appsecret'], 'MERCHNAME'=>$sec['app_wechat']['merchname'], 'NOTIFY_URL'=>getHttpHost() . '/payment/wechat/notify');
+        } elseif ($devicetype == 'wechat') {
+            $config = array('APPID'=>$sec['wx_wechat']['appid'], 'MCHID'=>$sec['wx_wechat']['merchid'], 'KEY'=>$sec['wx_wechat']['apikey'], 'APPSECRET'=>$sec['wx_wechat']['appsecret'], 'MERCHNAME'=>$sec['wx_wechat']['merchname'], 'NOTIFY_URL'=>getHttpHost() . '/payment/wechat/notify');
+        } else {
+            $config = array('APPID'=>$sec['web_wechat']['appid'], 'MCHID'=>$sec['web_wechat']['merchid'], 'KEY'=>$sec['web_wechat']['apikey'], 'APPSECRET'=>$sec['web_wechat']['appsecret'], 'MERCHNAME'=>$sec['web_wechat']['merchname'], 'NOTIFY_URL'=>getHttpHost() . '/payment/wechat/notify');
+        }
 
-        $order=array(
+        $order = array(
             'body'=>$param_title,
             'total_fee'=>$total_fee,
             'out_trade_no'=>$out_trade_no,
@@ -34,7 +40,26 @@ class Payment extends \think\Model
 
         $weixinpay=new \WechatPay();
         $weixinpay->config = $config;
-        $response = $weixinpay->getAppPayParams($order);
+
+        if($devicetype == 'iOS' || $devicetype == 'android') {
+            $response = $weixinpay->getAppPayParams($order);
+        } elseif ($devicetype == 'wechat') {
+            if(!is_weixin()) {
+                return '请在微信客户端打开';
+            }
+            $order['trade_type'] = 'JSAPI';
+            $order['openid'] = $openid;
+            $response = $weixinpay->getJsapiPayParams($order);
+        } else {
+            if($devicetype == 'web') {
+                if(!is_mobile()) {
+                    return '请在手机浏览器打开';
+                }
+                $order['trade_type'] = 'MWEB';
+                $response = $weixinpay->getMwebPayParams($order);
+            }
+        }
+        
         return $response;
 	}
 
@@ -45,10 +70,11 @@ class Payment extends \think\Model
      * @param int $type
      * @return string 唤起支付所需签名
      */
-	public static function alipay_build($params, $type = 0) 
+	public static function alipay_build($params, $devicetype, $type = 0, $RETURN_URL) 
 	{
 		vendor('alipay.aop.AopClient');
         vendor('alipay.aop.request.AlipayTradeAppPayRequest'); 
+        vendor('alipay.aop.request.AlipayTradeWapPayRequest'); 
         $out_trade_no = strval($params['tid']);
         $product_id = intval($params['product_id']);
         $total_fee = round($params['fee'], 2);
@@ -67,25 +93,41 @@ class Payment extends \think\Model
         $aop->signType = "RSA2";
         $aop->alipayrsaPublicKey = $config['alipayrsaPublicKey'];//对应填写
 
-        $request = new \AlipayTradeAppPayRequest();
-        //SDK已经封装掉了公共参数，这里只需要传入业务参数
-        $bizcontent = json_encode(array(
-            'body'=>$type,
-            'subject' => $param_title,//支付的标题，
-            'out_trade_no' => $out_trade_no,
-            'timeout_express' => '30m',//過期時間（分钟）
-            'total_amount' => $total_fee,//金額最好能要保留小数点后两位数
-            'product_code' => 'QUICK_MSECURITY_PAY'
-        ),JSON_UNESCAPED_UNICODE);
         $NOTIFY_URL = getHttpHost() . '/payment/alipay/notify';
-        if($type == 0) {
-            $NOTIFY_URL = getHttpHost() . '/payment/alipay/notify';
-        }
-        
-        $request->setNotifyUrl($NOTIFY_URL);//你在应用那里设置的异步回调地址
-        $request->setBizContent($bizcontent);
-        $response = $aop->sdkExecute($request);//这里和普通的接口调用不同，使用的是sdkExecute
-        return $response;
+        if($devicetype == 'iOS' || $devicetype == 'android') {
+            $request = new \AlipayTradeAppPayRequest();
+            //SDK已经封装掉了公共参数，这里只需要传入业务参数
+            $bizcontent = json_encode(array(
+                'body'=>$type,
+                'subject' => $param_title,//支付的标题，
+                'out_trade_no' => $out_trade_no,
+                'timeout_express' => '30m',//過期時間（分钟）
+                'total_amount' => $total_fee,//金額最好能要保留小数点后两位数
+                'product_code' => 'QUICK_MSECURITY_PAY'
+            ),JSON_UNESCAPED_UNICODE);
+            
+            $request->setNotifyUrl($NOTIFY_URL);//你在应用那里设置的异步回调地址
+            $request->setBizContent($bizcontent);
+            $response = $aop->sdkExecute($request);//这里和普通的接口调用不同，使用的是sdkExecute
+            return $response;
+        } else {
+             //建立请求
+            $request = new \AlipayTradeWapPayRequest();
+            $bizcontent = json_encode(array(
+                'body'=>$type,
+                'subject' => $param_title,//支付的标题，
+                'out_trade_no' => $out_trade_no,
+                'timeout_express' => '30m',//過期時間（分钟）
+                'total_amount' => $total_fee,//金額最好能要保留小数点后两位数
+                'product_code' => 'QUICK_MSECURITY_PAY'
+            ),JSON_UNESCAPED_UNICODE);
+            $request->setNotifyUrl($NOTIFY_URL);//你在应用那里设置的异步回调地址
+            $request->setReturnUrl($RETURN_URL);//同步回调地址
+            $request->setBizContent($bizcontent);
+            $aop->apiVersion = '1.0';
+            $result = $aop->pageExecute ($request,'GET');
+            return $result;
+        }        
 	}
 
     /**
@@ -196,6 +238,65 @@ class Payment extends \think\Model
         } else {
             return errormsg(0, $result->$responseNode->sub_msg);
         }
+    }
+
+    /**
+     * 
+     * 支付宝打款（单笔转账到支付宝账户）
+     * @param array $params
+     * @param int $type
+     * @return string 唤起支付所需签名
+     */
+    public function singleAliPay($params)
+    {
+        vendor('alipay.aop.AopClient');
+        vendor('alipay.aop.request.AlipayFundTransToaccountTransferRequest'); 
+        $biz_content = array();
+        $biz_content['out_biz_no'] = $params['out_trade_no'];
+        $biz_content['payee_type'] = $params['refund_amount'];
+        $biz_content['payee_account'] = $params['refund_reason'];
+        $biz_content['amount'] = $params['out_request_no'];
+        $biz_content['payer_show_name'] = $params['out_request_no'];
+        $biz_content['payee_real_name'] = $params['out_request_no'];
+        $biz_content['remark'] = $params['out_request_no'];
+        $biz_content = array_filter($biz_content);
+        $set = model('common')->getSec();
+        $sec = iunserializer($set['sec']);
+
+        $config = array('appId'=>$sec['app_alipay']['appid'], 'alipayrsaPublicKey'=>$sec['app_alipay']['public_key'], 'rsaPrivateKey'=>$sec['app_alipay']['private_key']);
+
+        $aop = new AopClient ();
+        $aop->gatewayUrl = 'https://openapi.alipay.com/gateway.do';
+        $aop->appId = $config['appId'];
+        $aop->rsaPrivateKey = $config['rsaPrivateKey'];
+        $aop->alipayrsaPublicKey = $config['alipayrsaPublicKey'];
+        $aop->apiVersion = '1.0';
+        $aop->signType = 'RSA2';
+        $aop->postCharset='UTF-8';
+        $aop->format='json';
+        $request = new \AlipayFundTransToaccountTransferRequest ();
+        $request->setBizContent(json_encode($biz_content,JSON_UNESCAPED_UNICODE));
+        $result = $aop->execute ( $request); 
+
+        $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
+        $resultCode = $result->$responseNode->code;
+        if(!empty($resultCode)&&$resultCode == 10000){
+            return errormsg(1, $result->$responseNode->sub_msg);
+        } else {
+            return errormsg(0, $result->$responseNode->sub_msg);
+        }
+    }
+
+    /**
+     * 
+     * 微信打款打款（企业付款到零钱）
+     * @param array $params
+     * @param int $type
+     * @return string 唤起支付所需签名
+     */
+    public function wechat_pay()
+    {
+        
     }
 
 }

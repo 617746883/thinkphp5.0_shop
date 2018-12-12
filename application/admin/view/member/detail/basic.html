@@ -17,18 +17,29 @@
     </div>
 </div>
 <div class="form-group">
+    <label class="col-lg control-label">会员组</label>
+    <div class="col-sm-9 col-xs-12">
+        <select name='data[groupid][]' class='form-control'>
+            <option value=''>无分组</option>
+            {foreach name='groups' item='group'}
+            <option value='{$group['id']}' {if $member['groupid']==$group['id']}selected{/if}>{$group['groupname']}</option>
+            {/foreach}
+        </select>
+    </div>
+</div>
+<div class="form-group">
     <label class="col-lg control-label">真实姓名</label>
     <div class="col-sm-9 col-xs-12">
         {:tpl_form_field_editor(array('name'=>'data[realname]', 'value'=>$member['realname']))}
     </div>
 </div>
-<!-- <div class="form-group">
+<div class="form-group">
     <label class="col-lg control-label">积分上限</label>
     <div class="col-sm-9">
         <span class="input-group">
         <label class="radio-inline"><input type="radio" class="btn-maxcredit" value="0" {if empty($member['diymaxcredit'])}checked{/if} name="data[diymaxcredit]" >读取系统设置</label>
         <label class="radio-inline"><input type="radio" class="btn-maxcredit" value="1" {if !empty($member['diymaxcredit'])}checked{/if} name="data[diymaxcredit]">自定义</label>
-        <input type="number" class="form-control  maxcreditinput input-sm" value="{php echo intval($member['maxcredit'])}" style="margin-left:5px;float: right; display: {if empty($member['diymaxcredit'])}none{else}inline-block{/if}; width: 150px;" name="data[maxcredit]" >
+        <input type="number" class="form-control  maxcreditinput input-sm" value="{:intval($member['maxcredit'])}" style="margin-left:5px;float: right; display: {if empty($member['diymaxcredit'])}none{else}inline-block{/if}; width: 150px;" name="data[maxcredit]" >
         </span>
         <span class='help-block text-danger'>会员积分上限，0为不限制(后台手动充值不限制，已持有积分不限制，保存后生效)</span>
     </div>
@@ -38,7 +49,7 @@
     <label class="col-lg control-label">积分</label>
     <div class="col-sm-3">
         <div class='form-control-static'>{$member['credit1']}
-            <a class="text-primary " data-toggle='ajaxModal' href="{:url('finance/recharge', array('type'=>'credit1','id'=>$member['id']))}" style="padding-left: 5px;">充值</a>
+            <a class="text-primary " data-toggle='ajaxModal' href="{:url('admin/member/recharge', array('type'=>'credit1','id'=>$member['id']))}" style="padding-left: 5px;">充值</a>
         </div>
     </div>
 </div>
@@ -47,10 +58,10 @@
     <label class="col-lg control-label">余额</label>
     <div class="col-sm-3">
         <div class='form-control-static'>{$member['credit2']}
-            <a class="text-primary " data-toggle='ajaxModal' href="{:url('finance/recharge', array('type'=>'credit2','id'=>$member['id']))}" style="padding-left: 5px;">充值</a>
+            <a class="text-primary " data-toggle='ajaxModal' href="{:url('admin/member/recharge', array('type'=>'credit2','id'=>$member['id']))}" style="padding-left: 5px;">充值</a>
         </div>
     </div>
-</div>  -->
+</div> 
 <div class="form-group">
     <label class="col-lg control-label">注册时间</label>
     <div class="col-sm-9 col-xs-12">

@@ -1,6 +1,6 @@
 
 <form class="form-horizontal form-validate" action="{:url('admin/order/op',array('ops'=>'changeprice','id'=>$item['id']))}" method="post" enctype="multipart/form-data">
-	<input type='hidden' name='id' value='{$id}' />
+	<input type='hidden' name='id' value='{$item['id']}' />
 	<input type='hidden' id='changeprice-orderprice' value="{:$item['price']-$item['dispatchprice']}"/>
 	<input type='hidden' id='changeprice-dispatchprice' value="{$item['dispatchprice']}"/> 
 	<div class="modal-dialog"  style="width:800px;">

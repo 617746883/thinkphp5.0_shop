@@ -1,4 +1,14 @@
 <div class="form-group">
+	<label class="col-lg control-label">商户地址</label>
+	<div class="col-sm-9 col-xs-12">
+		<p class='form-control-static'>
+			<a href='javascript:;' class="js-clip" title='点击复制链接' data-url="{$url}" >
+				{$url}
+			</a>
+		</p>
+	</div>
+</div>
+<div class="form-group">
 	<label class="col-lg control-label">登录页面LOGO</label>
 	<div class="col-sm-9 col-xs-12">
 		{:tpl_form_field_image2('data[reglogo]',$data['reglogo'],'/public/plugin/merch/template/mobile/default/static/images/regbg.png')}

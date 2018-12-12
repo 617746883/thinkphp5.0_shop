@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{if !empty($merch) && !empty($merch['merchname'])}{$merch['merchname']}{/if}</title>
+    <link rel="shortcut icon" href="__STATIC__/images/favicon.ico" />
+    <link href="/public/static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/public/static/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/public/static/css/animate.css" rel="stylesheet">
+    <link href="/public/static/css/v2.css?v=4.1.0" rel="stylesheet">
+    <link href="/public/static/css/common.css?v=2.0.2" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/public/static/fonts/iconfont.css?v=20170503">
+    <script src="/public/static/js/lib/jquery-1.11.1.min.js"></script>
+    <script src="/public/static/js/dist/jquery/jquery.gcjs.js"></script>
+    <script src="/public/static/js/app/util.js"></script>
+
+    <link href="/public/static/css/we7.common.css?v=1.0.0" rel="stylesheet">
+    <script type="text/javascript" src="/public/static/js/lib/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/app/common.min.js?v=20170802"></script>
+    <script type="text/javascript">if(util){util.clip = function(){}}</script>
+
+    <script src="/public/static/js/require.js"></script>
+    <script src="/public/static/js/config1.0.js"></script>
+    <script>
+        require.config({
+            waitSeconds: 0
+        });
+    </script>
+    <script src="/public/static/js/myconfig.js?2017515"></script>
+    <script type="text/javascript">
+        if (navigator.appName == 'Microsoft Internet Explorer') {
+            if (navigator.userAgent.indexOf("MSIE 5.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0) {
+                alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
+            }
+        }
+
+        myrequire.path = "/public/static/js/";
+        myrequire.systemVersion = '1.0';
+        function preview_html(txt) {
+            var win = window.open("", "win", "width=300,height=600"); // a window object
+            win.document.open("text/html", "replace");
+            win.document.write($(txt).val());
+            win.document.close();
+        }
+    </script>
+</head>
+
+<body class="white-bg ">
+<div id='topbar' class='top-navigation gray-bg '>
+    <nav class="navbar gray-bg " role="navigation" style="width:1038px;margin:auto;">
+        <div class="navbar-header" style="width:200px;">
+            <button aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse" class="navbar-toggle collapsed" type="button">
+                <i class="fa fa-reorder"></i>
+            </button>
+            {if !empty($merch) && !empty($merch['logo'])}
+            <a style='padding:0;overflow:hidden;'><img src="{$merch['logo']}" style='width:100px;height:50px;' /></a>
+            {else}
+            <a class="navbar-brand" href="{:url('merch/index/index')}">LOGO</a>
+            {/if}
+        </div>

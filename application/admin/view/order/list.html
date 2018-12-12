@@ -172,11 +172,12 @@
                 </span>
                 <span class="input-group-select">
                     <select name='searchfield'  class='form-control'   style="width:110px;padding:0 5px;"  >
+                        {if $act == 'olist6'} <option value='verifycode' {if $searchfield=='verifycode'}selected{/if}>核销码</option> {else}
                         <option value='ordersn' {if $searchfield=='ordersn'}selected{/if}>订单号</option>
                         <option value='member' {if $searchfield=='member'}selected{/if}>会员信息</option>
                         <option value='address' {if $searchfield=='address'}selected{/if}>收件人信息</option>
                         <option value='location' {if $searchfield=='location'}selected{/if}>地址信息</option>
-                        <option value='expresssn' {if $searchfield=='expresssn'}selected{/if}>快递单号</option>
+                        <option value='expresssn' {if $searchfield=='expresssn'}selected{/if}>快递单号</option>{/if}
                         <!-- <option value='goodstitle' {if $searchfield=='goodstitle'}selected{/if}>商品名称</option> -->
                     </select>
                 </span>

@@ -153,10 +153,10 @@ class Sysset extends Base
 	{
 		if (Request::instance()->isPost()) {
 			$data = ((is_array($_POST['data']) ? $_POST['data'] : array()));
-			$data['province'] = trim(input('province'));
-			$data['city'] = trim(input('city'));
-			$data['provincecode'] = trim(input('chose_province_code'));
-			$data['citycode'] = trim(input('chose_city_code'));
+			$data['province'] = trim($data['province']);
+			$data['city'] = trim($data['city']);
+			$data['area'] = trim($data['area']);
+			$data['street'] = trim($data['street']);
 			$data['qq'] = trim($data['qq']);
 			$data['address'] = trim($data['address']);
 			$data['phone'] = trim($data['phone']);
@@ -167,8 +167,8 @@ class Sysset extends Base
 			$shop['phone'] = $data['phone'];
 			$shop['province'] = $data['province'];
 			$shop['city'] = $data['city'];
-			$shop['provincecode'] = $data['provincecode'];
-			$shop['citycode'] = $data['citycode'];
+			$shop['area'] = $data['area'];
+			$shop['street'] = $data['street'];
 			model('common')->updateSysset(array('shop' => $shop));
 			model('shop')->plog('sysset.contact.edit', '修改系统设置-联系方式设置');
 			show_json(1);
@@ -181,10 +181,13 @@ class Sysset extends Base
 			$data['phone'] = $shop['phone'];
 			$data['province'] = $shop['province'];
 			$data['city'] = $shop['city'];
-			$data['provincecode'] = $shop['provincecode'];
-			$data['citycode'] = $shop['citycode'];
+			$data['area'] = $shop['area'];
+			$data['street'] = $shop['street'];
 		}
-		$this->assign(['data'=>$data]);
+		$area_set = model('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		$address_street = intval($area_set['address_street']);
+		$this->assign(['data'=>$data,'new_area'=>$new_area,'address_street'=>$address_street]);
 		return $this->fetch('');
 	}
 
@@ -345,39 +348,25 @@ class Sysset extends Base
 		$data = model('common')->getSysset('pay');
 		$payments = Db::name('shop_payment')->where('paytype',0)->field('id,title')->select();
 		$paymentalis = Db::name('shop_payment')->where('paytype',1)->field('id,title')->select();
-
-		// if (empty($payments)) {
-		// 	$payments = array();
-		// 	$setting = uni_setting($_W['uniacid'], array('payment'));
-		// 	$payment = $setting['payment'];
-
-		// 	if (!(empty($payment['wechat']['mchid']))) {
-		// 		if (IMS_VERSION <= 0.80000000000000004) {
-		// 			$payment['wechat']['apikey'] = $payment['wechat']['signkey'];
-		// 		}
-
-
-		// 		$default = array('title' => '微信支付', 'type' => 0, 'sub_appid' => $_W['account']['key'], 'sub_appsecret' => $_W['account']['secret'], 'sub_mch_id' => $payment['wechat']['mchid'], 'apikey' => $payment['wechat']['apikey'], 'cert_file' => $sec['cert'], 'key_file' => $sec['key'], 'root_file' => $sec['root'], 'createtime' => time());
-		// 		$payments[] = $default;
-		// 		pdo_insert('ewei_shop_payment', $default);
-		// 		$default_0 = pdo_insertid();
-		// 	}
-
-
-		// 	if ($data['weixin'] == 1) {
-		// 		$data['weixin_id'] = $default_0;
-		// 	}
-
-
-		// 	model('common')->updateSysset(array('pay' => $data));
-		// }
 		if (Request::instance()->isPost()) {
 			$sec['app_wechat']['appid'] = trim($_POST['data']['app_wechat_appid']);
 			$sec['app_wechat']['appsecret'] = trim($_POST['data']['app_wechat_appsecret']);
 			$sec['app_wechat']['merchname'] = trim($_POST['data']['app_wechat_merchname']);
 			$sec['app_wechat']['merchid'] = trim($_POST['data']['app_wechat_merchid']);
 			$sec['app_wechat']['apikey'] = trim($_POST['data']['app_wechat_apikey']);
-			$sec['alipay_pay'] = ((is_array($_POST['data']['alipay_pay']) ? $_POST['data']['alipay_pay'] : array()));
+
+			$sec['wx_wechat']['appid'] = trim($_POST['data']['wx_wechat_appid']);
+			$sec['wx_wechat']['appsecret'] = trim($_POST['data']['wx_wechat_appsecret']);
+			$sec['wx_wechat']['merchname'] = trim($_POST['data']['wx_wechat_merchname']);
+			$sec['wx_wechat']['merchid'] = trim($_POST['data']['wx_wechat_merchid']);
+			$sec['wx_wechat']['apikey'] = trim($_POST['data']['wx_wechat_apikey']);
+
+			$sec['web_wechat']['appid'] = trim($_POST['data']['web_wechat_appid']);
+			$sec['web_wechat']['appsecret'] = trim($_POST['data']['web_wechat_appsecret']);
+			$sec['web_wechat']['merchname'] = trim($_POST['data']['web_wechat_merchname']);
+			$sec['web_wechat']['merchid'] = trim($_POST['data']['web_wechat_merchid']);
+			$sec['web_wechat']['apikey'] = trim($_POST['data']['web_wechat_apikey']);
+
 			$sec['app_alipay']['public_key'] = trim($_POST['data']['app_alipay_public_key']);
 			$sec['app_alipay']['private_key'] = trim($_POST['data']['app_alipay_private_key']);
 			$sec['app_alipay']['appid'] = trim($_POST['data']['app_alipay_appid']);
@@ -401,6 +390,8 @@ class Sysset extends Base
 			$data['credit'] = intval($inputdata['credit']);
 			$data['cash'] = intval($inputdata['cash']);
 			$data['app_wechat'] = intval($inputdata['app_wechat']);
+			$data['wx_wechat'] = intval($inputdata['wx_wechat']);
+			$data['web_wechat'] = intval($inputdata['web_wechat']);
 			$data['app_alipay'] = intval($inputdata['app_alipay']);
 			$data['paytype'] = ((isset($inputdata['paytype']) ? $inputdata['paytype'] : array()));
 			model('common')->updateSysset(array('pay' => $data));

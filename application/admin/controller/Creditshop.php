@@ -16,7 +16,7 @@ class Creditshop extends Base
 
     public function goodslist()
     {
-		$merch_data = model('common')->getPluginset('store');
+		$merch_data = model('common')->getPluginset('merch');
 		if ($merch_data['is_openmerch']) {
 			$is_openmerch = 1;
 		} else {
@@ -47,8 +47,8 @@ class Creditshop extends Base
 			$condition .= ' AND cate = ' . intval($cate);
 		}
 
-		$list = Db::name('shop_creditshop_goods')->where($condition)->order('displayorder','desc')->paginate($psize);
-		$categorys = Db::name('shop_creditshop_goods_category')->field('id,`name`,thumb')->order('displayorder','desc')->group('id')->select();
+		$list = Db::name('shop_creditshop_goods')->where($condition)->order('displayorder desc,createtime desc')->paginate($psize);
+		$categorys = Db::name('shop_creditshop_goods_category')->field('id,`name`,thumb')->order('displayorder desc')->group('id')->select();
 		foreach ($categorys as $key => &$row) {
 			if (isset($row['id'])) {
 				$category[$row['id']] = $row;
@@ -304,10 +304,13 @@ class Creditshop extends Base
 			$html .= '</table>';
 		}
 		$dispatch_data = Db::name('shop_dispatch')->where('merchid = 0 and enabled = 1 ')->order('displayorder','desc')->select();
-
+		$stores = array();
+		if (!(empty($item['storeids']))) {
+			$stores = Db::name('shop_store')->where('id','in',$item['storeids'])->select();
+		}
 		if (Request::instance()->isPost()) {
 			$data = array('displayorder' => intval($_POST['displayorder']), 'goodstype' => intval($_POST['goodstype']), 'goodsid' => intval($_POST['goodsid']), 'couponid' => intval($_POST['couponid']), 'grant1' => floatval($_POST['grant1']), 'grant2' => floatval($_POST['grant2']), 'packetmoney' => floatval($_POST['packetmoney']), 'packetlimit' => floatval($_POST['packetlimit']), 'packettotal' => intval($_POST['packettotal']), 'packettype' => intval($_POST['packettype']), 'minpacketmoney' => floatval($_POST['minpacketmoney']), 'title' => trim($_POST['title']), 'cate' => intval($_POST['cate']), 'thumb' => trim($_POST['thumb']), 'price' => floatval($_POST['price']), 'productprice' => floatval($_POST['productprice']), 'credit' => intval($_POST['credit']), 'money' => trim($_POST['money']), 'dispatchtype' => intval($_POST['dispatchtype']), 'dispatchid' => intval($_POST['dispatchid']), 'dispatch' => floatval($_POST['dispatch']), 'istop' => intval($_POST['istop']), 'isrecommand' => intval($_POST['isrecommand']), 'istime' => intval($_POST['istime']), 'timestart' => strtotime($_POST['timestart']), 'timeend' => strtotime($_POST['timeend']), 'goodsdetail' => model('common')->html_images($_POST['goodsdetail']), 'goodssn' => trim($_POST['goodssn']), 'productsn' => trim($_POST['productsn']), 'weight' => intval($_POST['weight']), 'total' => intval($_POST['total']), 'showtotal' => intval($_POST['showtotal']), 'totalcnf' => intval($_POST['totalcnf']), 'hasoption' => intval($_POST['hasoption']), 'status' => intval($_POST['status']), 'type' => intval($_POST['type']), 'area' => trim($_POST['area']), 'chanceday' => intval($_POST['chanceday']), 'chance' => intval($_POST['chance']), 'totalday' => intval($_POST['totalday']), 'rate1' => trim($_POST['rate1']), 'rate2' => trim($_POST['rate2']), 'isendtime' => intval($_POST['isendtime']), 'usetime' => 0 <= intval($_POST['usetime']) ? intval($_POST['usetime']) : 0, 'endtime' => strtotime($_POST['endtime']), 'detailshow' => intval($_POST['detailshow']), 'noticedetailshow' => intval($_POST['noticedetailshow']), 'detail' => model('common')->html_images($_POST['detail']), 'noticedetail' => model('common')->html_images($_POST['noticedetail']), 'showlevels' => is_array($_POST['showlevels']) ? implode(',', $_POST['showlevels']) : '', 'buylevels' => is_array($_POST['buylevels']) ? implode(',', $_POST['buylevels']) : '', 'showgroups' => is_array($_POST['showgroups']) ? implode(',', $_POST['showgroups']) : '', 'buygroups' => is_array($_POST['buygroups']) ? implode(',', $_POST['buygroups']) : '', 'subtitle' => trim($_POST['subtitle']), 'subdetail' => model('common')->html_images($_POST['subdetail']), 'isverify' => intval($_POST['isverify']), 'verifytype' => intval($_POST['verifytype']), 'verifynum' => intval($_POST['verifynum']), 'storeids' => is_array($_POST['storeids']) ? implode(',', $_POST['storeids']) : '', 'noticeopenid' => trim($_POST['noticeopenid']), 'followneed' => intval($_POST['followneed']), 'followtext' => trim($_POST['followtext']), 'share_title' => trim($_POST['share_title']), 'share_icon' => trim($_POST['share_icon']), 'share_desc' => trim($_POST['share_desc']));
-
+			$data['storeids'] = ((is_array(input('storeids/a')) ? implode(',', input('storeids/a')) : ''));
 			if ($isverify) {
 				$data['dispatch'] = 0;
 				if (($data['verifytype'] == 1) && ($data['verifynum'] < 1)) {
@@ -334,9 +337,9 @@ class Creditshop extends Base
 			$data['vip'] = !empty($data['showlevels']) || !empty($data['showgroups']) ? 1 : 0;
 
 			if (!empty($id)) {
-				$data['goodstype'] = $goodstype;
-				$data['type'] = $type;
-				$data['isverify'] = $isverify;
+				$data['goodstype'] = $item['goodstype'];
+				$data['type'] = $item['type'];
+				$data['isverify'] = $item['isverify'];
 				$data['packetmoney'] = $item['packetmoney'];
 				$data['surplusmoney'] = $item['surplusmoney'];
 				$data['packettotal'] = $item['packettotal'];
@@ -369,6 +372,7 @@ class Creditshop extends Base
 
 				$data['surplusmoney'] = $data['packetmoney'];
 				$data['packetsurplus'] = $data['packettotal'];
+				$data['createtime'] = time();
 				$id = Db::name('shop_creditshop_goods')->insertGetId($data);
 				model('shop')->plog('creditshop.goods.add', '添加积分商城商品 ID: ' . $id . '  <br/>商品名称: ' . $data['title']);
 			}
@@ -496,7 +500,7 @@ class Creditshop extends Base
 			show_json(1, array('url' => url('admin/creditshop/goodsedit', array('id' => $id, 'tab' => str_replace('#tab_', '', $_GET['tab'])))));
 		}
 
-		$this->assign(['item'=>$item,'endtime'=>$endtime,'groups'=>$groups,'category'=>$category,'levels'=>$levels,'allspecs'=>$allspecs,'html'=>$html,'discounts_html'=>$discounts_html,'isdiscount_discounts_html'=>$isdiscount_discounts_html,'dispatch_data'=>$dispatch_data]);
+		$this->assign(['item'=>$item,'endtime'=>$endtime,'groups'=>$groups,'category'=>$category,'levels'=>$levels,'allspecs'=>$allspecs,'html'=>$html,'discounts_html'=>$discounts_html,'isdiscount_discounts_html'=>$isdiscount_discounts_html,'dispatch_data'=>$dispatch_data,'stores'=>$stores]);
 		return $this->fetch('creditshop/goods/post');
 	}
 
@@ -852,7 +856,7 @@ class Creditshop extends Base
 		$enabled = input('enabled');
 		foreach ($items as $item) {
 			Db::name('shop_creditshop_banner')->where('id',$id)->update(array('enabled' => intval($enabled)));
-			model('shop')->plog('creditshop.banner.edit', ('修改幻灯片状态<br/>ID: ' . $item['id'] . '<br/>标题: ' . $item['bannername'] . '<br/>状态: ' . $_GPC['enabled']) == 1 ? '显示' : '隐藏');
+			model('shop')->plog('creditshop.banner.edit', ('修改幻灯片状态<br/>ID: ' . $item['id'] . '<br/>标题: ' . $item['bannername'] . '<br/>状态: ' . $_POST['enabled']) == 1 ? '显示' : '隐藏');
 		}
 
 		show_json(1, array('url' => referer()));
@@ -900,7 +904,7 @@ class Creditshop extends Base
 		return $data;
 	}
 
-	public function verify()
+	public function allverify()
 	{
 		$data = $this->getLogData(7);
 		return $data;
@@ -944,7 +948,7 @@ class Creditshop extends Base
 			} else if ($searchfield == 'goods') {
 				$condition .= ' and g.title like "%' . $keyword . '%"';
 			} else if ($searchfield == 'store') {
-				$condition .= ' and  s.merchname like "%' . $keyword . '%"';
+				$condition .= ' and  s.storename like "%' . $keyword . '%"';
 			} else {
 				if ($searchfield == 'express') {
 					$condition .= ' and  log.expresssn like "%' . $keyword . '%"';
@@ -974,13 +978,13 @@ class Creditshop extends Base
 			->join('shop_store s','s.id = log.storeid','left')
 			->join('shop_creditshop_goods g','g.id = log.goodsid','left')
 			->where($condition)
-			->field('log.*, m.nickname,m.avatar,m.realname as mrealname,m.mobile as mmobile, g.title,g.thumb,g.thumb,g.credit,g.money,g.type as goodstype,g.isverify,g.goodstype as iscoupon,s.merchname,s.address as storeaddress,g.dispatch,g.goodstype,g.type,g.merchid as gmerchid,g.hasoption')
+			->field('log.*, m.nickname,m.avatar,m.realname as mrealname,m.mobile as mmobile, g.title,g.thumb,g.thumb,g.credit,g.money,g.type as goodstype,g.isverify,g.goodstype as iscoupon,s.storename,s.address as storeaddress,g.dispatch,g.goodstype,g.type,g.merchid as gmerchid,g.hasoption')
 			->group('log.id')
 			->order('log.createtime','desc')
 			->paginate($psize);
 		$pager = $list->render();
 
-		foreach ($list as $key => &$row) {
+		foreach ($list as $key => $row) {
 			if (($row['hasoption'] == 1) && (0 < $row['optionid'])) {
 				$option = Db::name('shop_creditshop_goods_option')->where('id',$row['optionid'])->where('goodsid',$row['goodsid'])->field('total,credit,money,title as optiontitle,weight')->find();
 				$row['credit'] = $option['credit'];
@@ -988,20 +992,23 @@ class Creditshop extends Base
 				$row['weight'] = $option['weight'];
 				$row['total'] = $option['total'];
 				$row['optiontitle'] = $option['optiontitle'];
+				$data = array();
+	    		$data = $row;
+	    		$list->offsetSet($key,$data);
 			}
 		}
 		unset($row);
 
-		foreach ($list as &$row) {
+		foreach ($list as $key => $row) {
 			$row['address'] = array();
 
 			if (!empty($row['addressid'])) {
 				$row['address'] = Db::name('shop_member_address')->where('id',$row['addressid'])->field('realname,mobile,address,province,city,area')->find();
 			} else {
 				if (0 < intval($row['gmerchid'])) {
-					$stores = Db::name('shop_store')->where('id = ' . $row['storeid'] . 'and merchid = ' . $row['gmerchid'] . ' and status=1 and type in(2,3) ')->find();
+					$stores = Db::name('shop_store')->where('id = ' . $row['storeid'] . ' and merchid = ' . $row['gmerchid'] . ' and status=1 ')->find();
 				} else {
-					$stores = Db::name('shop_store')->where('id = ' . $row['storeid'] . 'and status=1 and type in(2,3) ')->find();
+					$stores = Db::name('shop_store')->where('id = ' . $row['storeid'] . ' and status=1 ')->find();
 				}
 
 				$row['address'] = array('carrier_realname' => $row['realname'], 'carrier_mobile' => $row['mobile'], 'carrier_storename' => $stores['storename'], 'carrier_address' => $row['storeaddress']);
@@ -1051,10 +1058,11 @@ class Creditshop extends Base
 			}
 
 			$row['canexchange'] = $canexchange;
+			$data = array();
+    		$data = $row;
+    		$list->offsetSet($key,$data);
 		}
 		unset($row);
-
-		$pager = $list->render();
 		$this->assign(['list'=>$list,'pager'=>$pager,'verifynum'=>$verifynum,'type'=>$type]);
 		return $this->fetch('creditshop/log/index');
 	}
@@ -1112,6 +1120,183 @@ class Creditshop extends Base
 		return $this->fetch('creditshop/log/detail');
 	}
 
+	public function doexchange()
+	{
+		$id = intval(input('id'));
+		$verifynum = intval(input('verifynum'));
+		$log = Db::name('shop_creditshop_log')->where('id',$id)->find();
+		$verifytotal = Db::name('shop_creditshop_verify')->where('logid',$id)->count();
+		$set = model('common')->getPluginset('creditshop');
+
+		if (empty($log)) {
+			show_json(0, '兑换记录不存在!');
+		}
+
+		if (empty($log['status'])) {
+			show_json(0, '无效兑换记录!');
+		}
+
+		$log['verifynum'] = $log['verifynum'] - $verifytotal ? $log['verifynum'] - $verifytotal : 0;
+
+		if ($log['verifynum'] - $verifytotal < $verifynum) {
+			show_json(0, '此记录剩余核销 ' . $log['verifynum'] . ' 次');
+		}
+
+		$member = model('member')->getMember($log['mid']);
+		$goods = model('creditshop')->getGoods($log['goodsid'], $member);
+
+		if (empty($goods['id'])) {
+			show_json(0, '商品记录不存在!');
+		}
+
+		if (!empty($goods['type'])) {
+			if ($log['status'] <= 1) {
+				show_json(0, '未中奖，不能兑换!');
+			}
+		}
+
+		$store = false;
+		$address = false;
+
+		if ($goods['isverify']) {
+			if (!empty($log['storeid'])) {
+				$store = Db::name('shop_store')->where('id',$log['storeid'])->field('id,storename,address')->find();
+			}
+		} else {
+			$address = iunserializer($log['address']);
+
+			if (!is_array($address)) {
+				$address = Db::name('shop_member_address')->where('id',$log['addressid'])->field('realname,mobile,address,province,city,area')->find();
+			}
+		}
+
+		if (0 < $goods['money'] && empty($log['paystatus'])) {
+			show_json(0, '未支付，无法进行兑换!');
+		}
+
+		if (0 < $goods['dispatch'] && empty($log['dispatchstatus'])) {
+			show_json(0, '未支付运费，无法进行兑换!');
+		}
+
+		if (Request::instance()->isPost()) {
+			if ($goods['goodstype'] == 0) {
+				if (0 < $log['verifynum'] && $verifynum <= 0 && 0 < $goods['isverify']) {
+					show_json(0, '最少兑换1次!');
+				}
+
+				if ($log['verifynum'] - $verifytotal <= 0 && 0 < $goods['isverify']) {
+					show_json(0, '此记录已兑换过了!');
+				}
+
+				if (0 < $goods['isverify']) {
+					if ($goods['verifytype'] == 0) {
+						Db::name('shop_creditshop_log')->where('id',$id)->update(array('status' => 3, 'usetime' => time(), 'verifyopenid' => 'system', 'time_finish' => time()));
+						$data = array('mid' => $log['mid'], 'logid' => $id, 'verifycode' => $log['eno'], 'storeid' => $log['storeid'], 'verifier' => 'system', 'isverify' => 1, 'verifytime' => time());
+						Db::name('shop_creditshop_verify')->insert($data);
+					}
+					else {
+						if ($goods['verifytype'] == 1) {
+							if ($log['status'] != 3) {
+								Db::name('shop_creditshop_log')->where('id',$id)->update(array('status' => 3, 'usetime' => time(), 'verifyopenid' => 'system', 'time_finish' => time()));
+							}
+
+							$i = 1;
+
+							while ($i <= $verifynum) {
+								$data = array('mid' => $log['mid'], 'logid' => $id, 'verifycode' => $log['eno'], 'storeid' => $log['storeid'], 'verifier' => 'system', 'isverify' => 1, 'verifytime' => time());
+								Db::name('shop_creditshop_verify')->insert($data);
+								++$i;
+							}
+						}
+					}
+				}
+				else {
+					Db::name('shop_creditshop_log')->where('id',$id)->update(array('status' => 3, 'usetime' => time(), 'time_send' => time(), 'expresscom' => $_POST['expresscom'], 'expresssn' => $_POST['expresssn'], 'express' => $_POST['express']));
+				}
+			}
+			else {
+				if ($goods['goodstype'] == 3) {
+					$packet = model('creditshop')->packetmoney($log['goodsid']);
+
+					if (!$packet['status']) {
+						show_json(0, $packet['message']);
+					}
+
+					$money = abs($packet['money']);
+					$params = array('mid' => $log['mid'], 'tid' => $log['logno'], 'send_name' => $set['sendname'] ? $set['sendname'] : $shopset['shop']['name'], 'money' => $money, 'wishing' => $set['wishing'] ? $set['wishing'] : '红包领到手抽筋，别人加班你加薪!', 'act_name' => '积分兑换红包', 'remark' => '积分兑换红包');
+					$goods = Db::name('shop_creditshop_goods')->where('id',$log['goodsid'])->field('surplusmoney')->find();
+					if ($goods['surplusmoney'] <= 0 || $goods['surplusmoney'] - $money < 0) {
+						show_json(0, array('message' => '剩余金额不足，请联系管理员!'));
+					}
+
+					$err = model('common')->sendredpack($params);
+
+					if (is_error($err)) {
+						show_json(0, array('message' => '红包发放出错，请联系管理员!'));
+					} else {
+						$update['time_finish'] = time();
+						$update['status'] = 3;
+						Db::name('shop_creditshop_log')->where('id',$id)->update($update);
+						$updategoods['surplusmoney'] = $goods['surplusmoney'] - $money;
+						Db::name('shop_creditshop_goods')->where('id',$log['goodsid'])->update($updategoods);
+					}
+				}
+			}
+
+			model('notice')->sendCreditshopMessage($id);
+			model('shop')->plog('creditshop.log.doexchange', '积分商城兑换 兑换记录ID: ' . $id);
+			show_json(1);
+		}
+		$this->assign(['log'=>$log,'address'=>$address,'store'=>$store,'goods'=>$goods,'id'=>$id]);
+		echo $this->fetch('creditshop/log/exchange');
+	}
+
+	public function remarksaler()
+	{
+		$id = intval($_POST['id']);
+		$item = Db::name('shop_creditshop_log')->where('id',$id)->find();
+
+		if (empty($item)) {
+			show_json(0, '未找到订单!');
+		}
+
+		if (Request::instance()->isPost()) {
+			Db::name('shop_creditshop_log')->where('id',$id)->update(array('remarksaler' => $_POST['remark']));
+			model('shop')->plog('creditshop.log.remarksaler', '订单备注 ID: ' . $logId . '  备注内容: ' . $_POST['remark']);
+			show_json(1);
+		}
+
+		echo $this->fetch('creditshop/log/remarksaler');
+	}
+
+	public function logfinish()
+	{
+		$id = intval(input('id'));
+		$ops = trim(input('ops'));
+		$item = Db::name('shop_creditshop_log')->where('id',$id)->find();
+		$member = model('member')->getMember($item['mid']);
+		$goods = model('creditshop')->getGoods($item['goodsid'], $member, $item['optionid']);
+		if (empty($item)) {
+			show_json(0, '未找到订单!');
+		}		
+		if($ops == 'finish') {
+			if ($item['status'] != 3 && empty($item['expresssn'])) {
+				$this->result(0, '订单不能确认收货');
+			}
+			Db::name('shop_creditshop_log')->where('id',$id)->update(array('time_finish' => time()));
+		} else {
+			if($ops == 'verify') {
+				if ($item['status'] != 2 && empty($goods['isverify'])) {
+					$this->result(0, '订单不能核销');
+				}
+				Db::name('shop_creditshop_log')->where('id',$id)->update(array('time_finish' => time(),'verifyopenid'=>'system','verifytime'=>time(),'status'=>3));
+			}
+		}
+		model('notice')->sendCreditshopMessage($item["id"]);
+		model('shop')->plog('creditshop.log.finish', '订单完成 ID: ' . $id );
+		show_json(1);
+	}
+
 	public function comment()
 	{
 		return $this->fetch('creditshop/comment/index');
@@ -1119,7 +1304,7 @@ class Creditshop extends Base
 
 	public function commentcheck()
 	{
-		return $this->fetch('creditshop/comment/check');
+		return $this->fetch('creditshop/comment/index');
 	}
 
 	public function set()
@@ -1132,6 +1317,7 @@ class Creditshop extends Base
 			$data['set_mobile'] = intval($_POST['data']['set_mobile']);
 			$data['isdetail'] = intval($_POST['data']['isdetail']);
 			$data['isnoticedetail'] = intval($_POST['data']['isnoticedetail']);
+			$data['rule'] = model('common')->html_images($_POST['data']['rule']);
 			$data['detail'] = model('common')->html_images($_POST['data']['detail']);
 			$data['noticedetail'] = model('common')->html_images($_POST['data']['noticedetail']);
 			model('common')->updatePluginset(array('creditshop' => $data));

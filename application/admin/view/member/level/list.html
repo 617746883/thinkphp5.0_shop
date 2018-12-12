@@ -72,6 +72,13 @@
                                 不自动升级
                                 {/if}
                                 {/if}
+                                {if $shopset['leveltype']==2}
+                                {if $row['creditnum']>0}
+                                已获得积分满 {$row['creditnum']}
+                                {else}
+                                不自动升级
+                                {/if}
+                                {/if}
                                 {/if}
                             </td>
                              <td>                               

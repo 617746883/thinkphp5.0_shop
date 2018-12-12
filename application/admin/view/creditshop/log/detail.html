@@ -118,9 +118,9 @@
                     {else}
                         {if $log['paytype']==0}
                             {if $log['paystatus']==0}
-                            <span class='label label-default'>余额未支付</span>
+                            <span class='label label-default'>无需支付</span>
                             {else}
-                            <span class='label label-warning'>余额已支付</span>
+                            <span class='label label-warning'>无需支付</span>
                             {/if}
                         {elseif $log['paytype']==1}
                             {if $log['paystatus']==0}
@@ -173,7 +173,6 @@
                     </div>
                 </div>
             </div>
-
          {/if}
         {else}
 
@@ -198,7 +197,7 @@
                         </div>
                         <div class='form-control-static'>
                             <label class="col-lg label-weight">快递单号：</label>{$log['expresssn']}
-                            <a class='op' data-toggle="ajaxModal" href="{:webUrl('util/express', array('id' => $log['id'],'express'=>$log['express'],'expresssn'=>$log['expresssn']))}">查看物流</a>
+                            <a class='op' data-toggle="ajaxModal" href="{:url('admin/util/express', array('id' => $log['id'],'express'=>$log['express'],'expresssn'=>$log['expresssn']))}">查看物流</a>
                         </div>
                         <div class='form-control-static'>
                             <label class="col-lg label-weight">发货时间：</label>{:date('Y-m-d H:i:s', $log['time_send'])}
@@ -220,10 +219,13 @@
           <div class="form-group">
             <label class="col-lg control-label"></label>
             <div class="col-sm-9 col-xs-12">
-                 {ifp 'creditshop.log.doexchange'}
-                    {if $log['canexchange']}
-                            <a class='btn btn-primary' data-toggle='ajaxModal' href="{:webUrl('creditshop/log/doexchange',array('id' => $log['id'],'type'=>$goods['type']));}" title='确认兑换' >确认兑换</a>
-                    {/if}
+                {if $log['canexchange']}
+                    <a class='btn btn-primary' data-toggle='ajaxModal' href="{:url('admin/creditshop/doexchange',array('id' => $log['id'],'type'=>$goods['type']));}" title='确认兑换' >确认兑换</a>
+                {/if}
+                {if $log['isverify'] == 1 && $log['status'] == 2}
+                <a class="btn btn-primary" data-toggle='ajaxPost' href="{:url('admin/creditshop/logfinish', array('id' => $log['id'],'ops' => 'verify'))}" data-confirm="确认核销订单吗？">确认核销</a>
+                {elseif $log['status'] == 3 && !empty($log['expresssn']) && $log['time_finish'] == 0}
+                <a class="btn btn-primary" data-toggle='ajaxPost' href="{:url('admin/creditshop/logfinish', array('id' => $log['id'],'ops' => 'finish'))}" data-confirm="确认完成订单吗？">确认完成</a>
                 {/if}
             <input type="button" class="btn btn-default" name="submit" onclick="history.go(-1)" value="返回列表"  {ifp 'creditshop.log.doexchange'}{if $log['canexchange']}style='margin-left:10px;'{/if}{/if}  />
             </div>

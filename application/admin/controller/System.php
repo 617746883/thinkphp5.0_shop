@@ -77,6 +77,9 @@ class System extends Base
 		if (Request::instance()->isPost()) {
 			$group_ids = input('group_ids/a');
 			$data = array('username' => trim(input('username')), 'avatar' => trim(input('avatar')), 'status' => intval(input('status')), 'remark' => trim(input('remark')));
+			$usertime = $_POST['usertime'];
+			$data['starttime'] = strtotime($usertime['start']);
+			$data['endtime'] = strtotime($usertime['end']);
 			$password = input('password');
 			if (!empty($password)) {
 				$password = trim($password);
@@ -914,7 +917,7 @@ class System extends Base
 					$where .= ' and level =' . intval($send_level);
 				}
 
-				$members = Db::name('member')->where($where)->field('id')->select();
+				$members = Db::name('member')->where($where)->column('id');
 
 				if (!empty($send_level)) {
 					$levelname = Db::name('member_level')->where('id',$send_level)->value('levelname');
@@ -922,7 +925,7 @@ class System extends Base
 					$levelname = '全部';
 				}
 
-				$mids = array_keys($members);
+				$mids = $members;
 				$plog = '推送消息 ，方式: 等级-' . $levelname . ' 人数: ' . count($members);
 			} else if ($class1 == 3) {
 				$where = ' 1 ';
@@ -931,7 +934,7 @@ class System extends Base
 					$where .= ' and groupid =' . intval($send_group);
 				}
 
-				$members = Db::name('member')->where($where)->field('id')->select();
+				$members = Db::name('member')->where($where)->column('id');
 
 				if (!empty($send_group)) {
 					$groupname = Db::name('member_group')->where('id',$send_group)->value('groupname');
@@ -939,12 +942,12 @@ class System extends Base
 					$groupname = '全部分组';
 				}
 
-				$mids = array_keys($members);
+				$mids = $members;
 				$plog = '推送消息 方式: 分组-' . $groupname . ' 人数: ' . count($members);
 			} else if ($class1 == 4) {
 				$where = '';
-				$members = Db::name('member')->where('status = 1 and isblack = 0')->field('id')->select();
-				$mids = array_keys($members);
+				$members = Db::name('member')->where('status = 1 and isblack = 0')->column('id');
+				$mids = $members;
 				$plog = '推送消息 方式: 全部会员 人数: ' . count($members);
 			}
 			foreach ($mids as $mid) {

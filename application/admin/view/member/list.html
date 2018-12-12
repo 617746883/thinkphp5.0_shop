@@ -227,6 +227,29 @@
 </div>
 
 <script language="javascript">
+    require(['bootstrap'], function () {
+        $("[rel=pop]").popover({
+            trigger: 'manual',
+            placement: 'right',
+            title: $(this).data('title'),
+            html: 'true',
+            content: $(this).data('content'),
+            animation: false
+        }).on("mouseenter", function () {
+            var _this = this;
+            $(this).popover("show");
+            $(this).siblings(".popover").on("mouseleave", function () {
+                $(_this).popover('hide');
+            });
+        }).on("mouseleave", function () {
+            var _this = this;
+            setTimeout(function () {
+                if (!$(".popover:hover").length) {
+                    $(_this).popover("hide")
+                }
+            }, 100);
+        });
+    });
     $("[data-toggle='batch-group'], [data-toggle='batch-level']").click(function () {
         var toggle = $(this).data('toggle');
         $("#modal-change .modal-title").text(toggle=='batch-group'?"批量修改会员分组":"批量修改会员等级");

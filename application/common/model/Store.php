@@ -238,4 +238,47 @@ class Store extends \think\Model
 		return $totals;
 	}
 
+	public function getListUserOne($merchid)
+	{
+		$merchid = intval($merchid);
+
+		if ($merchid) {
+			$merch = Db::name('shop_store')->where('id',$merchid)->find();
+			return $merch;
+		}
+		return false;
+	}
+
+	public function getListUser($list, $return = 'all')
+	{
+		if (!(is_array($list))) {
+			return self::getListUserOne($list);
+		}
+		$shopset = model('common')->getSysset();
+		$merch = array();
+
+		foreach ($list as $value) {
+			$merchid = $value['merchid'];
+
+			if (empty($merchid)) {
+				$merchid = 0;
+			}
+
+			if (empty($merch[$merchid])) {
+				$merch[$merchid] = array();
+			}
+
+			array_push($merch[$merchid], $value);
+		}
+
+		if (!(empty($merch))) {
+			$merch_ids = array_keys($merch);
+			$merch_user = Db::name('shop_store')->where('id','in',implode(',', $merch_ids))->select();
+			$all = array('merch' => $merch, 'merch_user' => $merch_user);
+			return ($return == 'all' ? $all : $all[$return]);
+		}
+
+		return array();
+	}
+
 }
