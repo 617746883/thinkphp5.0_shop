@@ -1,0 +1,143 @@
+{include file='_header'}
+<link href="/public/static/plugin/article/css/article.css" rel="stylesheet">
+<script type="text/javascript" src="__STATIC__/js/lib/moment.js"></script>
+<link rel="stylesheet" href="__STATIC__/components/datetimepicker/jquery.datetimepicker.css">
+<link rel="stylesheet" href="__STATIC__/components/daterangepicker/daterangepicker.css">
+<style type='text/css'>
+	.tabs-container .form-group {overflow: hidden;}
+	.tabs-container .tabs-left > .nav-tabs {width: 120px;}
+	.tabs-container .tabs-left .panel-body {margin-left: 120px; width: 880px; text-align: left;}	
+	.tab-article .nav li {width: 120px; text-align: right;}
+	.popover {left: 0;}
+	#source-container {position: relative;}
+</style>
+<form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+	<input type="hidden" name="aid" value="{$aid}" />
+	<input type="hidden" id="tab" name="tab" value="#tab_{$_GET['tab']}" />
+	<div class="page-header">
+		当前位置：<span class="text-primary">{if !empty($article['id'])}编辑{else}添加{/if}文章 <small>{if !empty($article['id'])}编辑【{$article['article_title']}】{/if}</small></span>
+	</div>
+<div class="page-content">
+	<div class="page-sub-toolbar">
+		<span class=''>
+			<input type="submit" value="保存文章" class="btn btn-primary btn-sm" onclick='return save()'/>
+			<a class="btn btn-success  btn-sm" href="{:url('admin/article/add')}" >添加文章</a>
+            <a class="btn btn-default  btn-sm" href="{:url('admin/article/index')}">返回列表</a>
+		</span>
+	</div>
+	<div class='row' style="width: 1080px; margin: auto;">
+		<div class="col-sm-5" style='padding-right:5px;'>
+			{include file='article/tpl/preview'}
+		</div>
+		<div class="col-sm-7" style='padding-left:5px;position:relative'>
+			<ul class="nav nav-tabs" id="myTab">
+				<li {if empty($_GET[ 'tab']) || $_GET[ 'tab']=='basic' }class="active" {/if}><a href="#tab_basic">基本</a></li>
+				<li {if $_GET[ 'tab']=='content' }class="active" {/if}><a href="#tab_content">内容</a></li>
+			</ul>
+			<a id="link_source" class="btn btn-warning btn-sm" href="javascript:;" style="position: absolute;top:0px;right:20px; {if $_GET['tab']!='content'}display: none;{/if}"><i class="fa fa-picture-o"></i> 素材库</a>
+			<div class="tab-content ">
+				<div class="tab-pane {if empty($_GET['tab']) || $_GET['tab']=='basic'}active{/if} " id="tab_basic">
+					<div class="panel-body">{include file='article/tpl/basic'}</div>
+				</div>
+				<div class="tab-pane {if $_GET['tab']=='content'}active{/if}" id="tab_content">{include file='article/tpl/content'}</div>
+			</div>
+		</div>
+	</div>
+
+</form>
+</div>
+<script type="text/javascript">
+	$(function() {
+		$(':input[name=article_date_v]').attr('bind-in', 'art_date_v');
+		$("input").bind('input propertychange', function() {
+			pagestate = 1;
+			var bindint = $(this).attr("bind-in");
+			var bindnum = $(this).attr("bind-num");
+			var bindinfo = !$(this).val() ? $(this).attr("bind-de") : $(this).val();
+			if (bindnum == '1' && parseInt(bindinfo) > 100000) {
+				bindinfo = '100000+';
+			}
+			$("*[bind-to=" + bindint + "]").text(bindinfo);
+		});
+	})
+	require(['bootstrap'], function() {
+		var source_content = "";
+		window.source_color = '';
+		$('#myTab a').click(function(e) {
+			$('#tab').val($(this).attr('href'));
+			e.preventDefault();
+			$(this).tab('show');
+			if($(this).attr('href')=='#tab_content'){
+				$("#link_source").show();
+			}else{
+				$("#link_source").hide();
+				$('#link_source').popover('hide');
+			}
+		});
+		//素材库
+		$('#link_source').popover({
+			html: true,
+			content: '<div id="source-container"><i class="fa fa-spinner fa-spin "></i> 加载中...</div>',
+			placement: 'bottom'
+		});
+
+		function setSourceColor() {
+			if (window.source_color != '') {
+				$(".itembox .tc").css("color", window.source_color);
+				$(".itembox .bc").css("background-color", window.source_color);
+				$(".itembox .bdc").css("border-color", window.source_color);
+				$(".itembox .blc").css("border-left-color", window.source_color);
+				$(".itembox .btc").css("border-top-color", window.source_color);
+				$(".itembox .bbc").css("border-bottom-color", window.source_color);
+				$(".itembox .brc").css("border-right-color", window.source_color);
+				$('.color').val(window.source_color);
+			}
+		}
+		setInterval(function() {
+			$('[bind-to=art_date_v]').html($(':input[name=article_date_v]').val());
+			if ($('#link_source').next().hasClass('popover')) {
+				if (source_content == '') {
+					$.ajax({
+						url: "{:url('admin/article/source')}",
+						cache: false,
+						success: function(html) {
+							source_content = html;
+						},
+						async: false
+					});
+				}
+				if ($('#source-container').find('.itembox').length <= 0) {
+					$('#source-container').html(source_content).css('width', '560px');
+					setSourceColor();
+					$(".color").change(function() {
+						window.source_color = $(this).val();
+						setSourceColor();
+					});
+					$(".itembox").click(function(a) {
+						UE.getEditor('editor').execCommand("insertHtml", "<div>" + $(this).html() + "<p></p>" + "</div>");
+					});
+					$('#sourceTab a').click(function(e) {
+						e.preventDefault();
+						$(this).tab('show');
+					});
+					$('#link_source').next().css({
+						'left': '0',
+						'min-width': '600px'
+					}).find('.arrow').css('left', "90%");
+				}
+			} else {
+			}
+		}, 1000);
+	});
+
+	function save(){
+		var category = $("select[name=article_category] option:selected").val();
+		if(category==0){
+			$('#myTab a[href="#tab_basic"]').tab('show');
+			tip.msgbox.err("请选择文章分类!");
+			$("select[name=article_category]").focus();
+			return false;
+		}
+	}
+</script>
+{include file='_footer'}

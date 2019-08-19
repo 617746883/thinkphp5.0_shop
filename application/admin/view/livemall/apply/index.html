@@ -1,0 +1,119 @@
+{include file='_header'}
+
+<div class="page-header">
+    当前位置：<span class="text-primary">{if $status=='0'}主播代售商品申请中 {else}主播代售商品申请驳回 {/if}</span>
+</div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal" role="form" id="form1">
+        <div class="page-toolbar m-b-sm m-t-sm">
+             <!-- <span class='pull-left'>
+                <a class='btn btn-primary btn-sm' href="{:url('admin/livemall/add')}"><i class="fa fa-plus"></i> 添加申请</a>
+            </span> -->
+            <div class="col-sm-6 pull-right">
+                <div class="input-group">
+                    <!-- <div class="input-group-select">
+                        <select name='status' class='form-control  input-sm select-md' style="width:100px;"  >
+                            <option value=''>状态</option>
+                            <option value='0' {if $status=='0'}selected{/if}>申请中</option>
+                            <option value='-1' {if $status=='-1'}selected{/if}>驳回</option>
+                        </select>
+                    </div> -->
+                    <input type="text" class="form-control input-sm"  name="keyword" value="{$_GET['keyword']}" placeholder="申请推荐语/商品名称"/>
+				    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit"> 搜索</button>
+				    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    {if empty(count($list))}
+    <div class='panel panel-default'>
+        <div class='panel-body' style='text-align: center;padding:30px;'>
+            暂时没有任何代售申请!
+        </div>
+    </div>
+    {else}
+    <div class="page-table-header">
+        <input type="checkbox">
+        <span   class="btn-group">
+            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/livemall/regdelete')}">
+                <i class='icow icow-shanchu1'></i> 删除
+            </button>
+        </span>
+    </div>
+    <table class="table table-hover table-responsive">
+        <thead class="navbar-inner" >
+        <tr>
+            <th style="width:25px;"></th>
+            <th style="width:100px;">商品</th>
+            <th style="">&nbsp;</th>
+            <th>推荐语</th>
+            <th>主播</th>
+            <th>申请时间</th>
+            <th>申请状态</th>
+            <th style='width:65px;'>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach name='list' item='row'}
+        <tr rel="pop" data-title="ID: {$row['id']} ">
+            <td>
+                <input type='checkbox' value="{$row['id']}"/>
+            </td>
+            <td>
+                <a href="{:url('admin/goods/edit', array('id' => $row['goodsid'],'goodsfrom'=>$goodsfrom))}">
+                    <img src="{$row['thumb']}" style="width:72px;height:72px;padding:1px;border:1px solid #efefef;margin: 7px 0" onerror="this.src='/public/static/images/nopic.png'" />
+                </a>
+            </td>
+            <td class='full' >
+                <span>
+                    <span style="display: block;width: 100%;">
+                        <a href='javascript:;' style="overflow : hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;">
+                            {$row['title']}
+                        </a>
+                    </span>
+                </span>
+            </td>
+            <td>{$row['slogans']}</td>
+            <td>{$row['nickname']}<br> {$row['mobile']}</td>
+            <td>{:date('Y-m-d', $row['applytime'])}<br/>{:date('H:i', $row['applytime'])}</td>
+            <td>
+                {if $row['status']==0}
+               <span class="label label-primary"> 申请中</span>
+                {elseif $row['status']==-1}
+                <span class="label label-danger"> 驳回申请</span>
+                {/if}
+            </td>
+            <td  style="overflow:visible;">
+                <a  href="{:url('admin/livemall/regdetail', array('id' => $row['id']))}" class="btn btn-default btn-sm btn-op btn-operation" >
+                   <span data-toggle="tooltip" data-placement="top" title="" data-original-title="处理申请">
+                        <i class='icow icow-bianji2'></i>
+                   </span>
+                </a>
+                <a data-toggle='ajaxRemove' href="{:url('admin/livemall/regdelete', array('id' => $row['id']))}"class="btn btn-default btn-sm btn-operation btn-op" data-confirm='确认要删除此申请吗?'>
+                    <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                         <i class='icow icow-shanchu1'></i>
+                    </span>
+                </a>
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td>
+                    <div class="input-group-btn">
+                        <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/livemall/regdelete')}">
+                            <i class='icow icow-shanchu1'></i> 删除
+                    </div>
+                </td>
+                <td class="text-right" colspan="6">
+                    {$pager}
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    {/if}
+</div>
+{include file='_footer'}

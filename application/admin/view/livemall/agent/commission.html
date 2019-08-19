@@ -1,0 +1,44 @@
+<script language="javascript">
+    $(function() {
+        $("#hascommission").click(function() {
+            var obj = $(this);
+            if (obj.get(0).checked) {
+                $("#commission_div").show();
+            } else {
+                $("#commission_div").hide();
+            }
+        });
+    })
+</script>
+<div class="region-goods-details row">
+    <div class="region-goods-left col-sm-2">佣金</div>
+    <div class="region-goods-right col-sm-10">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">独立规则</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="hascommission" value="1" name="hascommission" {if $item['hascommission']==1}checked{/if} />启用独立佣金比例
+                </label>
+                <span class="help-block">启用独立佣金设置，此商品拥有独自的佣金比例,不受默认设置限制</span>
+            </div>
+        </div>
+        <div id="commission_div" {if empty($item['hascommission'])}style="display:none"{/if} >
+            <div id="commission_0"  {if $commission_type!=0} style="display:none;" {/if}>
+                <div class='alert alert-danger'>
+                    如果比例为空，则使用固定规则，如果都为空则无分销佣金
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">佣金</label>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="input-group">
+                            <input type="text" name="commission1_rate" id="commission1_rate" class="form-control" value="{$item['commission1_rate']}" />
+                            <div class="input-group-addon">% 或固定</div>
+                            <input type="text" name="commission1_pay" id="commission1_pay" class="form-control" value="{$item['commission1_pay']}" />
+                            <div class="input-group-addon">元</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

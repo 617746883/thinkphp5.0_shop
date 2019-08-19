@@ -1,0 +1,160 @@
+{include file='_header'}
+<style type='text/css'>
+	.feed-activity-list {
+		width: 100%;
+		overflow: hidden;
+	}
+	
+	.feed-element {
+		float: left;
+		width: 320px;
+		height:100px;
+		margin-left: 15px;
+		margin-bottom: 20px;
+		border:1px solid #efefef;
+		padding: 20px;
+	}
+	
+	.feed-element::after {
+		display: none
+	}
+	
+	.feed-element .title {
+		font-size: 14px;
+		height: 24px;
+		line-height: 24px;
+		vertical-align: bottom;
+		color: #333;
+		font-weight: bold;
+		margin-left: 10px;
+	}
+	.feed-element img.img-circle,
+	.dropdown-messages-box img.img-circle {
+		float: left;
+		width: 60px;
+		height: 60px;
+		border-radius: 4px;
+	}
+	
+	.media-body {
+		margin-top: 3px;
+	}
+	.text-muted{
+		margin-left:10px;
+		width:200px;
+		display: block;
+		overflow : hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+</style>
+<div class="page-header">
+	当前位置：<span class="text-primary">我的应用</span>
+</div>
+
+<div class="page-content">
+	<div class='panel panel-default' style='border:none;'>
+		<div class="panel-heading" style='background:none;border:none;'>业务类</div>
+		<div class="feed-activity-list">
+			<a class="feed-element" href="{:url('admin/groups/index')}">
+				<span class="pull-left">
+					<img src="/public/static/images/groups.jpg" class="img-circle" alt="image" onerror="this.src='/public/static/images/yingyong.png'">
+				</span>
+				<div class="media-body ">
+					<span class="title">团购</span>
+					<br>
+					<small class="text-muted">团体购物，指认识或不认识的消费者联合起来，加大与商家的谈判能力，以求得最优价格</small>
+				</div>
+			</a>
+			<a class="feed-element" href="{:url('admin/auction/index')}" style="display: none;">
+				<span class="pull-left">
+					<img src="/public/static/images/auction.jpg" class="img-circle" alt="image" onerror="this.src='/public/static/images/yingyong.png'">
+				</span>
+				<div class="media-body ">
+					<span class="title">拍卖</span>
+					<br>
+					<small class="text-muted">拍卖的货物向买主展示，公开叫价竞购，最后由拍卖人把货物卖给出价最高的买主的一种现货交易方式</small>
+				</div>
+			</a>
+			<a class="feed-element" href="{:url('admin/creditshop/index')}">
+				<span class="pull-left">
+					<img src="/public/static/images/creditshop.jpg" class="img-circle" alt="image" onerror="this.src='/public/static/images/yingyong.png'">
+				</span>
+				<div class="media-body ">
+					<span class="title">积分兑换</span>
+					<br>
+					<small class="text-muted">积分是商城推出的一种会员奖励计划。商城内所有商品都参与积分返利活动。您获得的积分可以在商城购物中，直接作为现金抵用。购买商城内的商品。</small>
+				</div>
+			</a>
+			<a class="feed-element" href="{:url('admin/livemall/index')}">
+				<span class="pull-left">
+					<img src="/public/static/images/livemall.jpg" class="img-circle" alt="image" onerror="this.src='/public/static/images/yingyong.png'">
+				</span>
+				<div class="media-body ">
+					<span class="title">星店</span>
+					<br>
+					<small class="text-muted">主播向粉丝推广商品。</small>
+				</div>
+			</a>
+		</div>
+		<div class="panel-heading" style='background:none;border:none;'>营销类</div>
+		<div class="feed-activity-list">
+			<a class="feed-element" href="{:url('admin/seckill/index')}" style="display: none;">
+				<span class="pull-left">
+					<img src="/public/static/images/seckill.jpg" class="img-circle" alt="image" onerror="this.src='/public/static/images/yingyong.png'">
+				</span>
+				<div class="media-body ">
+					<span class="title">秒杀</span>
+					<br>
+					<small class="text-muted">在某一预定的营销活动时间里，大幅度降低活动商品的价格，买家只要在这个时间里成功拍得此商品，便可以用超低的价格买到原本很昂贵的物品</small>
+				</div>
+			</a>
+			<a class="feed-element" href="{:url('admin/treasure/index')}" style="display: none;">
+				<span class="pull-left">
+					<img src="/public/static/images/treasure.jpg" class="img-circle" alt="image" onerror="this.src='/public/static/images/yingyong.png'">
+				</span>
+				<div class="media-body ">
+					<span class="title">夺宝</span>
+					<br>
+					<small class="text-muted">把一件商品平分成若干“等份”进行出售，每份x元钱，一个商品所有“等份”售出后，再从购买者中按照一个计算规则算出一名幸运者获得这个商品。</small>
+				</div>
+			</a>
+			<a class="feed-element" href="{:url('admin/article/index')}">
+				<span class="pull-left">
+					<img src="/public/static/images/article.jpg" class="img-circle" alt="image" onerror="this.src='/public/static/images/yingyong.png'">
+				</span>
+				<div class="media-body ">
+					<span class="title">文章营销</span>
+					<br>
+					<small class="text-muted">强大的图文在线编辑工具</small>
+				</div>
+			</a>
+		</div>
+		<div class="panel-heading" style='background:none;border:none;'>工具类</div>
+		<div class="feed-activity-list">
+			<a class="feed-element" href="{:url('admin/taobao/index')}">
+				<span class="pull-left">
+					<img src="/public/static/images/taobao.jpg" class="img-circle" alt="image" onerror="this.src='/public/static/images/yingyong.png'">
+				</span>
+				<div class="media-body ">
+					<span class="title">商品助手</span>
+					<br>
+					<small class="text-muted">淘宝、京东、1688商品一键转化</small>
+				</div>
+			</a>
+		</div>
+	</div>
+</div>
+<script>
+	$(document).ready(function () {
+		$('.feed-activity-list,.plugin_tabs').each(function(){
+			if($(this).children().length<=0){
+				$(this).prev().remove();
+				$(this).remove();
+			}
+		});
+	})
+</script>
+{include file='_footer'}

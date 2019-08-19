@@ -1,0 +1,64 @@
+<form class="form-horizontal form-validate" action="{if $edit_flag==1}{:url('admin/groups/orderchangeExpress')}{else}{:url('admin/groups/ordersend')}{/if}" method="post" enctype="multipart/form-data">
+	<input type='hidden' name='id' value='{$id}' />
+
+	<div class="modal-dialog">
+           <div class="modal-content">
+            <div class="modal-header">
+                <button data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title">{if $edit_flag==1}修改物流信息{else}订单发货{/if}</h4>
+            </div>
+            <div class="modal-body">
+                   	<div class="form-group">
+						<label class="col-sm-2 control-label">收 货 人</label>
+						<div class="col-sm-9 col-xs-12">
+							<div class="form-control-static">
+								联系人: {$address['realname']} / {$address['mobile']} <br/>
+								地    址: {$address['province']}{$address['city']}{$address['area']} {$address['address']}
+							</div>
+						</div>
+					</div>
+                                
+					<div class="form-group">
+						<label class="col-sm-2 control-label">快递公司</label>
+						<div class="col-sm-9 col-xs-12">
+							<select class="form-control" name="express" id="express">
+                                <option value="" data-name="">其他快递</option>
+
+                                {foreach name='express_list' item='value'}
+                                <option value="{$value['express']}" data-name="{$value['name']}">{$value['name']}</option>
+                                {/foreach}
+
+							</select>
+							<input type='hidden' name='expresscom' id='expresscom' value="{$item['expresscom']}"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label must">快递单号</label>
+						<div class="col-sm-9 col-xs-12">
+							<input type="text" name="expresssn" class="form-control" value="{$item['expresssn']}" data-rule-required='true' />
+						</div>
+					</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="submit">{if $edit_flag==1}保存信息{else}确认发货{/if}</button>
+                <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+            </div>
+        </div>
+</form>
+
+<script language="javascript">
+
+    $("select[name=express]").val("{$item['express']}");
+
+    $("#express").change(function () {
+        var obj = $(this);
+        var sel = obj.find("option:selected").attr("data-name");
+        $("#expresscom").val(sel);
+    });
+
+</script>
+
+
+
+
+<!--6Z2S5bKb5piT6IGU5LqS5Yqo572R57uc56eR5oqA5pyJ6ZmQ5YWs5Y+454mI5p2D5omA5pyJ-->

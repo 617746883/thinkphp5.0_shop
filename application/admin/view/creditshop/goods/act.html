@@ -1,0 +1,44 @@
+<div class="form-group">
+    <label class="col-lg control-label">是否开启抽奖</label>
+    <div class="col-sm-9 col-xs-12">
+        <label class="radio-inline"><input type="radio" name='type' value="1" {if $item['type']==1}checked{/if} {if !empty($item)} disabled{/if} /> 是</label>
+        <label class="radio-inline"><input type="radio" name='type' value="0" {if empty($item['type'])}checked{/if} {if !empty($item)} disabled{/if} /> 否</label>
+        <div class="help-block">保存后不可更改</div>
+    </div>
+</div>
+
+<div class="form-group rate" id='rate' style="{if empty($item['type'])}display:none{/if}">
+    <label class="col-lg control-label must">中奖几率</label>
+    <div class="col-sm-9 col-xs-12">
+        <div class="input-group">
+            <input type='text' class='form-control' value="{$item['rate2']}" name='rate2' />
+            <span class="input-group-addon" style="border-left: 0; border-right: 0;">分之</span>
+            <input type='text' class='form-control' value="{$item['rate1']}" name='rate1'/>
+        </div>
+        <span class="help-block" style="margin-bottom: 0;">同时填写才能生效，否则为中奖几率为0 ,填写相同值（且不等于0）为中奖率100%</span>
+    </div>
+</div>
+
+
+<script language='javascript'>
+$(function(){
+    $(':radio[name=type]').click(function(){
+        if($(this).val()=='1'){
+            $('.rate').show();
+        }
+        else{
+            $('.rate').hide();
+        }
+    })
+    $("input[name='isendtime']").on("click",function(){
+        if($(this).val()=='1'){
+            $("#usetime").hide();
+            $("#endtime").show();
+        }else{
+            $("#usetime").show();
+            $("#endtime").hide();
+        }
+    });
+    
+})    
+</script>

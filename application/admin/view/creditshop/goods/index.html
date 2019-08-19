@@ -1,0 +1,224 @@
+{include file='_header'}
+<style type="text/css">
+    .table>thead>tr>td.full, .table>tbody>tr>td.full, .table>tfoot>tr>td.full{overflow: hidden;}
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">商品管理</span>
+   </div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal" plugins="form">
+        <div class="page-toolbar">
+            <div class="col-sm-5">
+                 <span class='pull-left'>
+                    <a class='btn btn-primary btn-sm' href="{:url('admin/creditshop/goodsadd')}"><i class='fa fa-plus'></i> 添加商品</a>
+                </span>
+            </div>
+            <div class="col-sm-6 pull-right">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name="cate" class='form-control input-sm select-sm' style="width:120px;">
+                            <option value="" {if empty($_GET['cate'])}selected{/if} >商品分类</option>
+                            {foreach name='category' item="cate"}
+                            <option value='{$cate['id']}' {if $_GET['cate']==$cate['id']}selected{/if}>{$cate['name']}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="input-group-select">
+                        <select name='type' class='form-control input-sm' style='width:100px;'  >
+                            <option value='' {if $_GET['type']==''}selected{/if}>类型</option>
+                            <option value='0' {if $_GET['type']=='0'}selected{/if}>兑换</option>
+                            <option value='1' {if $_GET['type']=='1'}selected{/if} >抽奖</option>
+                        </select>
+                    </div>
+                    <input type="text" class="input-sm form-control" name='keyword' value="{$_GET['keyword']}" placeholder="请输入关键词"> <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit"> 搜索</button> </span>
+                </div>
+            </div>
+        </div>
+        <ul class="nav nav-tabs" id="myTab">
+            <li {if empty($tab) || $tab=='sell'}class="active"{/if}><a href="{:url('admin/creditshop/goodslist',array('tab'=>'sell'))}">出售中</a></li>
+            <li {if $tab=='sellout'}class="active"{/if}><a href="{:url('admin/creditshop/goodslist',array('tab'=>'sellout'))}">已售罄</a></li>
+            <li {if $tab=='warehouse'}class="active"{/if}><a href="{:url('admin/creditshop/goodslist',array('tab'=>'warehouse'))}">仓库中</a></li>
+            <li {if $tab=='recycle'}class="active"{/if}><a href="{:url('admin/creditshop/goodslist',array('tab'=>'recycle'))}">回收站</a></li>
+        </ul>
+    </form>
+    {if count($list)>0}
+    <form action="" method="post">
+        <div class="page-table-header" style="border: none;">
+            <input type="checkbox">
+            <div class="btn-group">
+                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('admin/creditshop/goodsstatus',array('status'=>0))}">
+                    <i class='icow icow-xiajia3'></i> 下架</button>
+                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/creditshop/goodsstatus',array('status'=>1))}">
+                    <i class='icow icow-shangjia2'></i> 上架</button>
+                {if $tab!='recycle' && $tab!='warehouse'}
+                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除吗?" data-href="{:url('admin/creditshop/goodsdelete')}">
+                    <i class='icow icow icow-shanchu1'></i> 删除
+                </button>
+                {/if}
+                {if $tab=='recycle'}
+                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确定要彻底删除该商品吗?" data-href="{:url('admin/creditshop/goodsdeleted')}">
+                    <i class='icow icow-shanchu5'></i> 彻底删除
+                </button>
+                {/if}
+                {if $tab=='recycle'}
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch-remove' data-confirm="确定要恢复商品到仓库吗?" data-href="{:url('admin/creditshop/goodsrecycle')}">
+                    <i class='fa fa-reply'></i> 恢复商品到仓库
+                </button>
+                {/if}
+            </div>
+        </div>
+        <table class="table table-hover table-responsive">
+            <thead>
+            <tr>
+                <th style="width:25px;"></th>
+                <th style="width:50px;">排序</th>
+                <th style="width:60px;">商品</th>
+                <th>&nbsp;</th>
+                <th style="width:90px;">单价/元</th>
+                <th style="width:90px;">当前/总期数</th>
+                <th style="width:90px;">商品属性</th>
+                <th style="width: 100px;text-align: center;">状态</th>
+                <th style="width: 120px;text-align: center;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+                {foreach name='list' item='row'}
+                <tr>
+                    <td>
+                        <input type='checkbox' value="{$row['id']}"/>
+                    </td>
+                    <td>
+                        <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('admin/creditshop/goodsproperty',array('type'=>'displayorder','id'=>$row['id']))}" >{$row['displayorder']}</a>
+                    </td>
+                    <td>
+                        <img src="{$row['thumb']}" style="width:40px;height:40px;padding:1px;border:1px solid #ccc;" onerror="this.src='/public/static/images/nopic.png'" />
+                    </td>
+                    <td class='full'>
+                        {if !empty($row['merchname']) && $row['merchid'] > 0}
+                            <span class="text-default">商户名称:</span><span class="text-info">{$row['merchname']}</span>
+                        {/if}
+                        <span class='text-danger'>[{$category[$row['category']]['name']}]</span><br/>
+                        {$row['title']}
+                    </td>
+                    <td style="text-align: center;">
+                        {if $row['goodstype']==0}
+                        <span class='text-primary'>商品</span>
+                        {elseif $row['goodstype']==1}
+                        <span class='text-success'>优惠券</span>
+                        {elseif $row['goodstype']==2}
+                        <span class='text-warning'>余额</span>
+                        {elseif $row['goodstype']==3}
+                        <span class='text-danger'>红包</span>
+                        {/if}
+                    </td>
+                    <td style="text-align: center;">
+                        {if $row['type']==1}
+                        <span class='text-danger'>抽奖</span>
+                        {else}
+                        <span class='text-primary'>兑换</span>
+                        {/if}
+                    </td>
+                    <td>
+                        {if $row['credit']>0}-{$row['credit']}积分<br/>{/if}
+                        {if $row['money']>0}
+                        -{$row['money']}现金
+                        {/if}
+                    </td>
+                    <td>{$row['joins']}/{$row['views']}</td>
+                    <td style="text-align: center;">
+                        <span style="display: none;" class='label {if $row['istop']==1}label-success{else}label-default{/if}'
+                              data-toggle='ajaxSwitch'
+                              data-switch-value='{$row['istop']}'
+                              data-switch-value0='0||label label-default|{:url('admin/creditshop/goodsproperty',array('type'=>'istop', 'value'=>1,'id'=>$row['id']))}'
+                              data-switch-value1='1||label label-success|{:url('admin/creditshop/goodsproperty',array('type'=>'istop', 'value'=>0,'id'=>$row['id']))}'
+                            >
+                          置顶</span>
+                        <span class='label {if $row['isrecommand']==1}label-success{else}label-default{/if}'
+                              data-toggle='ajaxSwitch'
+                              data-switch-value='{$row['isrecommand']}'
+                              data-switch-value0='0||label label-default|{:url('admin/creditshop/goodsproperty',array('type'=>'isrecommand', 'value'=>1,'id'=>$row['id']))}'
+                              data-switch-value1='1||label label-success|{:url('admin/creditshop/goodsproperty',array('type'=>'isrecommand', 'value'=>0,'id'=>$row['id']))}'
+                            >
+                          推荐</span>
+                        <span class='label {if $row['status']==1}label-primary{else}label-default{/if}'
+                              data-toggle='ajaxSwitch'
+                              data-switch-value='{$row['status']}'
+                              data-switch-value0='0|暂停|label label-default|{:url('admin/creditshop/goodsproperty',array('type'=>'status', 'value'=>1,'id'=>$row['id']))}'
+                              data-switch-value1='1|启动|label label-primary|{:url('admin/creditshop/goodsproperty',array('type'=>'status', 'value'=>0,'id'=>$row['id']))}'
+                            >
+                          {if $row['status']==1}启动{else}暂停{/if}</span>
+                     </td>
+                    <td style="text-align: center;">
+                         <a class='btn btn-default btn-sm btn-op btn-operation' href="{:url('admin/creditshop/goodsedit',array('id' => $row['id']));}" title="">
+                             <span data-toggle="tooltip" data-placement="top" title="" data-original-title="编辑">
+                                    <i class='icow icow-bianji2'></i>
+                               </span>
+                         </a>
+                         {if $tab!='warehouse' && $tab!='recycle'}
+                            <a class='btn btn-default btn-sm btn-op btn-operation' data-toggle='ajaxRemove' href="{:url('admin/creditshop/goodsdelete',array('id' => $row['id']));}" data-confirm="确定要删除该商品吗？" title="删除">
+                                 <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                                     <i class="icow icow-shanchu1"></i>
+                                   </span>
+                            </a>
+                         {/if}
+                         {if $tab=='recycle'}
+                         <a class='btn btn-default btn-sm btn-op btn-operation' data-toggle='ajaxRemove' href="{:url('admin/creditshop/goodsdeleted',array('id' => $row['id']));}" data-confirm="确定要彻底删除该商品吗？" title="彻底删除">
+                             <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                                 <i class="icow icow-shanchu1"></i>
+                               </span>
+                             </a>
+                         {/if}
+                         {if $tab=='recycle'}
+                         <a class='btn btn-default btn-sm btn-op btn-operation' data-toggle='ajaxRemove' href="{:url('admin/creditshop/goodsrecycle',array('id' => $row['id']));}" data-confirm="确定要恢复商品到仓库吗？" title="恢复商品到仓库">
+                             <span data-toggle="tooltip" data-placement="top" title="" data-original-title="恢复商品到仓库">
+                                     <i class="icow icow-2"></i>
+                                   </span>
+                         </a>
+                         {/if}
+                    </td>
+                </tr>
+                {/foreach}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td colspan="3">
+                        <div class="btn-group">
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('admin/creditshop/goodsstatus',array('status'=>0))}">
+                                <i class='icow icow-xiajia3'></i> 下架</button>
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/creditshop/goodsstatus',array('status'=>1))}">
+                                <i class='icow icow-shangjia2'></i> 上架</button>
+                            {if $tab!='warehouse' && $tab!='recycle'}
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除吗?" data-href="{:url('admin/creditshop/goodsdelete')}">
+                                <i class='icow icow icow-shanchu1'></i> 删除
+                            </button>
+                            {/if}
+                            {if $tab=='recycle'}
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确定要彻底删除该商品吗?" data-href="{:url('admin/creditshop/goodsdeleted')}">
+                                <i class='icow icow-shanchu5'></i> 彻底删除
+                            </button>
+                            {/if}
+                            {if $tab=='recycle'}
+                            <button class="btn btn-default btn-sm" type="button" data-toggle='batch-remove' data-confirm="确定要恢复商品到仓库吗?" data-href="{:url('admin/creditshop/goodsrecycle')}">
+                                <i class='fa fa-reply'></i> 恢复商品到仓库
+                            </button>
+                            {/if}
+                        </div>
+                    </td>
+                    <td colspan="6" class="text-right">
+                        {$pager}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    {else}
+        <div class='panel panel-default'>
+            <div class='panel-body' style='text-align: center;padding:30px;'>
+                暂时没有任何商品
+            </div>
+        </div>
+    {/if}
+    </form>
+</div>
+{include file='_footer'}

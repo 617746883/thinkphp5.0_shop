@@ -1,0 +1,91 @@
+{include file='_header'}
+
+<div class="page-header">
+    当前位置：<span class="text-primary">{if !empty($level['id'])}编辑{else}添加{/if}会员等级{if !empty($level['id'])}({$level['levelname']}){/if}</span>
+</div>
+
+<div class="page-content">
+    <div class="page-sub-toolbar">
+        <span class=''>
+            <a class="btn btn-primary btn-sm" href="{:url('admin/member/level/add')}">添加新会员等级</a>
+        </span>
+    </div>
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$level['id']}" />
+        {if $id!='default'}
+            <div class="form-group">
+                <label class="col-lg control-label">等级</label>
+                <div class="col-sm-9 col-xs-12">
+                    <select  name="level" class="form-control tp_is_default" style="width:90px;">
+                        {foreach name='level_array' key='key' item='value'}
+                        <option value="{$value}" {if $level['level']==$value}selected{/if}>{$value}</option>
+                        {/foreach}
+                    </select>
+                    <span class='help-block'>数字越大等级越高</span>
+                </div>
+            </div>
+        {/if}
+        <div class="form-group">
+            <label class="col-lg control-label must"> {if $id=='default'}默认{/if}等级名称</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="levelname" class="form-control" value="{$level['levelname']}" data-rule-required="true" />
+            </div>
+        </div>
+        {if $id!='default'}
+            <div class="form-group">
+                <label class="col-lg control-label">升级条件</label>
+                <div class="col-sm-9 col-xs-12">
+                    <div class='input-group fixsingle-input-group'>
+                        {if empty($set['shop']['leveltype'])}
+                            <span class='input-group-addon'>完成订单金额满</span>
+                            <input type="text" name="ordermoney" class="form-control" value="{$level['ordermoney']}" />
+                            <span class='input-group-addon'>元</span>
+                        {/if}
+                        {if $set['shop']['leveltype']==1}
+                            <span class='input-group-addon'>完成订单数量满</span>
+                            <input type="text" name="ordercount" class="form-control" value="{$level['ordercount']}" />
+                            <span class='input-group-addon'>个</span>
+                        {/if}
+                        {if $set['shop']['leveltype']==2}
+                            <span class='input-group-addon'>积分数量满</span>
+                            <input type="text" name="creditnum" class="form-control" value="{$level['creditnum']}" />
+                            <span class='input-group-addon'>个</span>
+                        {/if}
+                    </div>
+                    <span class='help-block'>会员升级条件，不填写默认为不自动升级, 设置<a href="{:url('admin/sysset/member')}">【会员升级依据】</a> </span>
+                </div>
+            </div>
+        {/if}
+        <div class="form-group">
+            <label class="col-lg control-label">折扣</label>
+            <div class="col-sm-9 col-xs-12">
+                <div class="input-group fixsingle-input-group">
+                    <input type="text" name="discount" class="form-control" value="{$level['discount']}" />
+                    <div class="input-group-addon">折</div>
+                </div>
+                <span class='help-block'>请输入0.1~10之间的数字,值为空代表不设置折扣</span>
+            </div>
+        </div>
+        <div class="form-group" {if $id=='default'}style="display: none;"{/if}>
+            <label class="col-lg control-label">状态</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'>
+                    <input type='radio' name='enabled' value=1' {if $level['enabled']==1}checked{/if} /> 启用
+                </label>
+                <label class='radio-inline'>
+                    <input type='radio' name='enabled' value=0' {if $level['enabled']==0}checked{/if} /> 禁用
+                </label>
+            </div>
+        </div>
+        <div class="form-group"></div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"  />
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div>
+    </form>
+
+</div>
+{include file='_footer'}

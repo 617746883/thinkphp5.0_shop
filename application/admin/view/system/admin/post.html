@@ -1,0 +1,123 @@
+{include file='_header'}
+<script type="text/javascript" src="__STATIC__/js/lib/moment.js"></script>
+<link rel="stylesheet" href="__STATIC__/components/datetimepicker/jquery.datetimepicker.css">
+<link rel="stylesheet" href="__STATIC__/components/daterangepicker/daterangepicker.css">
+<div class="page-header">
+    <span>当前位置：<span class="text-primary">{if !empty($item['id'])}编辑{else}添加{/if}操作员 <small>{if !empty($item['id'])}修改【{$item['username']}】{/if}</small></span></span>
+
+</div>
+<div class="page-content">
+    <div class="page-sub-toolbar">
+        <span class=''>
+            <a class="btn btn-primary btn-sm" href="{:url('admin/system/adminadd')}">添加新操作员</a>
+        </span>
+    </div>
+    <form id="dataform" action="" method="post" class="form-horizontal form-validate" >
+        <input type="hidden" name="id" value="{$item['id']}" />
+        <div class="form-group">
+            <label class="col-lg control-label must">操作员用户名</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="username" class="form-control" value="{$item['username']}" {if !empty($item)}readonly{/if} data-rule-required=true autocomplete="off" />
+                <span class='help-block'>不能输入现有用户!  只能新增. 新增的从这里可以修改</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label must">操作员密码</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="password" name="password" class="form-control" value="" autocomplete="off" {if empty($item['password'])}data-rule-required='true' {/if}/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">操作员头像</label>
+            <div class="col-sm-9 col-xs-12">
+                {:tpl_form_field_image2('avatar', $item['avatar'])}
+                <span class='help-block'>建议尺寸:640 * 350 , 请将所有图片尺寸保持一致</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">所属权限组</label>
+            <div class="col-sm-9 col-xs-12">
+                {foreach name="auth_group" item="v"} 
+                <label>{$v['title']} 
+                    <input class="xb-icheck" type="checkbox" name="group_ids[]" value="{$v['id']}" {in name="$v['id']" value="$group_data"}checked="checked"{/in} > &emsp;
+                </label>
+                {/foreach}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">备注</label>
+            <div class="col-sm-9 col-xs-12">
+                <textarea name="remark" class="form-control richtext" rows="5">{$item['remark']}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">有效期限</label>
+            {:tpl_form_field_daterange('usertime', array('starttime'=>date('Y-m-d H:i', !empty($item['starttime'])?$item['starttime']:time()),'endtime'=>date('Y-m-d H:i', !empty($item['endtime'])?$item['endtime']:strtotime('7 days'))),true);}
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">操作员状态</label>
+            <div class="col-sm-10  col-xs-12">
+                <label class='radio-inline'>
+                    <input type='radio' name='status' value=1' {if $item['status']==1}checked{/if} /> 启用
+                </label>
+                <label class='radio-inline'>
+                    <input type='radio' name='status' value=0' {if $item['status']==0}checked{/if} /> 禁用
+                </label>
+            </div>
+        </div>
+        <div class="form-group"></div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary" />
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div>
+    </form>
+</div>
+<script language='javascript'>
+    function search_users() {
+        $("#module-menus1").html("正在搜索....")
+        $.get('{:url("perm/role/query")}', {
+            keyword: $.trim($('#search-kwd1').val())
+        }, function(dat){
+            $('#module-menus1').html(dat);
+        });
+    }
+    function select_role(o) {
+        $("#userid").val(o.id);
+        $("#user").val( o.rolename );
+        var perms = o.perms2.split(',');
+
+
+        $(':checkbox').removeAttr('disabled').removeAttr('checked').each(function(){
+
+            var _this = $(this);
+            var perm = '';
+            if( _this.data('group') ){
+                perm+=_this.data('group');
+            }
+            if( _this.data('parent') ){
+                if (_this.data('parent') != 'text') {
+                    perm += "." + _this.data('parent');
+                }
+            }
+            if( _this.data('son') ){
+                if (_this.data('son') != 'text') {
+                    perm += "." + _this.data('son');
+                }
+            }
+            if( _this.data('grandson') ){
+                if (_this.data('grandson') != 'text') {
+                    perm += "." + _this.data('grandson');
+                }
+            }
+            if( $.arrayIndexOf(perms,perm)!=-1){
+                $(this).attr('disabled',true).get(0).checked =true;
+            }
+
+        });
+        $(".close").click();
+    }
+</script>
+{include file='_footer'}

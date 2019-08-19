@@ -1,0 +1,164 @@
+<div class="modal-dialog">
+<style>
+	#selectUrl .modal-body {padding: 10px 15px;}
+	#selectUrl .tab-pane {margin-top: 5px; min-height: 400px; max-height: 400px; overflow-y: auto;}
+	#selectUrl .page-head {padding: 9px 0; margin-bottom: 8px;}
+	#selectUrl .page-head h4 {margin: 0;}
+	#selectUrl .btn {margin-bottom: 3px;}
+	#selectUrl .modal-dialog {width: 930px;}
+	#selectUrl .line {border-bottom: 1px dashed #ddd; color: #999; height: 36px; line-height: 36px;}
+	#selectUrl .line .icon {height: 35px; width: 30px; position: relative; float: left;}
+	#selectUrl .line .icon.icon-1:before {content: ""; width: 10px; height: 10px; border: 1px dashed #ccc; position: absolute; top: 12px; left: 10px;}
+	#selectUrl .line .icon.icon-2 {width: 50px;}
+	#selectUrl .line .icon.icon-2:before {content: ""; width: 10px; height: 10px; border-left: 1px dashed #ccc; border-bottom: 1px dashed #ccc; position: absolute; top: 12px; left: 20px;}
+	#selectUrl .line .icon.icon-3 {width: 60px;}
+	#selectUrl .line .icon.icon-3:before {content: ""; width: 10px; height: 10px; border-left: 1px dashed #ccc; border-bottom: 1px dashed #ccc; position: absolute; top: 12px; left: 30px;}
+	#selectUrl .line .btn-sm {float: right; margin-top: 5px; margin-right: 5px; height: 24px; line-height: 24px; padding: 0 10px;}
+	#selectUrl .line .text {display: block;}
+	#selectUrl .line .label-sm {padding: 2px 5px;}
+	#selectUrl .line.good {height: 60px; padding: 4px 0;}
+	#selectUrl .line.good .image {height: 50px; width: 50px; border: 1px solid #ccc; float: left;}
+	#selectUrl .line.good .image img {height: 100%; width: 100%;}
+	#selectUrl .line.good .text {padding-left: 60px; height: 52px;}
+	#selectUrl .line.good .text p {padding: 0; margin: 0;}
+	#selectUrl .line.good .text .name {font-size: 15px; line-height: 32px; height: 28px;}
+	#selectUrl .line.good .text .price {font-size: 12px; line-height: 18px; height: 18px;}
+	#selectUrl .line.good .btn-sm {height: 32px; padding: 5px 10px; line-height: 22px; margin-top: 9px;}
+	#selectUrl .tip {line-height: 250px; text-align: center;}
+	#selectUrl .nav-tabs > li > a {padding: 8px 20px;}
+</style>
+<div class="modal-content">
+    <div class="modal-header">
+        <button data-dismiss="modal" class="close" type="button">×</button>
+        <h4 class="modal-title">选择链接</h4>
+    </div>
+    <div class="modal-body">
+    	<ul class="nav nav-tabs" id="selectUrlTab">
+			<li class="active"><a href="#sut_shop">商城</a></li>
+			<li class=""><a href="#sut_good">商品</a></li>
+			<li class=""><a href="#sut_cate">商品分类</a></li>
+			<!-- <li class=""><a href="#sut_coupon">超级券</a></li> -->
+			<!-- <li class=""><a href="#sut_groups">团购</a></li> -->
+			<li class=""><a href="#sut_creditshop">积分商城</a></li>
+			<li class=""><a href="#sut_article">文章营销</a></li>
+		</ul>
+		<div class="tab-content ">		
+			<div class="tab-pane active" id="sut_shop">
+				{if $platform}
+				<div class="alert alert-primary" style="margin-bottom: 0;">
+					<p>如果底部菜单中已经选择该链接，页面中选择后点击无效</p>
+					{if $platform=='wxapp_tabbar'}
+						<p>底部菜单只可选择部分页面地址</p>
+					{/if}
+				</div>
+				{/if}
+				{foreach name='allUrls' item='item'}
+					<div class="page-head"><h4><i class="fa fa-folder-open-o"></i> {$item['name']}</h4></div>
+					{foreach name="item['list']" item='child'}
+						<nav data-href="{$child['url']}" class="btn btn-default btn-sm" title="{$child['name']}">{$child['name']}</nav>
+					{/foreach}
+				{/foreach}
+			</div>
+
+			<div class="tab-pane" id="sut_good">
+				<div class="input-group">
+					<input type="text" placeholder="请输入商品名称进行搜索" id="select-good-kw" value="" class="form-control">
+						<span class="input-group-addon btn btn-default select-btn" data-type="good">搜索</span>
+				</div>
+				<div id="select-good-list"></div>
+			</div>
+
+			<div class="tab-pane" id="sut_cate">
+				{foreach name='categorys' item='category'}
+					 {if empty($category['parentid'])}
+						<div class="line">
+							<div class="icon icon-1"></div>
+							<nav title="选择" class="btn btn-default btn-sm" data-href="goodslist?cate={$category['id']}">选择</nav>
+							<div class="text">{$category['name']}</div>
+						</div>
+						{if intval($syscate['level'])>1}
+						{foreach name='categorys' item='category2'}
+						 	{if $category2['parentid']==$category['id']}
+							 	<div class="line">
+									<div class="icon icon-2"></div>
+									<nav title="选择" class="btn btn-default btn-sm" data-href="goodslist?cate={$category2['id']}">选择</nav>
+									<div class="text">{$category2['name']}</div>
+								</div>
+								{if intval($syscate['level'])>2}
+								{foreach name='categorys' item='category3'}
+									 {if $category3['parentid']==$category2['id']}
+										 <div class="line">
+											<div class="icon icon-3"></div>
+											<nav title="选择" class="btn btn-default btn-sm" data-href="goodslist?cate={$category3['id']}">选择</nav>
+											<div class="text">{$category3['name']}</div>
+										</div>
+									 {/if}
+								{/foreach}
+								{/if}
+						 	{/if}
+						{/foreach}
+						{/if}
+					{/if}
+				{/foreach}
+			</div>
+			<!-- <div class="tab-pane" id="sut_coupon">
+				<div class="input-group">
+					<input type="text" placeholder="请输入优惠券名称进行搜索" id="select-coupon-kw" value="" class="form-control">
+						<span class="input-group-addon btn btn-default select-btn" data-type="coupon">搜索</span>
+				</div>
+				<div id="select-coupon-list"></div>
+			</div> -->
+
+			<div class="tab-pane" id="sut_groups">
+				<div class="input-group">
+					<input type="text" placeholder="请输入商品名称进行搜索" id="select-groups-kw" value="" class="form-control">
+					<span class="input-group-addon btn btn-default select-btn" data-type="groups">搜索</span>
+				</div>
+				<div id="select-groups-list"></div>
+			</div>
+			<div class="tab-pane" id="sut_creditshop">
+				<div class="input-group">
+					<input type="text" placeholder="请输入商品名称进行搜索" id="select-creditshop-kw" value="" class="form-control">
+					<span class="input-group-addon btn btn-default select-btn" data-type="creditshop">搜索</span>
+				</div>
+				<div id="select-creditshop-list"></div>
+			</div>
+			<div class="tab-pane" id="sut_article">
+				<div class="input-group">
+					<input type="text" placeholder="请输入文章名称进行搜索" id="select-article-kw" value="" class="form-control">
+						<span class="input-group-addon btn btn-default select-btn" data-type="article">搜索</span>
+				</div>
+				<div id="select-article-list"></div>
+			</div>
+		</div>
+    </div>
+    <div class="modal-footer">
+        <button data-dismiss="modal" class="btn btn-default" type="button">关闭</button>
+    </div>
+    <script>
+    	$(function(){
+    		$("#selectUrl").find('#selectUrlTab a').click(function(e) {
+					$('#tab').val($(this).attr('href'));
+					e.preventDefault();
+					$(this).tab('show');
+			});
+    		$(".select-btn").click(function(){
+    			var type = $(this).data("type");
+    			var kw = $.trim($("#select-"+type+"-kw").val());
+    			if(!kw){
+    				tip.msgbox.err("请输入搜索关键字！");
+    				return;
+    			}
+    			$("#select-"+type+"-list").html('<div class="tip">正在进行搜索...</div>');
+    			$.ajax("{:url('merch/utility/selecturlquery')}", {
+	      			type: "get",
+	      			dataType: "html",
+	      			cache: false,
+	      			data: {kw:kw, type:type}
+	      		}).done(function (html) {
+	      			$("#select-"+type+"-list").html(html);
+	      		});
+    		});
+    	});
+    </script>
+</div>

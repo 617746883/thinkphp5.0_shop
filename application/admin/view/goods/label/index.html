@@ -1,0 +1,124 @@
+{include file='_header'}
+
+<div class="page-header">
+    当前位置：<span class="text-primary">标签组管理</span>
+</div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal form-search" role="form">
+        <div class="page-toolbar">
+            <div class="col-sm-6">
+                <span class="">
+                    <a href="{:url('admin/goods/labeladd')}" class="btn btn-primary"><i class="fa fa-plus"></i> 添加新标签组</a>
+                    <a class="btn btn-default" href="{:url('admin/goods/labelstyle')}">设置样式</a>
+                </span>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group">
+                    <span class="input-group-select">
+                        <select name="enabled" class='form-control'>
+                            <option value="" {if $enabled == ''} selected{/if}>状态</option>
+                            <option value="1" {if $enabled== '1'} selected{/if}>启用</option>
+                            <option value="0" {if $enabled == '0'} selected{/if}>禁用</option>
+                        </select>
+                    </span>
+                    <input type="text" class="input-sm form-control" name='keyword' value="{$keyword}" placeholder="请输入关键词">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit"> 搜索</button>
+                    </span>
+            	</div>
+        	</div>
+        </div>
+    </form>
+    <form action="" method="post" >
+        {if count($list)>0}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-table-header">
+                    <input type='checkbox' />
+                    <div class="btn-group">
+                        <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/goods/labelstatus',array('status'=>1))}">
+                            <i class='icow icow-qiyong'></i>启用
+                        </button>
+                        <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('admin/goods/labelstatus',array('status'=>0))}">
+                            <i class='icow icow-jinyong'></i> 禁用
+                        </button>
+                        <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/goods/labeldelete')}">
+                            <i class="icow icow-shanchu1"></i>删除
+                    </div>
+                </div>
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th style="width:25px;"></th>
+                        <th>标签组名称</th>
+                        <th style="width:80px;">状态</th>
+                        <th style="width:65px;text-align: center;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {foreach name='list' item='row'}
+                    <tr>
+                        <td>
+                            {if $row['id']!='default'}
+                            <input type='checkbox' value="{$row['id']}"/>
+                            {/if}
+                        </td>
+                        <td>{$row['label']}</td>
+                        <td>
+                            <span class='label {if $row['status']==1}label-primary{else}label-default{/if}'
+                            data-toggle='ajaxSwitch'
+                            data-switch-value='{$row['status']}'
+                            data-switch-value0='0|禁用|label label-default|{:url('admin/goods/labelstatus',array('status'=>1,'id'=>$row['id']))}'
+                            data-switch-value1='1|启用|label label-primary|{:url('admin/goods/labelstatus',array('status'=>0,'id'=>$row['id']))}'
+                            >
+                            {if $row['status']==1}启用{else}禁用{/if}</span>
+                        </td>
+                        <td style="text-align: center;">
+                            <a href="{:url('admin/goods/labeledit', array('id' => $row['id']))}" class="btn btn-default btn-sm btn-operation btn-op">
+                                 <span data-toggle="tooltip" data-placement="top" title="" data-original-title="修改">
+                                     <i class="icow icow-bianji2"></i>
+                                </span>
+                            </a>
+                            {if $row['id']!='default'}
+                                <a data-toggle='ajaxRemove' href="{:url('admin/goods/labeldelete', array('id' => $row['id']))}"class="btn btn-default btn-sm btn-operation btn-op" data-confirm='确认要删除此标签组吗?'>
+                                    <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                                     <i class="icow icow-shanchu1"></i>
+                                </span>
+                                </a>
+                            {/if}
+                        </td>
+                    </tr>
+                    {/foreach}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="2">
+                            <input type="checkbox">
+                            <div class="btn-group">
+                                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/goods/labelstatus',array('status'=>1))}">
+                                    <i class='icow icow-qiyong'></i>启用
+                                </button>
+                                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('admin/goods/labelstatus',array('status'=>0))}">
+                                    <i class='icow icow-jinyong'></i> 禁用
+                                </button>
+                                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/goods/labeldelete')}">
+                                    <i class="icow icow-shanchu1"></i>删除
+                            </div>
+                        </td>
+                        <td colspan="2" style="text-align: right">
+                            {$pager}
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        {else}
+        <div class="panel panel-default">
+            <div class="panel-body empty-data">暂时没有任何标签组</div>
+        </div>
+        {/if}
+    </form>
+</div>
+
+{include file='_footer'}

@@ -1,0 +1,398 @@
+{template '_header'}
+<style type='text/css'>
+    .order-container{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+    }
+    .order-container-left,.order-container-right{
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+    }
+    .ordertable { width:100%;position: relative;margin-bottom:10px}
+    .ordertable tr td:first-child { text-align: right }
+    .ordertable tr td {padding:8px 5px 0;vertical-align: top}
+    .ordertable1 tr td { text-align: right; }
+    .ops .btn { padding:5px 10px;}
+    {if count($step_array)>4}.ui-step-4 li { width:20%;}{/if}
+    .order-container-right{
+        padding:30px 0 0 15px ;
+    }
+    .trorder td{
+        text-align: center;
+    }
+    .navbar-inner tr th{
+        text-align: center
+    }
+    .table .trorder td{
+        border-right:1px solid #efefef;
+    }
+    .table .trorder td:nth-of-type(1){
+        border:none;
+    }
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">维权处理</span>
+</div>
+<div class="page-content">
+{if !empty($step_array)}
+<div class="step-region" >
+	<ul class="ui-step ui-step-4" >
+
+        {loop $step_array $k1 $v1}
+        <li {if $v1['done']==1}class="ui-step-done"{/if}>
+            <div class="ui-step-number">{$v1['step']}</div>
+            <div class="ui-step-title">{$v1['title']}</div>
+            <div class="ui-step-meta">{if !empty($v1['time'])}{php echo date('Y-m-d',$v1['time'])}<br/>{php echo date('H:i:s',$v1['time'])}{/if}</div>
+        </li>
+        {/loop}
+
+
+	</ul>
+</div>
+{/if}
+   <form class="form-horizontal form" action="" method="post">
+        <input type="hidden" name="id" value="{$item['id']}" />
+        
+        <input type="hidden" name="dispatchid" value="{$dispatch['id']}" />
+		  {if !empty($refund)}
+
+		<!--div class='panel panel-default'>
+			<div class='panel-body'>
+				 <h4 class="m-t-none m-b">退款申请</h4>
+				 <table class='ordertable' style='table-layout:fixed'>
+						 <tr>
+							 <td style='width:80px'>退款原因：</td>
+						            <td>{$refund['reason']}</td>
+						 </tr>
+						  <tr>
+							 <td style='width:80px'>退款原因：</td>
+						            <td>{$refund['reason']}</td>
+						 </tr>
+						{if $refund['status']==1}
+						<tr>
+							 <td style='width:80px'>退款时间：</td>
+						            <td>{php echo date('Y-m-d H:i:s',$item['refundtime'])}</td>
+						 </tr>
+						{/if}
+
+						  {ifp 'order.op.refund'}
+						  <tr>
+							 <td style='width:80px'></td>
+						            <td>{if $refund['status']==0}
+									<a class="btn btn-danger btn-sm" href="javascript:;" onclick="$('#modal-refund').find(':input[name=id]').val('{$item['id']}')" data-toggle="modal" data-target="#modal-refund">处理退款申请</a>
+									{elseif $refund['status']==-1}
+									<span class='label label-default'>已拒绝</span>
+									{elseif $refund['status']==1}
+									<span class='label label-danger'>已退款</span>
+									{/if}</td>
+						 </tr>
+
+							{/if}
+
+				 </table>
+			</div>
+		</div-->
+		   {/if}
+
+ 
+	<div  class='row order-container'>
+		<div class="order-container-left" style="border-right: 1px solid #efefef">
+			<div class='panel-body' >
+				 <h4 class="m-t-none m-b">维权信息</h4>
+				 <div class="form-group" style='padding:0 10px;'>
+					 <table class='ordertable' style='table-layout:fixed'>
+						 <tr>
+							 <td style='width:80px'>维权类型：</td>
+						            <td>{$r_type[$refund['rtype']]}</td>
+						 </tr>
+
+                         {if $refund['rtype']!=2}
+                         <tr>
+                             <td style='width:80px'>退款金额：</td>
+                             <td>{$refund['applyprice']}(元)</td>
+                         </tr>
+                         {/if}
+
+                         <tr>
+                             <td style='width:80px'>维权原因：</td>
+                             <td>{$refund['reason']}</td>
+                         </tr>
+
+                         <tr>
+                             <td style='width:80px'>维权说明：</td>
+                             <td style="white-space: normal;">{$refund['content']}</td>
+                         </tr>
+
+                         {if !empty($refund['imgs'])}
+                         <tr>
+                             <td style='width:80px'>图片凭证：</td>
+                             <td>
+                                 {loop $refund['imgs'] $k1 $v1}
+                                 <a target='_blank' href='{php echo tomedia($v1)}'><img style='width:100px;;padding:1px;border:1px solid #ccc' src='{php echo tomedia($v1)}'></a>
+                                 {php break;}
+                                 {/loop}
+                                 &nbsp;
+                                 {if count($refund['imgs']) > 1}
+                                 <a data-toggle='popover' data-html='true' data-placement='right' data-trigger="hover"
+                                    data-content="<table style='width:100%;'>
+                        {loop $refund['imgs'] $k1 $v1}
+                        <tr>
+                        <td  style='border:none;text-align:right;padding:5px;'>
+                            <a target='_blank' href='{php echo tomedia($v1)}'><img style='width:100px;;padding:1px;border:1px solid #ccc' src='{php echo tomedia($v1)}'></a>
+                        </td>
+                        </tr>
+                        {/loop}
+                </table>
+">查看全部</a>
+{/if}
+                             </td>
+                         </tr>
+                         {/if}
+
+                         <tr>
+                             <td style='width:80px'>维权编号：</td>
+                             <td>{$refund['refundno']}</td>
+                         </tr>
+
+                         <tr>
+                             <td style='width:80px'>订单编号：</td>
+                             <td><a href="{php echo merchUrl('order/detail', array('id' => $item['id']))}" target="_blank" title="">{$item['ordersn']}</a></td>
+                         </tr>
+
+						 <tr>
+							<td>订单金额：</td>
+							<td>￥{php echo number_format($item['price'],2)} </td>
+						 </tr>
+
+                         <tr>
+                             <td>买家：</td>
+                             <td>{$member['nickname']} <a data-toggle='popover' data-html='true' data-placement='right' data-trigger="hover"
+                                                          data-content="<table style='width:100%;'>
+                <tr>
+                    <td  style='border:none;text-align:right;' colspan='2'><img src='{$member['avatar']}' style='width:100px;height:100px;padding:1px;border:1px solid #ccc' /></td>
+                </tr>
+                                <tr>
+                    <td  style='border:none;text-align:right;'>昵称：</td>
+                    <td  style='border:none;text-align:right;'>{$member['nickname']}</td>
+                </tr>
+                <tr>
+                    <td  style='border:none;text-align:right;'>姓名：</td>
+                    <td  style='border:none;text-align:right;'>{$member['realname']}</td>
+                </tr>
+                <tr>
+                    <td  style='border:none;text-align:right;'>ID：</td>
+                    <td  style='border:none;text-align:right;'>{$member['id']}</td>
+                </tr>
+                <tr>
+                    <td  style='border:none;text-align:right;'>手机号：</td>
+                    <td  style='border:none;text-align:right;'>{$member['mobile']}</td>
+                </tr>
+                <tr>
+                    <td  style='border:none;text-align:right;'>微信号：</td>
+                    <td  style='border:none;text-align:right;'>{$member['weixin']}</td>
+                </tr>
+                </table>
+"><i class='icow icow-help'></i></a></td>
+                         </tr>
+
+                         <tr>
+                             <td style='width:80px'>付款时间：</td>
+                             <td>{php echo date('Y-m-d H:i:s', $item['paytime'])}</td>
+                         </tr>
+
+                         <tr>
+                             <td style='width:80px'>付款方式：</td>
+                             <td> {if $item['paytype'] == 0}未支付{/if}
+                                 {if $item['paytype'] == 1}余额支付{/if}
+                                 {if $item['paytype'] == 11}后台付款{/if}
+                                 {if $item['paytype'] == 21}微信支付{/if}
+                                 {if $item['paytype'] == 22}支付宝支付{/if}
+                                 {if $item['paytype'] == 23}银联支付{/if}
+                                 {if $item['paytype'] == 3}货到付款{/if}
+                             </td>
+                         </tr>
+
+                     </table>
+
+                </div>
+			</div>
+		</div>
+
+        <div class="order-container-right" style="padding: 30px" >
+            <div class='panel-body' style='height:450px;' >
+
+                <div class='row'>
+                    <div class='col-sm-3 control-label' style='padding-top:5px;'>维权状态: </div>
+                    <div class="col-sm-9 col-xs-12">
+                        <h3 class="form-control-static">
+                            {if $refund['status'] == -2}<span class="text-default">客户取消{$r_type[$refund['rtype']]}</span>
+
+                            {else if $refund['status'] == -1}<span class="text-default">已拒绝{$r_type[$refund['rtype']]}</span>
+
+                            {else if $refund['status'] == 0}<span class="text-warning">等待商家处理申请</span>
+
+                            {else if $refund['status'] == 1}<span class="text-default">{$r_type[$refund['rtype']]}完成</span>
+
+                            {else if $refund['status'] == 3}<span class="text-warning">等待客户退回物品</span>
+
+                            {else if $refund['status'] == 4}<span class="text-warning">客户退回物品，等待商家重新发货</span>
+
+                            {else if $refund['status'] == 5}<span class="text-warning">等待客户收货</span>{/if}
+
+                        </h3>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label"></label>
+                    <div class="col-sm-9 col-xs-12">
+                        <p class="form-control-static ops">
+
+                            {if ($refund['status'] == 0 || $refund['status'] > 1)}
+                            <a class="btn btn-primary btn-xs" data-toggle="ajaxModal"  href="{php echo merchUrl('order/op/refund/submit', array('id' => $item['id'],'refundid' => $refund['id']))}">处理申请</a>
+                            {/if}
+                        </p>
+                    </div>
+                </div>
+
+                {if $refund['rtype']>0 && !empty($refund['expresssn'])}
+                <div class='row'>
+                    <div class='col-sm-3 control-label' style='padding-top:10px;'>
+                        客户退回物品 :
+                    </div>
+                    <div class="col-sm-9 col-xs-12">
+                            <div class="form-control-static">
+                                快递公司: {if empty($refund['expresscom'])}其他快递{else}{$refund['expresscom']}{/if}<br>
+                                快递单号: {$refund['expresssn']} &nbsp;&nbsp;&nbsp;<a class='op' data-toggle="ajaxModal" href="{php echo merchUrl('util/express', array('id' => $item['id'],'express'=>$refund['express'],'expresssn'=>$refund['expresssn']))}">查看物流</a><br>
+                                退回时间: {php echo date('Y-m-d H:i:s', $refund['sendtime'])}
+                            </div>
+                    </div>
+                </div>
+                {/if}
+
+                {if $refund['rtype']==2 && !empty($refund['rexpresssn'])}
+                <div class='row'>
+                    <div class='col-sm-3 control-label' style='padding-top:10px;'>
+                        商家寄出物品 :
+                    </div>
+                    <div class="col-sm-9 col-xs-12">
+                        <div class="form-control-static">
+                            快递公司: {if empty($refund['rexpresscom'])}其他快递{else}{$refund['rexpresscom']}{/if}<br>
+                            快递单号: {$refund['rexpresssn']} &nbsp;&nbsp;&nbsp;<a class='op' data-toggle="ajaxModal" href="{php echo merchUrl('util/express', array('id' => $item['id'],'express'=>$refund['rexpress'],'expresssn'=>$refund['rexpresssn']))}">查看物流</a><br>
+                            发货时间: {php echo date('Y-m-d H:i:s', $refund['returntime'])}
+                        </div>
+                    </div>
+                </div>
+                {/if}
+
+
+                <!--<div class='order-tips'>-->
+                    <!--<div class='row order-tips-title'>友情提醒</div>-->
+                      <!--<div class='row order-tips-row'>订单为货到付款，请您务必联系买家确认后再进行发货</div>-->
+                <!--</div>-->
+
+            </div>
+
+        </div>
+ 
+</div>
+
+       <br>
+       <div class=" table-responsive goods_list" style="overflow: hidden;">
+               <table class="table "  style="border: 1px solid #efefef;">
+                   <thead class="navbar-inner">
+                   <tr>
+                       <th style="width:15%;">商品标题</th>
+                       <th style="width:10%;">商品规格</th>
+                       <th style="width:10%;">商品编号</th>
+                       <th style="width:10%;">商品条码</th>
+                       <th style="width:10%;">单价(元)</th>
+                       <th style="width:5%;">数量</th>
+                       <th style="width:15%">折扣前/折扣后(元)</th>
+                       <!--<th style="width:5%;">操作</th>-->
+                   </tr>
+                   </thead>
+                   {loop $item['goods'] $goods}
+                   <tr class="trorder">
+                       <td>
+                           {if $category[$goods['pcate']]['name']}
+                           <span class="text-error">[{$category[$goods['pcate']]['name']}] </span>{/if}{if $children[$goods['pcate']][$goods['ccate']][1]}
+                           <span class="text-info">[{$children[$goods['pcate']][$goods['ccate']][1]}] </span>
+                           {/if}
+                           {$goods['title']}
+                       </td>
+                       <td>{if !empty($goods['optionname'])}<span class="label label-info">{$goods['optionname']}</span>{/if}</td>
+                       <td>{$goods['goodssn']}</td>
+                       <td>{$goods['productsn']}</td>
+                       <td>{$goods['marketprice']}</td>
+                       <td>{$goods['total']}</td>
+                       <td>{$goods['orderprice']}/{$goods['realprice']}
+                           {if intval($goods['changeprice'])!=0}
+                           <br/>(改价{if $goods['changeprice']>0}+{/if}{php echo number_format(abs($goods['changeprice']),2)})
+                           {/if}
+                       </td>
+                       <!--td>
+                           <a href="{php echo merchUrl('goods/edit', array('id' => $goods['id']))}" class="btn btn-default btn-sm" title="编辑"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
+                       </td-->
+                   </tr>
+                   {/loop}
+                   <tr class="trorder">
+                       <td colspan="2" style="padding-left: 20px"> {if $item['ispackage']}
+                           <span class="text-danger" style="color:red;">（套餐优惠价：&yen;{php echo number_format($item['price'],2)}{if $item['dispatchprice'] }，含运费：&yen;{php echo number_format($item['dispatchprice'],2)}{/if}）</span>
+                           {/if}
+                       </td>
+                       {php $colspan=$item['ispackage']?4:5}
+                       {if $showdiyform}
+                       {php $colspan++}
+                       {/if}
+                       <td colspan="{$colspan}" style="padding-right: 60px;text-align: right">
+                           <div class="price">
+                               <p> <span class="price-inner">商品小计：</span><span style="font-weight: bold">￥{php echo number_format( $item['goodsprice'] ,2)}</span></p>
+                               <p><span class="price-inner">运费：</span>￥{php echo number_format( $item['olddispatchprice'],2)}</p>
+                               {if !$item['ispackage']}
+                               {if $item['discountprice']>0}
+                               <p><span class="price-inner">会员折扣：</span><span class="text-danger">-￥{php echo number_format( $item['discountprice'],2)}</span></p>
+                               {/if}
+                               {if $item['deductprice']>0}
+                               <p><span class="price-inner">积分抵扣：</span><span class="text-danger">-￥{php echo number_format( $item['deductprice'],2)}</span></p>
+                               {/if}
+                               {if $item['deductcredit2']>0}
+                               <p><span class="price-inner">余额抵扣：</span><span class="text-danger">-￥{php echo number_format( $item['deductcredit2'],2)}</span></p>
+                               {/if}
+                               {if $item['deductenough']>0}
+                               <p><span class="price-inner">满额立减：</span><span class="text-danger">-￥{php echo number_format( $item['deductenough'],2)}</span></p>
+                               {/if}
+                               {if $item['couponprice']>0}
+                               <p><span class="price-inner">优惠券优惠：</span><span class="text-danger">-￥{php echo number_format( $item['couponprice'],2)}</span></p>
+                               {/if}
+                               {/if}
+
+                               {if intval($item['changeprice'])!=0}
+                               <p>
+                                   <span class="price-inner">卖家改价：</span>
+                                   <span style='{if 0<$item['changeprice']}color:green{else}color:red{/if}'>{if 0<$item['changeprice']}+{else}-{/if}￥{php echo number_format(abs($item['changeprice']),2)}</span>
+                               </p>
+                               {/if}
+
+                               {if intval($item['changedispatchprice'])!=0}
+                               <p>
+                                   <span class="price-inner">卖家改运费：</span>
+                                   <span style='{if 0<$item['changedispatchprice']}color:green{else}color:red{/if}'>{if 0<$item['changedispatchprice']}+{else}-{/if}￥{php echo abs($item['changedispatchprice'])}</span>
+                               </p>
+                               {/if}
+
+                               <p><span class="price-inner">实付款：</span><span style="font-size: 14px;font-weight: bold;color: #e4393c">￥{php echo number_format($item['price'],2)}</span></p>
+                           </div>
+                       </td>
+                   </tr>
+               </table>
+       </div>
+   </form>
+</div>
+{template '_footer'}
+

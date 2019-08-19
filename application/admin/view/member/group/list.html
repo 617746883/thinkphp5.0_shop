@@ -1,0 +1,104 @@
+{include file='_header'}
+<div class="page-header">当前位置：<span class="text-primary">标签组管理</span></div>
+<div class="page-content">
+    <form action="./index.php" method="get" class="form-horizontal form-search" role="form">
+        <div class="page-toolbar">
+            <div class="pull-left">
+                <a class='btn btn-primary btn-sm' data-toggle="ajaxModal" href="{:url('admin/member/groupadd')}"><i class='fa fa-plus'></i> 添加标签组</a>
+            </div>
+            <div class="pull-right col-md-6">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name="enabled" class='form-control'>
+                            <option value="" {if $_GET['enabled'] == ''} selected{/if}>状态</option>
+                            <option value="1" {if $_GET['enabled']== '1'} selected{/if}>启用</option>
+                            <option value="0" {if $_GET['enabled'] == '0'} selected{/if}>禁用</option>
+                        </select>
+                    </div>
+                    <input type="text" class=" form-control" name='keyword' value="{$_GET['keyword']}" placeholder="请输入关键词">
+                    <span class="input-group-btn">
+                            <button class="btn btn-primary" type="submit"> 搜索</button>
+                        </span>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {if count($list) <= 0}
+        <div class="panel panel-default">
+            <div class="panel-body empty-data">未查询到相关数据</div>
+        </div>
+    {else}
+        <form action="" method="post" onsubmit="return formcheck(this)">
+            <div class="page-table-header">
+                <input type='checkbox' />
+                <div class="btn-group">
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/member/group/delete')}">
+                        <i class='icow icow-shanchu1'></i> 删除</button>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive">
+                <thead>
+                    <tr>
+                        <th style="width:25px;"></th>
+                        <th>分组名称</th>
+                        <th style="width: 200px">会员数</th>
+                        <th>分组描述</th>
+                        <th style="width: 90px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name='list' item='row'}
+                        <tr {if $row['id']=='default'}style='background:#eee;'{/if}>
+                            <td>
+                                {if $row['id']!='default'}
+                                    <input type='checkbox' value="{$row['id']}"/>
+                                {/if}
+                            </td>
+                            <td style="cursor: pointer;" onclick='location="{:url('admin/member/mlist', array('groupid' => $row['id']))}"'>{$row['groupname']}</td>
+                            <td style="cursor: pointer;" onclick='location="{:url('admin/member/mlist', array('groupid' => $row['id']))}"'>{$row['membercount']}</td>
+                            <td>{$row['description']}</td>
+                            <td>
+                                <a class='btn btn-op btn-operation' href="{:url('admin/member/mlist', array('groupid' => $row['id']))}">
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="分组会员">
+                                            <i class='icow icow-member'></i>
+                                        </span>
+                                </a>
+                                {if $row['id']!='default'}
+                                    <a data-toggle="ajaxModal" href="{:url('admin/member/groupedit', array('id' => $row['id']))}" class="btn btn-op btn-operation" >
+                                        <span data-toggle="tooltip" data-placement="top" data-original-title="修改">
+                                            <i class='icow icow-bianji2'></i>
+                                        </span>
+                                    </a>
+                                    <a data-toggle='ajaxRemove' href="{:url('admin/member/groupdelete', array('id' => $row['id']))}"class="btn btn-op btn-operation" data-confirm='确认要删除此标签组吗?'>
+                                        <span data-toggle="tooltip" data-placement="top" data-original-title="删除">
+                                           <i class='icow icow-shanchu1'></i>
+                                        </span>
+                                    </a>
+                                {/if}
+                            </td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td colspan="1">
+                            <div class="btn-group">
+                                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/member/groupdelete')}">
+                                        <i class='icow icow-shanchu1'></i> 删除</button>
+                            </div>
+                        </td>
+                        <td colspan="3" style="text-align: right">
+                            <span class="pull-right" style="line-height: 28px;">(共{:count($list)}条记录)</span>
+                            {$pager}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        {/if}
+    </form>
+</div>
+{include file='_footer'}
+
+

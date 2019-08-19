@@ -1,0 +1,69 @@
+{include file='_header'}
+<div class="page-header">
+    当前位置：<span class="text-primary">{if !empty($item['id'])}编辑{else}添加{/if}幻灯片 <small>{if !empty($item['id'])}修改【{$item['bannername']}】{/if}</small></span>
+</div> 
+ <div class="page-content">
+     <div class="page-sub-toolbar">
+         <span class=''>
+            <a class="btn btn-primary btn-sm" href="{php echo webUrl('creditshop/banner/add')}">添加新幻灯片</a>
+        </span>
+     </div>
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$item['id']}" /> 
+        <div class="form-group">
+            <label class="col-lg control-label">排序</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="displayorder" class="form-control" value="{$item['displayorder']}" />
+                <span class='help-block'>数字越大，排名越靠前</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label must">幻灯片标题</label>
+            <div class="col-sm-9 col-xs-12 ">
+                <input type="text" id='bannername' name="bannername" class="form-control" value="{$item['bannername']}" data-rule-required="true" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">幻灯片图片</label>
+            <div class="col-sm-9 col-xs-12">
+                {:tpl_form_field_image2('thumb', $item['thumb'])}
+                <span class='help-block'>建议尺寸:640 * 350 , 请将所有幻灯片图片尺寸保持一致</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">幻灯片链接</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="link" class="form-control" value="{$item['link']}" data-rule-url="true" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">状态</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'>
+                    <input type='radio' name='enabled' value=1' {if $item['enabled']==1}checked{/if} /> 显示
+                </label>
+                <label class='radio-inline'>
+                    <input type='radio' name='enabled' value=0' {if $item['enabled']==0}checked{/if} /> 隐藏
+                </label>
+            </div>
+        </div>            
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"  />
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div> 
+    </form>
+ </div>
+<script language='javascript'>
+    function formcheck() {
+        if ($("#bannername").isEmpty()) {
+            Tip.focus("bannername", "请填写幻灯片名称!");
+            return false;
+        }
+        return true;
+    }
+</script>
+
+{include file='_footer'}

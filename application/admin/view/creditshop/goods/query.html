@@ -1,0 +1,27 @@
+<div class="alert alert-danger">
+    <p class="alert-link">以下商城商品不能参加积分商城兑换活动：</p>
+    <p>虚拟、促销、秒杀活动、砍价活动商品；以及参加拼团的商品。</p>
+</div>
+<div style='max-height:500px;overflow:auto;min-width:850px;'>
+    <table class="table table-hover" style="min-width:850px;">
+        <tbody>
+        {foreach name='list' item='row'}
+        <tr>
+            <td>
+                <img src="{$row['thumb']}" style="width:30px;height:30px;padding: 1px; border:1px solid#ccc; display: inline-block;" />
+                <span style="display: inline-block; vertical-align: middle; padding-left: 5px;">
+                    <p style="margin-bottom: 0; font-size: 14px;">{$row['title']}</p>
+                    <p style="margin-bottom: 0; font-size: 12px;"><!--{$row['credit']}积分+-->{$row['minprice']}元</p>
+                </span>
+            </td>
+            <td style="width:80px;"><a href="javascript:;" class="label label-primary" onclick='biz.selector.set(this, {:json_encode($row);})'>选择</a></td>
+        </tr>
+        {/foreach}
+        {if count($list)<=0}
+        <tr>
+            <td colspan='4' align='center'>未找到商品</td>
+        </tr>
+        {/if}
+        </tbody>
+    </table>
+</div>

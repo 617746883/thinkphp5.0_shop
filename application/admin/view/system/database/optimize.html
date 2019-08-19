@@ -1,0 +1,43 @@
+<div class="alert we7-page-alert" style="margin-bottom:0">
+	<i class="wi wi-info-sign"></i><strong>数据表优化可以去除数据文件中的碎片, 使记录排列紧密, 提高读写速度.</strong>
+</div>
+<input type="hidden" name="do" value="optimize" />
+<br>		
+{if count($optimize_table) > 0}
+<table class="table we7-table table-hover site-list">
+	<col width="30px"/>
+	<col width="100px"/>
+	<col width="50px"/>
+	<col width="50px"/>
+	<col width="80px"/>
+	<col width="80px"/>
+	<col width="80px"/>
+	<tr>
+		<th>操作</th>
+		<th>表名</th>
+		<th>表类型</th>
+		<th>记录数</th>
+		<th>数据尺寸</th>
+		<th>索引尺寸</th>
+		<th>碎片尺寸</th>
+	</tr>
+	{foreach name='optimize_table' item='row'}
+	<tr>
+		<td><input type="checkbox" name="select[]" checked="checked" value="{$row['title']}"></td>
+		<td>{$row['title']}</td>
+		<td>{$row['type']}</td>
+		<td>{$row['rows']}</td>
+		<td>{$row['data']}</td>
+		<td>{$row['index']}</td>
+		<td>{$row['free']}</td>
+	</tr>
+	{/foreach}
+	<tr>
+		<td colspan="7" class="text-left">
+			<button type="submit" class="btn btn-primary span3" name="submit" value="提交">开始优化</button>
+		</td>
+	</tr>
+</table>
+{else}
+<div class="alert alert-success"><strong>没有要优化的数据表</strong></div>
+{/if}

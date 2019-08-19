@@ -1,0 +1,192 @@
+{include file='_header'}
+
+<style type='text/css' xmlns="http://www.w3.org/1999/html">
+    .dd-handle { height: 40px; line-height: 30px}
+    .dd-list { width:860px;}
+    .dd-handle span {
+        font-weight: normal;
+    }
+</style>
+
+<div class="page-header">
+    当前位置：<span class="text-primary">商品分类</span>
+</div>
+<div class="page-content">
+    <div class="page-toolbar">
+            <span class="pull-left">
+                <a href="{:url('admin/sysset/category')}" class="btn btn-warning"> 设置分类层级</a>
+                <button type="button" id='btnExpand' class="btn btn-default" data-action='expand'><i class='fa fa-angle-up'></i> 折叠所有</button>
+                <a href="{:url('admin/goods/categoryadd')}" class="btn btn-primary"><i class="fa fa-plus"></i> 添加新分类</a>
+            </span>
+        <div class="input-group"></div>
+    </div>
+    <form action="" method="post" class="form-validate">
+        <div class="dd" id="div_nestable">
+            <ol class="dd-list">
+                {foreach name='category' item='row'}
+                {if empty($row['parentid'])}
+                <li class="dd-item full" data-id="{$row['id']}">
+                    <div class="dd-handle" >
+                        [ID: {$row['id']}] {$row['name']}
+                        <span class="pull-right">
+                            <div class='label {if $row['enabled']==1}label-primary{else}label-default{/if}'
+                                 data-toggle='ajaxSwitch'
+                                 data-switch-value='{$row['enabled']}'
+                                 data-switch-value0='0|隐藏|label label-default|{:url('admin/goods/categoryenabled',array('enabled'=>1,'id'=>$row['id']))}'
+                                 data-switch-value1='1|显示|label label-primary|{:url('admin/goods/categoryenabled',array('enabled'=>0,'id'=>$row['id']))}'
+                                 >
+                                 {if $row['enabled']==1}显示{else}隐藏{/if}
+                            </div>
+                            {if intval($shopset['category']['level'])>1 }
+                                <a class='btn btn-default btn-sm btn-operation btn-op' href="{:url('admin/goods/categoryadd', array('parentid' => $row['id']))}" title='' >
+                                    <span data-toggle="tooltip" data-placement="top" title="" data-original-title="添加子分类">
+                                        <i class="icow icow-tianjia"></i>
+                                    </span>
+                                </a>
+                			{/if}
+							<a class='btn btn-default btn-sm btn-operation btn-op' href="{:url('admin/goods/categoryedit', array('id' => $row['id']))}"  >
+							   <span data-toggle="tooltip" data-placement="top"  data-original-title="修改">
+							    <i class="icow icow-bianji2"></i>
+							     </span>
+							</a>
+                            <a class='btn btn-default btn-sm btn-operation btn-op' data-toggle='ajaxPost' href="{:url('admin/goods/categorydelete', array('id' => $row['id']))}" data-confirm='确认删除此分类吗？'>
+                                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                                    <i class="icow icow-shanchu1"></i>
+                                </span>
+                            </a>
+                        </span>
+                    </div>
+                    {if count($children[$row['id']])>0 && intval($shopset['category']['level'])>=2}
+                    <ol class="dd-list">
+                        {foreach name="children[$row['id']]" item='child'}
+                        <li class="dd-item full" data-id="{$child['id']}">
+                            <div class="dd-handle" style="width:100%;">
+                                <img src="{$child['thumb']}" width='30' height="30" onerror="$(this).remove()" style='padding:1px;border: 1px solid #ccc;float:left;' /> &nbsp;
+                                [ID: {$child['id']}] {$child['name']}
+                                <span class="pull-right">
+                                    <div class='label {if $child['enabled']==1}label-primary{else}label-default{/if}'
+                                         data-toggle='ajaxSwitch'
+                                         data-switch-value='{$child['enabled']}'
+                                         data-switch-value0='0|隐藏|label label-default|{:url('admin/goods/categoryenabled',array('enabled'=>1,'id'=>$child['id']))}'
+                                         data-switch-value1='1|显示|label label-primary|{:url('admin/goods/categoryenabled',array('enabled'=>0,'id'=>$child['id']))}'
+                                         >
+                                         {if $child['enabled']==1}显示{else}隐藏{/if}
+                                     </div>
+                                           {if intval($shopset['category']['level'])>2}
+                                                <a class='btn btn-default btn-sm btn-operation btn-op' href="{:url('admin/goods/categoryadd', array('parentid' => $child['id']))}" title='添加子分类' >
+                                                   <span data-toggle="tooltip" data-placement="top" title="" data-original-title="添加子分类">
+                                                    <i class="icow icow-tianjia"></i>
+                                                   </span>
+                                                </a>
+                                           {/if}
+                                            <a class='btn btn-default btn-sm btn-operation btn-op' href="{:url('admin/goods/categoryedit', array('id' => $child['id']))}" title="" >
+                                                  <span data-toggle="tooltip" data-placement="top" title="" data-original-title="修改">
+                                                        <i class="icow icow-bianji2"></i>
+                                                 </span>
+                                            </a>
+                                            <a class='btn btn-default btn-sm btn-operation btn-op'  data-toggle='ajaxPost'  href="{:url('admin/goods/categorydelete', array('id' => $child['id']))}" data-confirm="确认删除此分类吗？">
+                                              <span data-toggle="tooltip" data-placement="top"  data-original-title="删除">
+                                                    <i class="icow icow-shanchu1"></i>
+                                                </span>
+                                            </a>
+                                    </span>
+                                </div>
+                                {if count($children[$child['id']])>0 && intval($shopset['category']['level'])==3}
+                                <ol class="dd-list"  style='width:100%;'>
+                                    {foreach name="children[$child['id']]" item='third'}
+                                    <li class="dd-item" data-id="{$third['id']}">
+                                        <div class="dd-handle">
+                                            <img src="{$third['thumb']}" width='30' height="30" onerror="$(this).remove()" style='padding:1px;border: 1px solid #ccc;float:left;' /> &nbsp;
+                                            [ID: {$third['id']}] {$third['name']}
+                                            <span class="pull-right">
+                         						<div class='label {if $third['enabled']==1}label-primary{else}label-default{/if}'
+	                                                data-toggle='ajaxSwitch'
+	                                                data-switch-value='{$third['enabled']}'
+	                                                data-switch-value0='0|隐藏|label label-default|{:url('admin/goods/categoryenabled',array('enabled'=>1,'id'=>$third['id']))}'
+	                                                data-switch-value1='1|显示|label label-primary|{:url('admin/goods/categoryenabled',array('enabled'=>0,'id'=>$third['id']))}'
+	                                                >
+                                            		{if $third['enabled']==1}显示{else}隐藏{/if}
+                                            	</div>
+												<a class='btn btn-default btn-sm btn-operation btn-op' href="{:url('admin/goods/categoryedit', array('id' => $third['id']))}" title="" >
+                                                 <span data-toggle="tooltip" data-placement="top" title="" data-original-title="添加子分类">
+                                                    <i class="icow icow-bianji2"></i>
+                                                     </span>
+                                                </a>
+                                                <a class='btn btn-default btn-sm btn-operation btn-op'  data-toggle='ajaxPost'  href="{:url('admin/goods/categorydelete', array('id' => $third['id']))}" data-confirm="确认删除此分类吗？">
+                                                    <span data-toggle="tooltip" data-placement="top"  data-original-title="删除">
+                                                        <i class="icow icow-shanchu1"></i>
+                                                    </span>
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </li>
+                                    {/foreach}
+                                </ol>
+                                {/if}
+                        </li>
+                        {/foreach}
+                    </ol>
+                    {/if}
+                </li>
+                {/if}
+                {/foreach}
+            </ol>
+            <table class='table'>
+                <tr>
+                    <td>
+                        <!-- <input id="save_category" type="submit" class="btn btn-primary" value="保存"> -->
+                        <input type="hidden" name="datas" value="" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+
+<script language='javascript'>
+    myrequire(['jquery.nestable'], function () {
+        $('#btnExpand').click(function () {
+            var action = $(this).data('action');
+            if (action === 'expand') {
+                $('#div_nestable').nestable('collapseAll');
+                $(this).data('action', 'collapse').html('<i class="fa fa-angle-up"></i> 展开所有');
+
+            } else {
+                $('#div_nestable').nestable('expandAll');
+                $(this).data('action', 'expand').html('<i class="fa fa-angle-down"></i> 折叠所有');
+            }
+        })
+        var depth = {:intval($shopset['category']['level'])};
+        if (depth <= 0) {
+            depth = 2;
+        }
+        $('#div_nestable').nestable({maxDepth: depth});
+
+        $('.dd-item').addClass('full');
+
+        $(".dd-handle a,.dd-handle div").mousedown(function (e) {
+
+            e.stopPropagation();
+        });
+        var $expand = false;
+        $('#nestableMenu').on('click', function (e)
+        {
+            if ($expand) {
+                $expand = false;
+                $('.dd').nestable('expandAll');
+            } else {
+                $expand = true;
+                $('.dd').nestable('collapseAll');
+            }
+        });
+
+        $('form').submit(function(){
+            var json = window.JSON.stringify($('#div_nestable').nestable("serialize"));
+            $(':input[name=datas]').val(json);
+        });
+
+    })
+</script>
+
+
+{include file='_footer'}

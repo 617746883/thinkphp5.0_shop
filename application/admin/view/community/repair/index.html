@@ -1,0 +1,90 @@
+{include file='_header'}
+
+<div class="page-header">当前位置：<span class="text-primary">维修管理</span></div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal form-search" role="form">
+        <div class="page-toolbar">
+           <div class="pull-right col-md-6">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name="status" class='form-control'>
+                            <option value="" {if $status == ''} selected{/if}>状态</option>
+                            <option value="1" {if $status == '1'} selected{/if}>待处理</option>
+                            <option value="2" {if $status == '2'} selected{/if}>处理中</option>
+                            <option value="3" {if $status == '3'} selected{/if}>已处理</option>
+                        </select>
+                    </div>
+                    <input type="text" class="form-control" name='keyword' value="{$keyword}" placeholder="请输入维修物品" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit"> 搜索</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    {if empty(count($list))}
+        <div class="panel panel-default">
+            <div class="panel-body empty-data">未查询到相关数据</div>
+        </div>
+    {else}
+        <form action="" method="post">
+            <div class="page-table-header">
+                <input type='checkbox' />
+                <div class="btn-group">
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/community/housestatus',array('status'=>1))}"><i class='icow icow-xianshi'></i> 显示</button>
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('admin/community/housestatus',array('status'=>0))}"><i class='icow icow-yincang'></i> 隐藏</button>
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/community/housedelete')}"><i class='icow icow-shanchu1'></i> 删除</button>
+                </div>
+            </div>
+            <table class="table table-responsive table-hover" >
+                <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:25px;"></th>
+                        <th style="width: 180px;">业务编号</th>
+                        <th style="width: 120px;">联系电话</th>
+                        <th style="width: 120px;">处理状态</th>
+                        <th style="width: 220px;">户号信息</th>
+                        <th style="width: 100px;">维修户号</th>
+                        <th>报修内容</th>
+                        <th style='width:60px'>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name='list' item='row'}
+                        <tr>
+                            <td>
+                                <input type='checkbox'   value="{$row['id']}"/>
+                            </td>
+                            <td>{$row['repairsn']}</td>
+                            <td>{$row['mobile']}</td>
+                            <td><span class='label {if $row['status']==1}label-danger{elseif $row['status']==2}label-primary{else}label-default{/if}'>{if ($row['status'])==1}待处理{/if}{if ($row['status'])==2}处理中{/if}{if ($row['status'])==3}已处理{/if}{if ($row['status'])==-1}已关闭{/if} </span></td>
+                            <td>{$row['communityname']}<br>{$row['buildingname']}<br>{$row['ownername']}-{$row['housename']}</td>
+                            <td>{$row['housesn']}</td>
+                            <td>{$row['description']}</td>
+                            <td>
+                                <a class='btn btn-default btn-sm' href="{:url('admin/community/repairdetail', array('id' => $row['id']))}">详情</a>
+                            </td>  
+                        </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td colspan="3">
+                        <div class="btn-group">
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('admin/community/housestatus',array('status'=>1))}"><i class='icow icow-xianshi'></i> 显示</button>
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('admin/community/housestatus',array('status'=>0))}"><i class='icow icow-yincang'></i> 隐藏</button>
+                            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/community/housedelete')}"><i class='icow icow-shanchu1'></i> 删除</button>
+                        </div>
+                    </td>
+                    <td colspan="4" style="text-align: right">
+                        {$pager}
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </form>
+    {/if}
+</div>
+
+{include file='_footer'}

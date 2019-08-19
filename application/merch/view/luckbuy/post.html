@@ -1,0 +1,95 @@
+{include file='_header'}
+<div class="page-header">
+    当前位置：<span class="text-primary">幸运购活动</small></span>
+</div>
+<!-- <link rel="stylesheet" href="/public/plugin/lottery/static/style/post.css" /> -->
+<div class="page-content">
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$item['lottery_id']}" />
+        <div class="tab-content">   
+            <div class="form-group">
+                <label class="col-lg control-label must">活动名称</label>
+                <div class="col-sm-9 col-xs-12">
+                    <div class="input-group">
+                        <input type="text" name="lottery_title" class="form-control" value="{$item['lottery_title']}" data-rule-required="true" />
+                        <input type="hidden" id="lottery_icon" name="lottery_icon" value="{if !empty($item['lottery_icon'])}{$item['lottery_icon']}{else}{/if}">
+                        <span class="input-group-addon" style="padding: 0px;"><img src="{if !empty($item['lottery_icon'])}{$item['lottery_icon']}{else}{/if}" id="showimg" width="30px" height="28px" onerror="this.src='/public/static/images/nopic.png'"></span>
+                        <span class="input-group-addon" data-toggle="selectImg" data-input="#lottery_icon" data-img="#showimg" data-full="1">选择图片</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg control-label must">活动详情页背景图</label>
+                <div class="col-sm-9 col-xs-12">
+                    <div class="input-group">
+                        <input type="text" id="lottery_banner" class="form-control" name="lottery_banner" value="{if !empty($item['lottery_banner'])}{$item['lottery_banner']}{else}{/if}">
+                        <span class="input-group-addon" style="padding: 0px;"><img src="{if !empty($item['lottery_banner'])}{$item['lottery_banner']}{else}{/if}" id="showbanner" width="30px" height="28px" onerror="this.src='/public/static/images/nopic.png'"></span>
+                        <span class="input-group-addon" data-toggle="selectImg" data-input="#lottery_banner" data-img="#showbanner" data-full="1">选择图片</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg control-label must">幸运购的次数</label>
+                <div class="col-sm-9 col-xs-12">
+                    <input type="number" name="luckbuycount" class="form-control" value="{$item['luckbuycount']}" {if !empty($item['lottery_id'])} readonly="true" {/if} data-rule-required="true"  />
+                    <span class='help-block'>此次活动的幸运购次数，最少设置大于每组个数。不然无法开奖。</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg control-label must">每组个数</label>
+                <div class="col-sm-9 col-xs-12">
+                    <input type="number" name="groupcount" class="form-control" value="{$item['groupcount']}" {if !empty($item['lottery_id'])} readonly {/if} data-rule-required="true"  />
+                    <span class='help-block'>参加活动按每组X人分组，取其中一列中奖</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg control-label must">参与限制</label>
+                <div class="col-sm-9 col-xs-12">
+                    <input type="number" name="joinlimied" class="form-control" value="{$item['joinlimied']}" {if !empty($item['lottery_id'])} readonly="true" {/if} data-rule-required="true"  />
+                    <span class='help-block'>此次活动每个会员最多参与几次。0或-1不限制</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg control-label must">场景条件(购买商品)</label>
+                <div class="col-sm-9 col-xs-12">
+                    <select class="form-control tpl-category-parent select2" id="goodsid" name="goodsid" {if !empty($item['lottery_id'])} disabled {/if} data-rule-required="true">
+                        <option value="0">请选择商品</option>
+                        {foreach name='luckbuygoods' item='goods'}
+                        <option value="{$goods['id']}" {if $item['goodsid'] == $goods['id']}selected="true"{/if}>{$goods['title']}</option>
+                        {/foreach}
+                    </select>
+                    {if !empty($item['lottery_id'])} <input type="hidden" name="goodsid" value="{$item['goodsid']}"> {/if}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg control-label">不能参加活动提示</label>
+                <div class="col-sm-9 col-xs-12">
+                    <textarea name="lottery_cannot" class="form-control" rows="5" >{if $item['lottery_cannot']}{$item['lottery_cannot']}{else}您没有参与抽奖的机会..{/if}</textarea>
+                    <span class="help-block">默认：您没有参与抽奖的机会..</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg control-label">是否开启</label>
+                <div class="col-sm-9 col-xs-12">
+                    <label class='radio-inline'>
+                        <input type='radio' name='status' value=1' {if $item['status']==1}checked{/if} /> 是
+                    </label>
+                    <label class='radio-inline'>
+                        <input type='radio' name='status' value=0' {if $item['status']==0}checked{/if} /> 否
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group"></div>
+        <div class="form-group">
+            <label class="col-lg control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" id="reward-submit" value="提交" class="btn btn-primary"  />
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div>
+    </form>
+</div>
+
+{include file='_footer'}
+

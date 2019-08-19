@@ -1,0 +1,33 @@
+<div class="fart-preview">
+    <div class="top"><p bind-to="art_title">{if $aid}{$article['article_title']}{else}这里是文章标题{/if}</p></div>
+    <div class="main">
+        <div class="fart-rich-primary">
+            <div class="fart-rich-title" bind-to="art_title">{if $aid}{$article['article_title']}{else}这里是文章标题{/if}</div>
+            <div class="fart-rich-mate">
+                <div class="fart-rich-mate-text" bind-to="art_date_v">{if $aid}{$article['article_date_v']}{else}{:date('Y-m-d');}{/if}</div>
+                <div class="fart-rich-mate-text" bind-to="art_author">{if $aid}{$article['article_author']}{else}编辑小美{/if}</div>
+                <div class="fart-rich-mate-text href" bind-to="art_mp">{if empty($article['article_mp'])}{$mp['name']}{else}{$article['article_mp']}{/if}</div>
+            </div>
+            <div class="fart-rich-content" id="preview-content">
+                {:htmlspecialchars_decode($article['article_content'])}
+            </div>
+            <div class="fart-rich-tool" style="display: none;">
+                <div class="fart-rich-tool-text"><i class="icon icon-person2"></i></div>
+                <div class="fart-rich-tool-text" bind-to="art_read"> {if $aid}{if $article['article_readnum_v']>100000}100000+{else}{$article['article_readnum_v']}{/if}{else}100000+{/if}</div>
+                <div class="fart-rich-tool-text"><i class="icon icon-likefill text-danger"></i></div>
+                <div class="fart-rich-tool-text">
+                    <span bind-to="art_like"> {if $aid}{if $article['article_likenum_v']>100000}100000+{else}{$article['article_likenum_v']}{/if}{else}54321{/if}</span>
+                </div>
+                <div class="fart-rich-tool-text right">反馈</div>
+            </div>
+        </div>
+        <div class="fart-rich-sift product" {if $article['product_advs_type']!=0}style="display:block;"{/if}>
+            <div class="fart-rich-sift-line">
+                <div class="fart-rich-sift-border"></div>
+                <div class="fart-rich-sift-text"><a bind-to="product_adv_title">{if $aid}{$article['product_advs_title']}{else}精品推荐{/if}</a></div>
+            </div>
+            <div class="fart-rich-sift-img"><img src="/public/static/plugin/article/css/img01.jpg"></div>
+            <div class="fart-rich-sift-more" bind-to="product_adv_more">{if $aid}{$article['product_advs_more']}{else}更多精品{/if}</div>
+        </div>
+    </div>
+</div>

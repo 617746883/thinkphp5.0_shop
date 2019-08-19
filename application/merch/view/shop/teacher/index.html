@@ -1,0 +1,124 @@
+{include file='_header'}
+
+<div class="page-header">
+    当前位置：<span class="text-primary"> 教师管理 </span>
+</div>
+<div class="page-merch">
+<form action="" method="get" class="form-horizontal" role="form" id="form1">
+    <div class="page-toolbar m-b-sm m-t-sm">
+        <div class="col-sm-3">
+            <span class='pull-left'>
+                <a class='btn btn-primary btn-sm' href="{:url('merch/shop/teacheradd')}"><i class="fa fa-plus"></i> 添加教师</a>
+            </span>
+        </div>
+        <div class="col-sm-8 pull-right">
+            <div class="input-group">
+                <div class="input-group-select">
+                    <select name='status' class='form-control  input-sm select-md' style="width:100px;"  >
+                        <option value=''>状态</option>
+                        <option value='0' {if $status=='0'}selected{/if}>显示</option>
+                        <option value='1' {if $status=='1'}selected{/if}>隐藏</option>
+                    </select>
+                </div>
+                <input type="text" class="form-control input-sm"  name="keyword" value="{$keyword}" placeholder="教师名"/>
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit"> 搜索</button>
+                </span>
+            </div>
+
+        </div>
+    </div>
+</form>
+{if empty(count($list))}
+<div class='panel panel-default'>
+    <div class='panel-body' style='text-align: center;padding:30px;'>
+        暂时没有任何教师!
+    </div>
+</div>
+{else}
+<div class="page-table-header">
+    <input type="checkbox">
+    <div class="btn-group">
+        <a class='btn btn-default btn-sm btn-operation'  data-toggle='batch' data-href="{:url('merch/shop/teacherstatus',array('status'=>1))}"  data-confirm='确认要启用账户吗?'>
+            <i class="icow icow-qiyong"></i>启用
+        </a>
+        <a class='btn btn-default btn-sm btn-operation'  data-toggle='batch' data-href="{:url('merch/shop/teacherstatus',array('status'=>-1))}" data-confirm='确认要禁用账户吗?'>
+            <i class="icow icow-jinyong"></i>禁用
+        </a>
+        <a class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('merch/shop/teacherdelete')}">
+            <i class='icow icow-shanchu1'></i> 删除
+        </a>
+    </div>
+</div>
+<table class="table table-hover table-responsive">
+    <thead class="navbar-inner" >
+    <tr>
+        <th style="width:25px;"></th>
+        <th>教师名</th>
+        <th>擅长</th>
+        <th>标签</th>
+        <th>性别</th>
+        <th style="width:85px;">状态</th>
+        <th style='width:65px;'>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {foreach name='list' item='row'}
+    <tr rel="pop" data-title="ID: {$row['id']} ">
+        <td>
+            <input type='checkbox'   value="{$row['id']}"/>
+        </td>
+        <td>{$row['teachername']}<br/></td>
+        <td>{$row['business']}</td>
+        <td>{$row['label']}</td>
+        <td>{if $row['gender'] == 1}男{elseif $row['gender'] == 2}女{else}保密{/if}</td>
+        <td>
+            <span class='label {if $row['status']==1}label-primary{else}label-default{/if}'
+                    data-toggle='ajaxSwitch'
+                    data-switch-value='{$row['status']}'
+                    data-switch-value0='0|隐藏|label label-default|{:url('merch/shop/teacherstatus',array('status'=>1,'id'=>$row['id']))}'
+                    data-switch-value1='1|显示|label label-primary|{:url('merch/shop/teacherstatus',array('status'=>0,'id'=>$row['id']))}' >
+                {if $row['status']==1}显示{else}隐藏{/if}
+            </span>
+        </td>
+        <td  style="overflow:visible;">
+            <a href="{:url('merch/shop/teacheredit', array('id' => $row['id']))}" class="btn btn-default btn-sm btn-op btn-operation" >
+                  <span data-toggle="tooltip" data-placement="top" title="" data-original-title="修改">
+                        <i class='icow icow-bianji2'></i>
+                   </span>
+            </a>
+            <a data-toggle='ajaxRemove' href="{:url('merch/shop/teacherdelete', array('id' => $row['id']))}"class="btn btn-default btn-sm btn-op btn-operation" data-confirm='确认要删除此教师吗?'>
+                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                     <i class='icow icow-shanchu1'></i>
+                </span>
+            </a>
+        </td>
+    </tr>
+    {/foreach}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td><input type="checkbox"></td>
+            <td colspan="2">
+                <div class="btn-group">
+                    <a class='btn btn-default btn-sm btn-operation'  data-toggle='batch' data-href="{:url('merch/shop/teacherstatus',array('status'=>1))}"  data-confirm='确认要启用教师吗?'>
+                        <i class="icow icow-qiyong"></i>启用
+                    </a>
+                    <a class='btn btn-default btn-sm btn-operation'  data-toggle='batch' data-href="{:url('merch/shop/teacherstatus',array('status'=>0))}" data-confirm='确认要禁用教师吗?'>
+                        <i class="icow icow-jinyong"></i> 禁用
+                    </a>
+                    <a class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('merch/shop/teacherdelete')}">
+                        <i class='icow icow-shanchu1'></i> 删除
+                    </a>
+                </div>
+            </td>
+            <td colspan="4" class="text-right">
+                {$pager}
+            </td>
+        </tr>
+    </tfoot>
+</table>
+{/if}
+</div>
+
+{include file='_footer'}

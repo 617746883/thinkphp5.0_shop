@@ -1,0 +1,160 @@
+.fui-header {
+    background: #6ca5e8;
+    height: 3rem;
+    padding: 0.5rem;
+}
+
+.fui-header:before,
+.fui-header:after {
+    border: 0;
+}
+
+.fui-header .left {
+    width: auto;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+}
+
+.fui-header .logo {
+    height: 2.2rem;
+    width: 2.2rem;
+}
+
+.fui-header .logo img {
+    height: inherit;
+    width: inherit;
+    vertical-align: middle;
+}
+
+.fui-header .angle {
+    height: 3rem;
+    width: 2rem;
+    background: url("../images/custom_angle.jpg") no-repeat center;
+    margin-left: 0.5rem;
+    background-size: 70%;
+}
+
+.fui-header .angle i {
+    font-size: 1.5rem;
+}
+
+.fui-header .title {
+    line-height: 3rem;
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.fui-header ~ .fui-content {
+    top: 3rem;
+    background: #d2d2d2;
+}
+
+.fui-header .fui-header-left,
+.fui-header .fui-header-right {
+    height: 3rem;
+    line-height: 3rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.fui-header a {
+    height: 3rem;
+    line-height: 3rem;
+}
+.fui-header a.back::after {
+    content: " ";
+    display: inline-block;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    height: 0.5rem;
+    width: 0.5rem;
+    border-width: 0 0 2px 2px;
+    border-color: #fff;
+    border-style: solid;
+    position: relative;
+    top: 0;
+    left: 4px;
+}
+.fui-header a.back::before {
+    border-color: #fff;
+}
+
+.fui-header .fui-header-right .icon {
+    font-size: 1.2rem;
+    color: #fff;
+    padding-right: 0.4rem;
+}
+
+.follow_topbar {
+    background: #f01;
+}
+.page-goods-detail .follow_topbar ~ .fui-content {
+    top: 5.6rem;
+}
+
+.fui-content .form-area {
+    margin: 2em 0.5em 0.5em 0.5em;
+}
+
+.fui-content .form-area .input-area {
+    height: 1.8rem;
+    display: block;
+    width: 100%;
+    border: 1px solid #717171;
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+    background: #fff;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    overflow: hidden;
+}
+
+.fui-content .form-area .input-area .title {
+    width: 8rem;
+    padding-left: 0.5rem;
+    line-height: 1.8rem;
+    font-size: 0.8rem;
+    color: #b9b9b9;
+}
+
+.fui-content .form-area .input-area .input {
+    width: 100%;
+}
+
+.fui-content .form-area .input-area .input input {
+    height: 1.8rem;
+    width: 100%;
+    border: 0;
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.btn-blue {
+    background: #2e91ee;
+    color: #fff;
+    border: 0;
+    display: block;
+    margin-top: 0.7rem;
+}
+
+.text-area {
+    padding: 0.5rem;
+    color: #15556e;
+    font-size: 0.75rem;
+}
+
+.fui-footer {
+    background: #d2d2d2;
+}
+.fui-footer .btn {
+    margin-left: 0.5rem;
+
+}

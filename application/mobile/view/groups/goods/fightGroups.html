@@ -1,0 +1,108 @@
+{include file='_header'}
+<title>商品详情</title>
+<link rel="stylesheet" href="/public/static/plugin/groups/css/style.css?v=2018531" />
+<div class='fui-page creditshop-detail-page'>
+	<div class="fui-header">
+		<div class="fui-header-left">
+			<a class="back" href="{php echo mobileUrl('order')}"></a>
+		</div>
+		<div class="title">拼团操作</div>
+		<div class="fui-header-right">&nbsp;</div>
+	</div>
+	<div class='fui-content navbar'>
+		{if !is_mobile()}<div class="pcshop-index">{/if}
+		<div class="lynn_opengroups_head fui-list">
+			<a href="{php echo mobileUrl('groups/goods', array('id'=>$goods['id']))}" class="lynn_index_list_a fui-list-media">
+				<img src="{$goods['thumb']}" alt="{$goods['title']}" onerror="this.src='/public/static/images/nopic100.jpg'">
+			</a>
+			<div class="fui-list-inner lynn_opengroups_head_goods">
+				<h2>{$goods['title']}</h2>
+				<div class="lynn_opengroups_head_goods_info">
+					{if $goods['is_ladder'] ==1}
+						<span class="fl person"style="margin: 0.65rem 0">阶梯团</span>
+						{else}
+						<span class="fl person"style="margin: 0.65rem 0">{$goods['groupnum']}人团</span>
+					{/if}
+					<div style="clear:both;"></div>
+				</div>
+				<div class="price">
+					¥ <strong>{$goods['groupsprice']}/</strong>{if $goods['units']}{$goods['goodsnum']}{$goods['units']}{else}1件{/if}
+					<span class="fr">
+						已有<b>{$goods['fightnum']}</b>人参团
+					</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="progress">
+			<text class="icox icox-1">1</text>
+			下单开团/参团
+			<text class="line">---------</text>
+			<text class="icox icox-2">2</text>
+			邀请好友参团
+			<text class="line">---------</text>
+			<text class="icox icox-3">3</text>
+			人满拼团成功
+		</div>
+		<div class="lynn_fightgroups">
+			<div class="lynn_fightgroups_head">以下小伙伴正在发起拼团，您可以直接参加</div>
+			{if $teams}
+			<ul class="lynn_fightgroups_list">
+				{foreach name='teams' key='index' item='item'}
+				<li>
+					<img src="{$item['avatar']}" alt="{$item['nickname']}" onerror="this.src='/public/static/plugin/groups/images/avatar.png'">
+					<span class="lynn_fightgroups_span row">
+						<strong class="fl">
+							<p>{if $item['nickname']}{$item['nickname']}{else}匿名{/if}</p>
+							<div>剩余：
+								<i id="residualtime{$index}" title="{$item['residualtime']}">{$item['hour']}時:{$item['minite']}分:{$item['second']}秒</i>
+								<span>
+								还差<b>{$item['num']}</b>人成团
+								</span>
+							</div>
+
+						</strong>
+
+					</span>
+					{if $item['is_ladder']==1}
+					<a href="{php echo mobileUrl('groups/orders/confirm',array('id' => $item['goodid'],'teamid' => $item['teamid'],'type'=>'groups','ladder_id'=>$item['ladder_id']));}" class="fr external">我要参团</a>
+					{elseif $item['more_spec']==1}
+					<a href="javascript:void(0);" class=" fr external" onclick="more_spec({$item['goodid']},{$item['teamid']},{$item['options_id']})">我要参团</a>
+					{else}
+					<a href="{php echo mobileUrl('groups/orders/confirm',array('id' => $item['goodid'],'teamid' => $item['teamid'],'type'=>'groups','options_id'=>$item['options_id']));}" class="fr external">我要参团</a>
+					{/if}
+				</li>
+				{/foreach}
+			</ul>
+			{else}
+			<div class="lynn_fight_nomarl">
+				暂无相关团购
+			</div>
+			{/if}
+		</div>
+		{if !is_mobile()}</div>{/if}
+	</div>
+	<script language='javascript'>
+		require(['/public/static/plugin/groups/js/fightGroups.js'], function (modal) {
+			modal.init();
+		});
+		function more_spec(goodid,teamid,options_id){
+            core.json('groups/goods/goodsCheck', {'id':goodid, type: 'groups',options_id:options_id}, function (postjson) {
+                if (postjson.status == 1) {
+                    location.href = core.getUrl('groups/orders/confirm', {
+                        id: goodid,
+                        type: 'groups',
+                        teamid:teamid,
+                        options_id:options_id
+                    });
+                    return
+                } else {
+                    FoxUI.toast.show(postjson.result.message)
+                }
+            }, true, true)
+		}
+
+	</script>
+</div>
+{include file='groups/footerMenus'}
+{include file='_footer'}

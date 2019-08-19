@@ -1,0 +1,96 @@
+<style>
+    h2{
+        padding: 30px;
+    }
+</style>
+<div class="row">
+    <div class="col-md-4 col-sm-4">
+        <div class="summary_box float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="summary_title">
+                <span class="text-default title_inner">申请的金额(抽成后)</span>
+            </div>
+            <div class="summary flex">
+                <div class="flex1 flex column">
+                    <h2 class="no-margins yesterday-count text-danger"><span id="bonusmoney_pay">{$item['realpricerate']}</span> 元</h2>
+                    <small>抽成前的金额: {$item['realprice']} 元</small>
+                </div >
+            </div>
+        </div>
+    </div>
+
+    {if $status > 1}
+    <div class="col-md-4 col-sm-4">
+        <div class="summary_box float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="summary_title">
+                <span class="text-default title_inner">通过申请的金额(抽成后)</span>
+            </div>
+            <div class="summary flex">
+                <div class="flex1 flex column">
+                    <h2 class="no-margins yesterday-count text-danger"><span id="passbonusmoney_pay">{$item['passrealpricerate']}</span> 元</h2>
+                    <small>抽成前的金额: {$item['passrealprice']} 元</small>
+                </div >
+            </div>
+        </div>
+    </div>
+    {/if}
+
+
+    {if $item['status']==3}
+    <div class="col-md-4 col-sm-4">
+        <div class="summary_box float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="summary_title">
+                <span class="text-default title_inner">实际打款金额</span>
+            </div>
+            <div class="summary flex">
+                <div class="flex1 flex column">
+                    <h2 class="no-margins today-count text-danger">{$item['finalprice']} 元</h2>
+                </div >
+            </div>
+        </div>
+    </div>
+    {/if}
+
+    <div class="col-md-4 col-sm-4">
+        <div class="summary_box float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="summary_title">
+                <span class="text-default title_inner">申请的订单金额</span>
+            </div>
+            <div class="summary flex">
+                <div class="flex1 flex column">
+                    <h2 class="no-margins today-count text-danger">{$item['orderprice']} 元</h2>
+                    <small>订单个数: {$item['ordernum']} 个</small>
+                </div >
+            </div>
+        </div>
+    </div>
+
+
+    {if $status > 1}
+    <div class="col-md-4 col-sm-4">
+        <div class="summary_box float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="summary_title">
+                <span class="text-default title_inner">通过申请的订单金额</span>
+            </div>
+            <div class="summary flex">
+                <div class="flex1 flex column">
+                    <h2 class="no-margins today-count text-danger">{$item['passorderprice']} 元</h2>
+                    <small>订单个数: {$item['passordernum']} 个</small>
+                </div >
+            </div>
+        </div>
+    </div>
+    {/if}
+    <div class="col-md-4 col-sm-4">
+        <div class="summary_box float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="summary_title">
+                <span class="text-default title_inner">抽成比例</span>
+            </div>
+            <div class="summary flex">
+                <div class="flex1 flex column">
+                    <h2 class="no-margins today-count ">{$item['payrate']} %</h2>
+                </div >
+            </div>
+        </div>
+    </div>
+</div>
+

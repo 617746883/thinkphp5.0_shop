@@ -1,0 +1,35 @@
+{if !$refund}
+    {if $item['status'] == 0}
+    <a class="btn btn-primary btn-xs" data-toggle="ajaxPost" href="{:url('admin/groups/orderpay', array('id' => $item['id']))}" data-confirm="确认此订单已付款吗？">确认付款</a>
+    {/if}
+{if ($item['status'] == 1 && $item['success'] == 1) || ($item['status'] == 1 && $item['is_team'] == 0) }
+{if $item['isverify'] == 1}
+{else}
+    <a class="btn btn-primary btn-xs" data-toggle="ajaxModal" href="{:url('admin/groups/ordersend', array('id' => $item['id']))}">确认发货</a><br />
+    {if $item['sendtype'] > 0}
+        <a class="text-primary" data-toggle='ajaxModal'  href="{:url('admin/groups/ordersendcancel', array('id' => $item['id']))}" >取消发货</a><br />
+    {/if}
+{/if}
+{/if}
+    {if $item['status'] == -1 && $item['success'] == -1}
+    <!--<a class="btn btn-primary btn-xs" data-toggle="ajaxModal" href="{:url('admin/groups/order/send', array('id' => $item['id']))}" data-confirm="确认此订单要退款吗？">确认退款</a>-->
+    {/if}
+    {if $item['status'] == 2}
+    <a class="btn btn-success btn-xs" data-toggle="ajaxModal"  href="{:url('admin/groups/orderchangeexpress', array('id' => $item['id']))}">修改物流</a><br />
+    <a class="btn btn-primary btn-xs" data-toggle='ajaxPost'  href="{:url('admin/groups/orderfinish', array('id' => $item['id']))}" data-confirm="确认订单收货吗？">确认收货</a>
+    {/if}
+{else}
+
+{if $item['refundstatus'] == 0}
+    <a class="btn btn-primary btn-xs" data-toggle="ajaxModal" href="{:url('admin/groups/refundsubmit', array('id' => $item['orderid'],'refundid' => $item['id']))}">处理申请</a>
+{/if}
+    {if $item['refundstatus'] == 3}
+    <a class="btn btn-primary btn-xs" data-toggle='ajaxPost'  href="{:url('admin/groups/refundsubmit', array('id' => $item['orderid'],'refundid' => $item['id']))}" data-confirm="确认订单收货吗？">确认收货</a>
+    {/if}
+    {if $item['refundstatus'] == 4}
+    <a class="btn btn-primary btn-xs" data-toggle="ajaxModal" href="{:url('admin/groups/refundsubmit', array('id' => $item['orderid'],'refundid' => $item['id']))}">确认发货</a>
+    {/if}
+    {if $item['refundstatus'] == 5}
+    <a class="btn btn-success btn-xs" data-toggle="ajaxModal"  href="{:url('admin/groups/refundsubmit', array('id' => $item['orderid'],'refundid' => $item['id']))}">修改物流</a>
+    {/if}
+{/if}

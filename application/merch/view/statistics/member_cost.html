@@ -1,0 +1,69 @@
+{include file='_header'}
+<div class="page-header"> 当前位置：<span class="text-primary">会员消费排行</span></div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal" role="form" id="form1">
+        <div class="page-toolbar">
+            <div class="col-sm-6 pull-right">
+                <div class="input-group">
+                    <span class="input-group-select">
+                        <select name="orderby" class='form-control ' style="width: 120px;">
+                            <option value="" {if $_GET['orderby'] == ''} selected{/if}>排序</option>
+                            <option value="ordercount" {if $_GET['orderby']== 'ordercount'} selected{/if}>订单数</option>
+                            <option value="ordermoney" {if $_GET['orderby'] == 'ordermoney'} selected{/if}>消费金额</option>
+                        </select>
+                    </span>
+                    <input type="text" class="input-sm form-control" name='keyword' value="{$_GET['keyword']}" placeholder="会员名/手机号"> <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit"> 搜索</button>
+                	<button type="submit" name="export" value='1' class="btn btn-success ">导出</button> </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    {if count($list) <= 0}
+    <div class="panel panel-default">
+        <div class="panel-body empty-data">未查询到相关数据</div>
+    </div>
+    {else}
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th style='width:80px;'>排行</th>
+            <th>粉丝</th>
+            <th>姓名</th>
+            <th>手机号</th>
+            <th>等级</th>
+            <th>消费金额</th>
+            <th>订单数</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach name='list' key='key' item="item"}
+        <tr>
+            <td>{if ($pindex -1)* $psize + $key + 1<=3}
+                <labe class='label label-danger' style='padding:8px;'>&nbsp;<?php echo ($pindex -1)* $psize + $key + 1?>&nbsp;</labe>
+                {else}
+                <labe class='label label-default'  style='padding:8px;'>&nbsp;<?php echo ($pindex -1)* $psize + $key + 1?>&nbsp;</labe>
+                {/if}
+            </td>
+            <td><img class="radius50" src="{$item['avatar']}" style='padding:1px;width:30px;height:30px;border:1px solid #ccc'  onerror="this.src='/public/static/images/noface.png'" />
+                {$item['nickname']}</td>
+            <td>{$item['realname']}</td>
+            <td>{$item['mobile']}</td>
+            <td>{if empty($item['levelname'])} {$shop['levelname']?$shop['levelname']:'普通会员'} {else}{$item['levelname']}{/if}</td>
+            <td>{$item['ordermoney']}</td>
+            <td>{$item['ordercount']}</td>
+        </tr>
+        {/foreach}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7" style="text-align: right">
+                    {$pager}
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    {/if}
+</div>
+
+{include file='_footer'}

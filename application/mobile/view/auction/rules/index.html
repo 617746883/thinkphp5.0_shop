@@ -1,0 +1,25 @@
+{include file='_header'}
+<link rel="stylesheet" href="/public/static/plugin/groups/css/style.css?v=2018531" />
+<div class='fui-page order-list-page' style="background: #fff">
+	<div class="fui-header">
+		<div class="fui-header-left">
+			<a class="back" href="{:url('mobile/groups/order')}"></a>
+		</div>
+		<div class="title">拍卖玩法</div>
+		<div class="fui-header-right">&nbsp;</div>
+	</div>
+	<div class='fui-content' style="padding-bottom:0;top:2.2rem;">
+		{if !is_mobile()}<div class="pcshop-index">{/if}
+		<dl class="lynn_team_rules">
+			<dt>拍卖流程：</dt>
+			<dd class="lynn_team_rules_dd">
+				1 选择心仪商品 2 交保证金 3 参与竞拍 4 竞拍成功 5 支付货款 6 交易成功 
+			</dd>
+			<dd class="lynn_team_rules_content">
+				{:htmlspecialchars_decode($set['explain'])}
+			</dd>
+		</dl>
+		{if !is_mobile()}</div>{/if}
+	</div>
+</div>
+{include file='_footer'}

@@ -1,0 +1,197 @@
+{include file='_header'}
+<style>
+    .ibox-content h3{
+        font-size:14px;
+        line-height: 20px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .ibox-content p{
+        line-height: 1.5;
+    }
+    .vote-star{
+        display:inline-block;/*内联元素转换成块元素，并不换行*/
+        margin-right:6px;
+        width:75px;/*5个星星的宽度*/
+        height:15px;/*1个星星的高度*/
+        overflow:hidden;
+        vertical-align:middle;
+        background:url(/public/static/images/star_default.png) repeat-x;
+    }
+    .vote-star i{
+        display:inline-block;/*内联元素转换成块元素，并不换行*/
+        height:15px;/*1个星星的高度*/
+        background:url(/public/static/images/star_activity.png) repeat-x 00;
+    }
+    .vote-number{
+        vertical-align:middle;
+        font-family:微软雅黑,Verdana,Geneva, sans-serif;
+        font-size:12px;
+    }
+    .num { position:absolute; left:10px;color:#000;font-weight:bold;}
+    .progress { position: relative; }
+</style>
+<div class="page-header">当前位置：<span class="text-primary">首页</span></div>
+
+<div class="page-content transparent">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5><i class="icow icow-shop"></i>店铺信息</h5>
+                    <ul>
+                        <a href="{:url('merch/sysset/index')}" class="text-primary">修改</a>
+                    </ul>
+                </div>
+                <div class="ibox-content" style="height: 250px;">
+                    <div class="col-sm-2" style="padding:0">
+                        <img onerror="this.src='__STATIC__/images/nopic.png'" src="{$merch['logo']}" style="width:65px;height:65px;border-radius:5px">
+                    </div>
+                    <div class="col-sm-10"  style="padding-left:30px;padding-bottom:20px;">
+                        <h3>{$merch['merchname']}</h3>
+                        <p>{:msubstr($merch['desc'],0,50,"utf-8",true)}</p>
+                        <p class='hidden'>
+                            店铺链接: <a href='javascript:;' class="js-clip text-primary" title='点击复制链接' data-url="{$url}" >点击复制</a>
+                            <span style="cursor: pointer;" data-toggle="popover" data-trigger="hover" data-html="true" data-content="<img src='{$qrcode}' width='130' alt='链接二维码'>" data-placement="auto right">
+                                <i class="glyphicon glyphicon-qrcode"></i>
+                            </span>
+                        </p>
+                    </div>                    
+                    <p style="padding: 10px 0 0 20px;">
+                        <span class="vote-star"><i style="width:{$levelpercent['levelpercent5'] * 100}%"></i></span><span class="vote-number">综合评分 <span style="color: red;">{$levelpercent['totalscore']}</span> 分  共{$levelpercent['totalcount']}人</span>
+                    </p>
+                    <p style="padding: 0px 0 0 20px;">
+                        <span class="vote-star"><i style="width:100%"></i></span><span class="vote-number">5分  <span style="color: red;">{$levelpercent['levelpercent5'] * 100}%</span></span>
+                    </p>
+                    <p style="padding: 0px 0 0 20px;">
+                        <span class="vote-star"><i style="width:80%"></i></span><span class="vote-number">4分  <span style="color: red;">{$levelpercent['levelpercent4'] * 100}%</span></span>
+                    </p>
+                    <p style="padding: 0px 0 0 20px;">
+                        <span class="vote-star"><i style="width:60%"></i></span><span class="vote-number">3分  <span style="color: red;">{$levelpercent['levelpercent3'] * 100}%</span></span>
+                    </p>
+                    <p style="padding: 0px 0 0 20px;">
+                        <span class="vote-star"><i style="width:40%"></i></span><span class="vote-number">2分  <span style="color: red;">{$levelpercent['levelpercent2'] * 100}%</span></span>
+                    </p>
+                    <p style="padding: 0px 0 0 20px;">
+                        <span class="vote-star"><i style="width:20%"></i></span><span class="vote-number">1分  <span style="color: red;">{$levelpercent['levelpercent1'] * 100}%</span></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="ibox">
+                <div class="ibox-content no-border">
+                    <ul class="fui-list-group noborder">
+                        <li class="fui-list">
+                            <a href="{:url('merch/goods/out')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-info icow-goodsL"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="goods_totals">--</h5>
+                                    <p>已售罄商品</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="fui-list">
+                            <a href="{:url('merch/order/status1')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-green icow-fahuo"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="status1">--</h5>
+                                    <p>待发货订单</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="fui-list">
+                            <a href="{:url('merch/order/status4')}">
+                                <div class="fui-list-media">
+                                    <span class="icow text-primary icow-tuihuo"></span>
+                                </div>
+                                <div class="fui-list-inner">
+                                    <h5 class="status4">--</h5>
+                                    <p>维权中订单</p>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5><i class="icow icow-shop"></i>订单信息</h5>
+                    <ul>
+                        <a href="{:url('merch/order/olist_all')}" class="text-primary">更多</a>
+                    </ul>
+                </div>
+                <div class="ibox-content">
+                    {if empty($order_ok)}
+                    <p style="line-height: 100px;" class="text-center">暂时没有任何待处理订单</p>
+                    {else}
+                    <table class="table table-hover no-margins">
+                        <thead>
+                        <tr>
+                            <th style="width: 100px">状态</th>
+                            <th style="width: 200px">日期</th>
+                            <th style="width: 200px">金额</th>
+                            <th>用户</th>
+                            <th>订单号</th>
+                            <th style="width: 80px">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {foreach name='order_ok' key='key' item='value'}
+                        <tr>
+                            <td><span class="label label-warning">待发货</span>
+                            </td>
+                            <td>{:date('Y-m-d H:i',$value['createtime'])}</td>
+                            <td class="text-navy">{$value['price']}</td>
+                            <td>{$value['address']['realname'] ? $value['address']['realname'] : $value['invoicename']}</td>
+                            <td class="text-navy">{$value['ordersn']}</td>
+                            <td>
+                                <a href="{:url('merch/order/detail',array('id'=>$value['id']))}" class="btn btn-xs btn-primary">查看详情</a>
+                            </td>
+                        </tr>
+                        {/foreach}
+                        </tbody>
+                    </table>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $.ajax({
+            type: "GET",
+            url: "{:url('merch/order/ajaxgettotals')}",
+            dataType: "json",
+            success: function (data) {
+                shopajax();
+                var res = data.result;
+                $("h5.status1").text(res.status1);
+                $("h5.status4").text(res.status4);
+            }
+        });
+
+        function shopajax() {
+            $.ajax({
+                type: "GET",
+                url: "{:url('merch/shop/ajax')}",
+                dataType: "json",
+                success: function (data) {
+                    var res = data.result;
+                    $("h5.goods_totals").text(res.goods_totals);
+                }
+            });
+        }
+    });
+</script>
+{include file='_footer'}

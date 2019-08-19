@@ -1,0 +1,130 @@
+{include file='_header'}
+<style type="text/css">
+.order-create-page .buybtn{width:5rem;margin:0;float:right;}
+</style>
+<form name='form' action="{:url('mobile/auction/pay')}" method="post">
+    <div class='fui-page order-create-page'>
+        <div class="fui-header">
+            <div class="fui-header-left">
+                <a class="back" href="{:url('order')}"></a><!-- onclick='history.back()'-->
+            </div>
+            <div class="title">确认订单</div>
+            <div class="fui-header-right">&nbsp;</div>
+        </div>
+        <div class='fui-content' style="padding-bottom: 2.5rem;overflow: scroll;overflow-scrolling: touch;">
+            {if  !$isverify}
+            <!--地址选择-->
+            <div class="fui-list-group" id='addressInfo' data-addressid="{:intval($address['id'])}">
+                <a  class="fui-list"
+                    {if empty($address)}
+                    href="{:url('member/addresspost')}"
+                    {else}
+                    href="{:url('member/addressselector')}"
+                    {/if} data-nocache="true">
+                    <div class="fui-list-media">
+                        <i class="icon icon-location"></i>
+                    </div>
+                    <div class="fui-list-inner" >
+                        <input type="hidden" class="aid" name="aid" value="{$address['id']}">
+                        <div class="title has-address" {if empty($address)}style='display:none'{/if}><span class='realname'>{$address['realname']}</span> <span class='mobile'>{$address['mobile']}</span></div>
+                        <div class="text has-address" {if empty($address)}style='display:none'{/if}><span class='address'>{$address['province']}{$address['city']}{$address['area']} {$address['address']}</span></div>
+                        <div class="text no-address" {if !empty($address)}style='display:none'{/if}><i class="icon icon-add"></i> 添加收货地址</div>
+                    </div>
+                    <div class="fui-list-angle">
+                        <div class="angle"></div>
+                    </div>
+                </a>
+            </div>
+            <!--自提点选择-->
+            <div class="fui-list-group"  id="carrierInfo" style="display: none">
+                <a class="fui-list" href="{:url('store/selector')}" data-nocache='true'>
+                    <div class="fui-list-media">
+                        <i class="icon icon-shop"></i>
+                    </div>
+
+                    <div class="fui-list-inner">
+                        <div class="title"><span class='storename'>{$carrier_list[0]['storename']}</span></div>
+                        <div class="subtitle"><span class='realname'>{$carrier_list[0]['realname']}</span> <span class='mobile' id="carrierInfo_mobile">{$carrier_list[0]['mobile']}</span></div>
+                        <div class="text"><span class='address'>{$carrier_list[0]['address']}</span></div>
+                    </div>
+                    <div class="fui-list-angle">
+                        <div class="angle"></div>
+                    </div>
+                </a>
+            </div>
+            {/if}
+
+        <!--联系填写-->
+        <div class="fui-cell-group sm" id="memberInfo" data-type="{$isverify}" {if !$isverify}style="display:none"{/if}>
+            <div class="fui-cell">
+                <div class="fui-cell-label sm">联系人</div>
+                <div class="fui-cell-info"><input type="text" placeholder="请输入联系人" name='realname'   class="fui-input" value="{$member['realname']}"/></div>
+            </div>
+            <div class="fui-cell">
+                <div class="fui-cell-label sm">联系电话</div>
+                <div class="fui-cell-info"><input type="tel" placeholder="请输入联系电话" name='mobile'   class="fui-input" value="{$member['mobile']}"/></div>
+            </div>
+        </div>
+        <div class="fui-list-group" style='margin-top: 10px'>
+            <div class="fui-list goods-item">
+                <div class="fui-list-media">
+                    <a href="{:url('mobile/auction/detail',array('id'=>$goods['id']))}" class="external">
+                        <img src="{:tomedia($goods['thumb'])}" alt="{$goods['title']}" class="round" onerror="this.src='/public/static/images/nopic100.jpg'">
+                    </a>
+                </div>
+                <div class="fui-list-inner">
+                    <a href="{:url('mobile/auction/detail',array('id'=>$goods['id']))}">
+                        <div class="text">
+                            {$goods['title']}
+                        </div>
+                    </a>
+                    <div class="text">
+                        <span class="price ">数量：1</span>
+                        <span class="total">
+                            （<span class='text-danger'>¥ {$goods['stprice']}</span>/1件
+                        </span>
+                        <div style="clear:both;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="fui-cell-group sm ">
+        <div class="fui-cell">
+            <div class="fui-cell-info"><input type="text" class="fui-input" name="remark" id='remark' placeholder="选填: 买家留言(50字以内)" maxlength="50"></div>
+        </div>
+    </div>
+    <div class="fui-cell-group sm">
+        <div class="fui-cell">
+            <div class="fui-cell-label" >商品小计</div>
+            <div class="fui-cell-info"></div>
+            <div class="fui-cell-remark noremark">¥ <span class='goodsprice'>
+                {$goods['stprice']}
+            </span></div>
+        </div>
+        <div class="fui-cell">
+            <div class="fui-cell-label" >运费</div>
+            <div class="fui-cell-info"></div>
+            <div class="fui-cell-remark noremark">
+                ¥ <span class='dispatchprice'>{:number_format(0,2)}</span>
+            </div>
+        </div>
+        <div class="fui-cell">
+            <div class="fui-cell-label" style='width:auto' >保证金抵扣</div>
+            <div class="fui-cell-info"></div>
+            <div class="fui-cell-remark noremark">- ¥ <span class='isdiscountprice'>{:number_format($goods['bond'],2)}</span></div>
+        </div>
+    </div>
+</div>
+<div class="fui-navbar order-create-checkout">
+    <input type="submit" name="submit" value="提交订单" id= 'submit' style="-webkit-appearance: none;" class="nav-item btn btn-danger buybtn" />
+    <input type="hidden" id="id" name='id' value="{$goods['id']}" />
+    <input type="hidden" id="price" name='price' value="{$price}" />
+    <a href="javascript:;" class="nav-item total">
+        需付：¥ <span class="text-danger totalprice">{:number_format($price,2)}</span>
+    </a>
+</div>
+</form>
+<script language='javascript'>
+    require(['/public/static/plugin/auction/js/confirm.js'], function (modal) {modal.init({:json_encode($createInfo)}); modal.totalPrice();});
+</script>
+{include file='_footer'}

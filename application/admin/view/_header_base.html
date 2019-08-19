@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{if !empty($copyright) && !empty($copyright['title'])}{$copyright['title']}{else}SUL1SS{/if}</title>
+        <link rel="shortcut icon" href="__STATIC__/images/favicon.ico" />
+        <link href="__STATIC__/css/bootstrap.min.css" rel="stylesheet">
+        <link href="__STATIC__/css/font-awesome.min.css" rel="stylesheet">
+        <link href="__STATIC__/css/animate.css" rel="stylesheet">
+        <link href="__STATIC__/css/v3.css" rel="stylesheet">
+        <link href="__STATIC__/css/common_v3.css" rel="stylesheet">
+        <link href="__STATIC__/fonts/v3/iconfont.css" rel="stylesheet" type="text/css" >
+        <link href="__STATIC__/fonts/iconfont.css" rel="stylesheet" type="text/css" >
+        <script src="__STATIC__/fonts/v3/iconfont.js"></script>
+        <script src="__STATIC__/js/lib/jquery-1.11.1.min.js"></script>
+        <script src="__STATIC__/js/dist/jquery/jquery.gcjs.js"></script>
+        <script src="__STATIC__/js/app/util.js"></script>
+
+        <link href="__STATIC__/css/we7.common.css" rel="stylesheet">
+        <!-- <link href="__STATIC__/css/we7.common169.css?v=1.0.0" rel="stylesheet"> -->
+        <script type="text/javascript" src="__STATIC__/js/lib/bootstrap.min.js"></script>
+        <script type="text/javascript" src="__STATIC__/js/app/common.min.js?v=20170802"></script>
+        <script type="text/javascript">if(util){util.clip = function(){}}</script>
+        <script src="__STATIC__/js/require.js"></script>
+        <script src="__STATIC__/js/config1.0.js"></script>
+        <script>
+            require.config({
+                waitSeconds: 0
+            });
+        </script>
+        <script src="__STATIC__/js/myconfig.js"></script>
+        <script type="text/javascript">
+            if (navigator.appName == 'Microsoft Internet Explorer') {
+                if (navigator.userAgent.indexOf("MSIE 5.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0) {
+                    alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
+                }
+            }
+            myrequire.path = "./public/js/";
+
+            function preview_html(txt)
+            {
+                var win = window.open("", "win", "width=300,height=600");  
+                win.document.open("text/html", "replace");
+                win.document.write($(txt).val());
+                win.document.close();
+            }
+        </script>
+    </head>
+    <body>

@@ -1,0 +1,75 @@
+{include file='_header'}
+<script type="text/javascript" src="__STATIC__/js/dist/area/cascade1.js"></script>
+<script type="text/javascript" src="__STATIC__/js/lib/moment.js"></script>
+<link rel="stylesheet" href="__STATIC__/components/datetimepicker/jquery.datetimepicker.css">
+<link rel="stylesheet" href="__STATIC__/components/daterangepicker/daterangepicker.css">
+<style type='text/css'>
+    .tabs-container .form-group {overflow: hidden;}
+    .tabs-container .tabs-left > .nav-tabs {}
+    .tab-goods .nav li {float:left;}
+    .spec_item_thumb {position: relative; width: 30px; height: 20px; padding: 0; border-left: none;}
+    .spec_item_thumb i {position: absolute; top: -5px; right: -5px;}
+    .multi-img-details, .multi-audio-details {margin-top:.5em;max-width: 700px; padding:0; }
+    .multi-audio-details .multi-audio-item {width:155px; height: 40px; position:relative; float: left; margin-right: 5px;}
+	.region-goods-details {
+		background: #f8f8f8;
+		margin-bottom: 10px;
+		padding: 0 10px;
+	}
+	.region-goods-left{
+		text-align: center;
+		font-weight: bold;
+		color: #333;
+		font-size: 14px;
+		padding: 20px 0;
+	}
+	.region-goods-right{
+		border-left: 3px solid #fff;
+		padding: 10px 10px;
+	}
+    {if $item['type']==4}
+    .type-4 {display: none;}
+    {/if}
+</style>
+<div class="page-header">
+    当前位置：
+    <span class="text-primary">
+    {if !empty($item['id'])}编辑{else}添加{/if}商品 <small>{if !empty($item['id'])}修改【<span class="text-info">{$item['title']}</span>】{/if}{if !empty($merch_user['merchname'])}商户名称:【<span class="text-info">{$merch_user['merchname']}</span>】{/if}</small>
+    </span>
+</div>
+<div class="page-content">
+<form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+    <input type="hidden" id="tab" name="tab" value="#tab_basic" />
+    <div class="tabs-container tab-goods">
+        <div class="tabs-left">
+            <ul class="nav nav-tabs" id="myTab">
+                <li  {if empty($tab) || $tab=='basic'}class="active"{/if}><a href="#tab_basic">基本</a></li>
+                <li  {if $tab=='commission'}class="active"{/if} ><a href="#tab_commission">代售佣金</a></li>
+            </ul>
+            <div class="tab-content  ">
+                <div class="tab-pane   {if empty($tab) || $tab=='basic'}active{/if}" id="tab_basic"><div class="panel-body">{include file='livemall/agent/basic'}</div></div>
+                <div class="tab-pane  {if $tab=='commission'}active{/if}" id="tab_commission"> <div class="panel-body">{include file='livemall/agent/commission'}</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"></label>
+        <div class="col-sm-9 subtitle">
+            <input type="submit" value="保存商品" class="btn btn-primary"/>
+			<a class="btn btn-default" href="{:url('admin/goods/index',array('goodsfrom'=>$_GET['goodsfrom'], 'page'=>$_GET['page']))}">返回列表</a>
+        </div>
+    </div>
+</form>
+</div>
+
+<script type="text/javascript">
+	require(['bootstrap'], function () {
+		$('#myTab a').click(function (e) {
+			$('#tab').val( $(this).attr('href'));
+			e.preventDefault();
+			$(this).tab('show');
+		})
+	});
+</script>
+
+{include file='_footer'}

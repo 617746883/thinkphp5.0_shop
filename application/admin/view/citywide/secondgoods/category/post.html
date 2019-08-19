@@ -1,0 +1,116 @@
+{include file='_header'}
+
+<div class="page-header">
+	当前位置：
+	<span class="text-primary">
+		{if !empty($item['id'])}编辑{else}添加{/if}商品分类 <small>{if !empty($item['id'])}修改【{$item['name']}】{/if}</small>
+	</span>
+</div>
+
+<div class="page-content">
+	<div class="page-sub-toolbar">
+		<span class=''>
+			<a class="btn btn-primary btn-sm" href="{:url('admin/goods/categoryadd')}">添加新分类</a>
+		</span>
+	</div>
+<form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data" >
+	{if !empty($parentid)}
+	<div class="form-group">
+		<label class="col-sm-2 control-label">上级分类</label>
+		<div class="col-sm-9 col-xs-12 control-label" style="text-align:left;">
+			{if !empty($parent1)}{$parent1['name']} >> {/if}
+			{$parent['name']}</div>
+	</div>
+	{/if}
+	<div class="form-group">
+		<label class="col-sm-2 control-label">排序</label>
+		<div class="col-sm-9 col-xs-12">
+			<input type="text" name="displayorder" class="form-control" value="{$item['displayorder']}" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label must">分类名称</label>
+		<div class="col-sm-9 col-xs-12">
+			<input type="text" name="name" class="form-control" value="{$item['name']}" data-rule-required='true' />
+		</div>
+	</div>
+	{if !empty($parentid)}
+	<div class="form-group">
+		<label class="col-sm-2 control-label">分类图片</label>
+		<div class="col-sm-9 col-xs-12">
+			{:tpl_form_field_image2('thumb', $item['thumb'])}
+			<span class="help-block">建议尺寸: 100*100，或正方型图片 </span>
+		</div>
+	</div>
+	{/if}
+	<div class="form-group">
+		<label class="col-sm-2 control-label">分类描述</label>
+		<div class="col-sm-9 col-xs-12">
+			<textarea name="description" class="form-control" cols="70">{$item['description']}</textarea>
+		</div>
+	</div> 
+	{if $level<=2}
+	<div class="form-group">
+		<label class="col-sm-2 control-label">{if intval($shopset['category']['level'])==1}分类图片{else}分类广告{/if}</label>
+		<div class="col-sm-9 col-xs-12">
+			{:tpl_form_field_image2('advimg', $item['advimg'])}
+			<span class="help-block">{if intval($shopset['category']['level'])==1}建议尺寸: 100*100，或正方型图片 {else}建议尺寸: 640*320 {/if}</span>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">分类广告链接</label>
+		<div class="col-sm-9 col-xs-12">
+			<div class="input-group">
+				<input type="text" name="advurl" class="form-control" value="{$item['advurl']}" id="advurl" />
+				<span data-input="#advurl" data-toggle="selectUrl" class="input-group-addon btn btn-default">选择链接</span>
+			</div>
+		</div>
+	</div>
+	{/if}
+	{if !empty($parentid)}
+	<div class="form-group">
+		<label class="col-sm-2 control-label">是否推荐</label>
+		<div class="col-sm-9 col-xs-12">
+			<label class='radio-inline'>
+				<input type='radio' name='isrecommand' value=1' {if $item['isrecommand']==1}checked{/if} /> 是
+			</label>
+			<label class='radio-inline'>
+				<input type='radio' name='isrecommand' value=0' {if $item['isrecommand']==0}checked{/if} /> 否
+			</label>
+		</div> 
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">首页推荐</label>
+		<div class="col-sm-9 col-xs-12">
+			<label class='radio-inline'>
+				<input type='radio' name='ishome' value=1' {if $item['ishome']==1}checked{/if} /> 是
+			</label>
+			<label class='radio-inline'>
+				<input type='radio' name='ishome' value=0' {if $item['ishome']==0}checked{/if} /> 否
+			</label>
+		</div> 
+	</div>
+	{/if}  
+	<div class="form-group">
+		<label class="col-sm-2 control-label">是否显示</label>
+		<div class="col-sm-9 col-xs-12">
+			<label class='radio-inline'>
+				<input type='radio' name='enabled' value=1' {if $item['enabled']==1}checked{/if} /> 是
+			</label>
+			<label class='radio-inline'>
+				<input type='radio' name='enabled' value=0' {if $item['enabled']==0}checked{/if} /> 否
+			</label>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label class="col-sm-2 control-label"></label>
+		<div class="col-sm-9 col-xs-12">
+			<input type="submit"  value="提交" class="btn btn-primary"/>
+			<input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+		</div>
+	</div>
+</form>
+</div>
+
+{include file='_footer'}

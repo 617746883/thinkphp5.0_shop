@@ -1,0 +1,77 @@
+{include file='_header'}
+<div class="page-header">
+    当前位置：<span class="text-primary"> 处理商品代售申请 </span> <small>({$goods['title']})</small>
+</div>
+
+<div class="page-content">
+<form id="setform" action="" method="post" class="form-horizontal form-validate">
+<input type="hidden" name="id" value="{$item['id']}"/>
+<div class="form-group">
+    <label class="col-lg control-label">主播信息</label>
+    <div class="col-sm-9 col-xs-12">
+        <img class="radius50" src="{$member['avatar']}" style='width:50px;height:50px;padding:1px;border:1px solid #ccc' onerror="this.src='/public/static/images/noface.png'"/>
+        {$member['nickname']}/{$member['mobile']}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg control-label">申请商品</label>
+    <div class="col-sm-9 col-xs-12">
+        <input type="text" name="goods" value="{if !empty($goods)}[{$goods['id']}]{$goods['title']}{/if}" id="goods" class="form-control" readonly />
+        <span id="goodsthumb" class='help-block' {if empty($goods)}style="display:none" {/if}>
+            <img style="width:100px;height:100px;border:1px solid #ccc;padding:1px" src="{:tomedia($goods['thumb'])}"  onerror="this.src='/public/static/images/nopic.png'"/>
+        </span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-lg control-label">主播推荐语</label>
+    <div class="col-sm-9">
+        <textarea name="slogans" class="form-control textarea">{$item['slogans']}</textarea>
+    </div>
+</div>
+<div class="form-group-title">申请操作</div>
+<div class="form-group">
+    <label class="col-lg control-label">申请状态</label>
+    <div class="col-sm-8">
+        <label class="radio-inline">
+            <input type="radio" name="status" value="0" {if $item['status']==0}checked{/if} onclick='showReason(false)'/>
+            申请中
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="status" value="-1" {if $item['status']==-1}checked{/if}
+            onclick='showReason(true)'/> 驳回申请
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="status" value="1" {if $item['status']==1}checked{/if} onclick='showReason(false)'/>
+            允许代售
+        </label>
+    </div>
+</div>
+
+<div class="form-group" id="reason" {if $item['status']!=-1}style='display:none'{/if}>
+<label class="col-lg control-label">驳回理由</label>
+<div class="col-sm-8">
+    <textarea name="reason" class="form-control textarea">{$item['reason']}</textarea>
+</div>
+</div>
+
+<div class="form-group">
+    <label class="col-lg control-label"></label>
+    <div class="col-sm-9 col-xs-12">
+        <input type="submit" value="提交" class="btn btn-primary"/>
+        <a class="btn btn-default" href="javascript:history.go(-1)">返回列表</a>
+    </div>
+</div>
+
+</form>
+</div>
+<script>
+    function showReason(show) {
+        if (show) {
+            $('#reason').show();
+        } else {
+            $('#reason').hide();
+        }
+    }
+</script>
+
+{include file='_footer'}

@@ -1,0 +1,1140 @@
+html,
+body,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+em,
+cite,
+del,
+a,
+img,
+ul,
+li,
+ol,
+dl,
+dt,
+dd,
+fieldset,
+legend,
+form,
+input,
+button,
+textarea,
+header,
+section,
+footer,
+article,
+nav,
+aside,
+address,
+menu,
+figure,
+figcaption {
+	margin: 0;
+	padding: 0;
+	outline: none
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-size: 100%;
+	font-weight: normal;
+}
+fieldset,
+img {
+	border: 0
+}
+ul {
+	list-style: none
+}
+mark {
+	background-color: transparent;
+	color: inherit;
+}
+header,
+section,
+footer,
+article,
+nav,
+aside,
+address,
+menu {
+	display: block
+}
+body {
+	text-align: left;
+	overflow-x: hidden;
+}
+a {
+	text-decoration: none;
+	outline: none;
+	
+}
+
+a,
+button,
+button:active {
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+}
+img {
+	width: 100%;
+}
+.top_bar {
+	background: #323438;
+	width: 100%;
+	height: 3.2rem;
+	position: absolute;
+	z-index: 10;
+}
+.top_bar h2 {
+	font-size: 1.15rem;
+	text-align: center;
+	color: #fff;
+	line-height: 3.2rem;
+}
+.back {
+	position: absolute;
+	left: 0.6rem;
+	top: 1rem;
+	font-size: 1.2rem;
+	line-height: 1.05rem;
+	color: #fff;
+}
+.back .b_arr {
+	background: url("http://1.vip.xunlei.com/one_wap/img/b_arr.png") no-repeat;
+	background-size: 100%;
+	display: inline-block;
+	width: 0.7rem;
+	height: 1.2rem;
+	float: left;
+	margin-right: 0.4rem;
+}
+.home {
+	position: absolute;
+	right: 0.8rem;
+	top: 0.9rem;
+	color: #fff;
+	font-size: 1.2rem;
+	line-height: 1.2rem;
+}
+.banner {
+	background: url("http://1.vip.xunlei.com/one_wap/img/bg.png") no-repeat;
+	background-size: 100%;
+	height: 17.9rem;
+	position: relative;
+}
+.bannerr {
+	background: url("./addons/feng_duobao/template/image/introduction.png") no-repeat;
+	background-size: 100%;
+	height: 17.9rem;
+	position: relative;
+}
+.headline {
+	background: url("http://1.vip.xunlei.com/one_wap/img/headline.png?v=141225") no-repeat;
+	background-size: 100%;
+	height: 12.97rem;
+	text-indent: -999em;
+	position: relative;
+	z-index: 2;
+}
+.user_lg {
+	background: url("http://1.vip.xunlei.com/one_wap/img/user_lg.png") no-repeat;
+	background-size: 100%;
+	display: block;
+	width: 1.83rem;
+	height: 1.83rem;
+	position: absolute;
+	top: 0.7rem;
+	right: 0.7rem;
+	z-index: 3;
+	text-indent: -999em;
+}
+.slide {
+	margin: -8rem 0.67rem;
+	position: relative;
+}
+.s_top {
+	background: #fb6009;
+	height: 2.77rem;
+	border-top-left-radius: 0.4rem;
+	border-top-right-radius: 0.4rem;
+}
+.s_top h2 {
+	color: #fff;
+	font-size: 1.2rem;
+	text-align: center;
+	line-height: 2.77rem;
+}
+.slide_box {
+	background: #fff;
+	height: 13rem;
+	overflow: hidden;
+	border-bottom-left-radius: 0.4rem;
+	border-bottom-right-radius: 0.4rem;
+}
+.slide_wp {
+	width: 20rem;
+	height: 10rem;
+	margin: 1.3rem auto;
+	overflow: hidden;
+	position: relative;
+}
+.slide_area {
+	width: 300rem;
+	height: 10rem;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.slide_area li {
+	width: 8rem;
+	height: 10rem;
+	padding: 0 1rem;
+	float: left;
+	text-align: center;
+}
+.slide_area li .s_img {
+	display: block;
+	width: 6rem;
+	height: 5.3rem;
+	margin: 0 auto 0.6rem;
+}
+.slide_area li h3 {
+	font-size: 1rem;
+	color: #e4393c;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.slide_area li strong {
+	color: #e4393c;
+}
+.slide_area li p {
+	font-size: 0.8rem;
+	color: #808080;
+	height: 2.4rem;
+	overflow: hidden;
+}
+.s_dot {
+	width: 4.5rem;
+	position: absolute;
+	bottom: 0.5rem;
+	left: 50%;
+	margin-left: -2rem;
+}
+.s_dot .dot {
+	background: #d7d4d4;
+	display: block;
+	width: 0.5rem;
+	height: 0.5rem;
+	float: left;
+	margin: 0 0 0 0.4rem;
+	overflow: hidden;
+	border-radius: 100%;
+}
+.s_dot .on {
+	background: #e4393c;
+}
+.cont {
+	margin: 9.2rem 0.67rem 0.67rem;
+}
+.cont .prize_list .prize:last-child {
+	border-bottom: none;
+}
+.prize_list {
+	background: #fff;
+	padding: 0 0.67rem;
+	min-height: 7.6rem;
+	border-bottom-left-radius: 0.4rem;
+	border-bottom-right-radius: 0.4rem;
+}
+.prize {
+	border-bottom: #9b9b9b dashed 1px;
+	padding: 1.3rem 0;
+	overflow: hidden;
+}
+.prize .pri_img {
+	background: #ebeaea;
+	width: 6.3rem;
+	height: 7.7rem;
+	float: left;
+	display: table;
+}
+.prize .pri_img a {
+	width: 6.3rem;
+	height: 7.7rem;
+	display: table-cell;
+	vertical-align: middle;
+}
+.prize .pri_info {
+	width: 13.2rem;
+	height: 7.6rem;
+	position: relative;
+	float: right;
+	overflow: hidden;
+}
+.prize .pri_info .pri_tit {
+	font-size: 0.7rem;
+	font-weight: bold;
+	line-height: 1rem;
+	max-height: 2rem;
+	overflow: hidden;
+}
+.prize .pri_info .pri_tit a {
+	color: #333;
+}
+.prize .pri_info .total {
+	font-size: 0.8rem;
+	color: #333;
+}
+.exc_record .prize .pri_info {
+	height: auto;
+}
+.join_num {
+	position: relative;
+}
+.att_num {
+	color: #808080;
+	font-size: 0.8rem;
+}
+.remain_num {
+	position: absolute;
+	top: .2rem;
+	right: 0;
+	color: #808080;
+	font-size: 0.8rem;
+}
+.bar {
+	background: #d7d4d4;
+	border-radius: 1rem;
+	height: 0.24rem;
+	position: relative;
+}
+.bar_in {
+	background: #ff711c;
+	border-radius: 1rem;
+	height: 0.24rem;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.exc_btn {
+	background: #ffb412;
+	border-radius: 0.3rem;
+	display: block;
+	width: 13.2rem;
+	height: 2.3rem;
+	margin-top: .5rem;
+	text-align: center;
+	font-size: 1.33rem;
+	line-height: 2.3rem;
+	color: #fff;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+}
+.white_box {
+	background: #fff;
+	/*margin: 1rem 0;*/
+	position: relative;
+	padding: 1rem;
+	/*border-top: #dfe3e6 solid 1px;*/
+	border-bottom: 0.4rem solid #f3f3f3;
+}
+.user_info {
+	position: relative;
+}
+.user_head {
+	display: block;
+	width: 4.03rem;
+	height: 4.03rem;
+	border-radius: 100% 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.user_head img {
+	border-radius: 100% 100%;
+}
+.user_info .user_detail {
+	padding: 0.5rem 0 0 5rem;
+}
+.user_info .user_detail .user_name {
+	color: #333;
+}
+.user_sum {
+	font-size: 0.8rem;
+	color: #808080;
+	padding-bottom: 1rem;
+}
+.rec_btn {
+	background: #ffb412;
+	border-radius: 0.3rem;
+	display: block;
+	width: 7.33rem;
+	height: 2.63rem;
+	position: absolute;
+	top: 0.8rem;
+	right: 0;
+	font-size: 1.2rem;
+	line-height: 2.63rem;
+	color: #fff;
+	text-align: center;
+}
+.rec_btnn {
+	background: #ffb412;
+	border-radius: 0.3rem;
+	display: block;
+	width: 6rem;
+	height: 2.63rem;
+	position: absolute;
+	top: 0.8rem;
+	right: 0;
+	font-size: 1.2rem;
+	line-height: 2.63rem;
+	color: #fff;
+	text-align: center;
+}
+.item {
+	display: block;
+	background: #fff;
+	border-top: #dfe3e6 solid 1px;
+	border-bottom: #dfe3e6 solid 1px;
+	margin-bottom: 1rem;
+	height: 3.07rem;
+	position: relative;
+	cursor: pointer;
+}
+.item_txt {
+	font-size: 1.2rem;
+	color: #333;
+	line-height: 3.07rem;
+	padding: 0 1rem;
+	font-weight: normal;
+}
+.rec_num {
+	font-size: 0.8rem;
+	color: #ea2127;
+	position: absolute;
+	top: 1rem;
+	right: 2rem;
+}
+.item:after {
+	background: url("http://1.vip.xunlei.com/one_wap/img/arr.png") no-repeat;
+	display: block;
+	content: "";
+	width: 0.53rem;
+	height: 0.87rem;
+	background-size: 100%;
+	position: absolute;
+	top: 50%;
+	margin-top: -0.4rem;
+	right: 0.8rem;
+}
+.item.hover {
+	background: #adadae;
+}
+.abs_bottom {
+	background: #fff;
+	padding: 1rem;
+	border-top: #dfe3e6 solid 1px;
+	border-bottom: #dfe3e6 solid 1px;
+	position: absolute;
+	bottom: 1rem;
+	left: 0;
+	right: 0;
+	margin-bottom: 0;
+}
+.abs_bottom .exit {
+	text-align: center;
+	color: #ea2127;
+	font-size: 1.2rem;
+	display: block;
+}
+.exc_record {
+	background: #fff;
+	padding: 0 0.33rem;
+}
+.exc_record .pri_tit {
+	font-size: 1.2rem;
+}
+.exc_record .pri_info p {
+	color: #666;
+	font-size: 0.8rem;
+	line-height: 1.35rem;
+}
+.exc_record .chk_link {
+	color: #007aff;
+	font-size: 0.8rem;
+	position: absolute;
+	right: 0;
+	bottom: 0.1rem;
+}
+.exc_record .pri_info {
+	position: relative;
+}
+.rec_tips p {
+	font-size: 0.87rem;
+}
+.tb_wp {
+	background: #fff;
+	margin-bottom: 1rem;
+}
+.tb_wp table {
+	border-collapse: collapse;
+	border: #dfe3e6 solid 1px;
+}
+.tb_wp table th,
+.tb_wp table td {
+	border-collapse: collapse;
+	border-bottom: #dfe3e6 solid 1px;
+	line-height: 3rem;
+	padding: 0 1rem;
+}
+.tb_wp table th {
+	font-size: 1.13rem;
+	color: #333;
+}
+.tb_wp table td {
+	font-size: 0.8rem;
+	color: #808080;
+}
+.tb_wp table td.sum {
+	font-size: 1rem;
+	color: #e4393c;
+}
+.ctg_tips {
+	background: #fff;
+	height: 9.53rem;
+	border: #ffba00 solid 4px;
+	border-radius: 1rem;
+	margin: 12.7rem 1rem 0;
+	position: relative;
+}
+.ctg_img {
+	width: 15.03rem;
+	height: 9.9rem;
+	position: absolute;
+	top: -9rem;
+	left: 50%;
+	margin-left: -7rem;
+}
+.ctg_tips h3 {
+	font-size: 1.6rem;
+	color: #333;
+	text-align: center;
+	font-weight: bold;
+	margin: 1.2rem auto 0.5rem;
+}
+.ctg_tips p {
+	text-align: center;
+	color: #808080;
+}
+.chk_btn {
+	display: block;
+	background: #f60;
+	border-radius: 0.6rem;
+	height: 3rem;
+	line-height: 3rem;
+	font-size: 1.2rem;
+	text-align: center;
+	color: #fff;
+	margin: 1rem;
+}
+.chk_btnn {
+	display: block;
+	background: #908883;
+	border-radius: 0.6rem;
+	height: 3rem;
+	line-height: 3rem;
+	font-size: 1.2rem;
+	text-align: center;
+	color: #fff;
+	margin: 1rem;
+}
+.rec_box {
+	overflow: hidden;
+	font-size: 1.2rem;
+	color: #000;
+}
+.rec_txt {
+	color: #362e2b;
+	font-size: 1.2rem;
+	line-height: 30px;
+}
+.item_amount {
+	width: 9.4rem;
+	height: 1.8rem;
+	display: inline-block;
+	position: relative;
+	margin: 0 0.4rem;
+}
+.item_amount a {
+	background-color: #ffb412;
+	background-size: 100%;
+	background-position: center center;
+	border-radius: 0.3rem;
+	display: inline-block;
+	width: 1.8rem;
+	height: 1.8rem;
+	position: absolute;
+	top: 0;
+}
+.minus {
+	background: url("http://1.vip.xunlei.com/one_wap/img/minus_ico.png") no-repeat #ffb412;
+	left: 0;
+}
+.plus {
+	background: url("http://1.vip.xunlei.com/one_wap/img/plus_ico.png") no-repeat #ffb412;
+	right: 0;
+}
+.item_amount .no_minus,
+.item_amount .no_plus {
+	background-color: #e2e2e2;
+}
+.ip_num {
+	text-align: center;
+	border-radius: 8px;
+	background: none;
+	text-align: center;
+	font-size: 1.2rem;
+	width: 100%;
+	height: 1.8rem;
+	line-height: 1.8rem;
+}
+.rec_txt {
+	color: #808080;
+}
+.total_amt {
+	margin: 0 1rem 1rem;
+}
+.total_amt p {
+	font-size: 1.2rem;
+}
+.rec_opt {
+	margin-top: 4rem;
+}
+.rec_opt .tips {
+	text-align: center;
+	color: #747474;
+}
+.submit {
+	padding: .6rem 0;
+}
+.submit p {
+	font-size: 1rem;
+}
+.smt_btn {
+	background: #f60;
+	border-radius: 0.4rem;
+	color: #fff;
+	font-size: 1.33rem;
+	text-align: center;
+	line-height: 2.6rem;
+	display: block;
+	width: 7.3rem;
+	height: 2.6rem;
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+}
+.pri_img1 {
+	width: 4.27rem;
+	height: 5.33rem;
+	position: absolute;
+	left: 1rem;
+	top: 1rem;
+}
+.pri_info1 {
+	padding-left: 5rem;
+	height: 5.33rem;
+	position: relative;
+}
+.pri_info1 .pri_tit {
+	height: 1.5rem;
+	overflow: hidden;
+}
+.pri_info1 .pri_tit a {
+	color: #000;
+	font-size: 0.93rem;
+}
+.pri_info1 p {
+	color: #808080;
+	font-size: 1rem;
+}
+.pri_info1 .item_amount {
+	width: 6.5rem;
+	font-size: 1.2rem;
+}
+.pri_info1 .rec_box {
+	position: absolute;
+	left: 5rem;
+	bottom: 0;
+}
+.prize_detail {
+	background: #fff;
+	border-bottom: #dfe3e6 solid 1px;
+	padding: 1.8rem 1rem 0;
+	margin-bottom: 1rem;
+}
+.pri_img2 {
+	width: 10.3rem;
+	height: 10.3rem;
+	overflow: hidden;
+	margin: 0 auto;
+}
+.pri_info2 {
+	padding-top: 1rem;
+}
+.pri_info2 .pri_tit {
+	height: 2rem;
+	overflow: hidden;
+}
+.pri_info2 .pri_tit a {
+	font-size: 1.2rem;
+	color: #000;
+}
+.pri_info2 .total {
+	color: #808080;
+	font-size: 1rem;
+	margin-bottom: 0.4rem;
+}
+.pri_info2 .chk_btn {
+	margin: 1rem 0;
+}
+.record_list {
+	position: relative;
+}
+.record_list h3 {
+	margin-bottom: 1rem;
+}
+.record_list .dot {
+	background: #fff;
+	border: #bbb solid 0.12rem;
+	border-radius: 100%;
+	display: block;
+	width: 0.8rem;
+	height: 0.8rem;
+	position: absolute;
+	left: -0.55rem;
+	top: 0.75rem;
+}
+.record_list .dot i {
+	display: block;
+	background: #bbb;
+	border-radius: 100%;
+	width: .3rem;
+	height: .3rem;
+	margin: .25rem auto;
+}
+.record_list .date {
+	border-left: #bbb solid 2px;
+	position: relative;
+	margin-left: 0.5rem;
+	line-height: 1rem;
+	padding: 0 0 0.6rem 1rem;
+}
+.record_list .date .dot {
+	background: #bbb;
+	top: 0;
+}
+.record_list .pd_top {
+	padding-top: 0.7rem;
+	padding-bottom: 2rem;
+	border-left: #bbb dashed 2px;
+}
+.record_list .pd_top .dot {
+	top: 0.6rem;
+}
+.record_list ul {
+	padding-left: 0.5rem;
+}
+.record_list ul li {
+	border-left: #bbb solid 2px;
+	position: relative;
+	padding-left: 1rem;
+	line-height: 2.4rem;
+}
+.record_list ul li .time {
+	position: absolute;
+	top: 0;
+	right: 0;
+	font-size: 0.8rem;
+	color: #808080;
+}
+.record_list .name {
+	color: #ea2127;
+	display: inline-block;
+	line-height: 1.8rem;
+	height: 2rem;
+	max-width: 7rem;
+	vertical-align: middle;
+	word-break: keep-all;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.winner_info {
+	margin-top: -0.8rem;
+}
+.winner_info p {
+	font-size: 0.8rem;
+	color: #808080;
+}
+.winner_info strong {
+	font-size: 1rem;
+}
+.winner_info .pri_num {
+	font-size: 1rem;
+	color: #e3191c;
+	margin-top: 0.3rem;
+}
+.chk_link {
+	padding-left: 1rem;
+	color: #007aff;
+}
+.pri_info1 {
+	overflow: hidden;
+}
+.stg_time {
+	font-size: 1rem;
+	padding-bottom: 0.5rem;
+	border-bottom: #dfe3e6 solid 1px;
+}
+.mg_top {
+	margin-top: 1rem;
+}
+.abs_top {
+	top: 1rem;
+}
+.winner_detail {
+	margin-top: 0.5rem;
+}
+.winner_detail p {
+	font-size: 0.87rem;
+	color: #808080;
+	line-height: 1.4rem;
+}
+.winner_detail strong {
+	font-size: 1rem;
+}
+.w_tit {
+	font-size: 1.2rem;
+	color: #000;
+}
+.w_p {
+	font-size: 0.93rem;
+}
+.w_tb {
+	border-top: #dfe3e6 solid 1px;
+	margin-top: 1rem;
+	padding-top: 0.5rem;
+}
+.w_tb table {
+	color: #666;
+}
+.w_tb table th {
+	font-size: 0.9rem;
+	line-height: 1.8rem;
+}
+.w_tb table td {
+	font-size: 0.75rem;
+	line-height: 1.6rem;
+}
+.pop_layer {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, .7);
+	z-index: 3;
+}
+.p_box {
+	background: #fff;
+	width: 85%;
+	border-radius: .3rem;
+	position: fixed;
+	top: 50%;
+	margin-top: -24%;
+	left: 50%;
+	margin-left: -47%;
+	background: #fff;
+	padding: .5rem 1rem 1rem;
+	z-index: 4;
+}
+.p_clo {
+	background: #272727;
+	border-radius: 100px;
+	display: block;
+	width: 1.6rem;
+	height: 1.6rem;
+	position: absolute;
+	top: -0.4rem;
+	right: -0.4rem;
+}
+.p_clo i {
+	background: url("http://1.vip.xunlei.com/one_wap/img/clo_ico.png") no-repeat;
+	background-size: 100%;
+	display: block;
+	width: 0.8rem;
+	height: 0.8rem;
+	text-indent: -999em;
+	margin: 0.4rem auto;
+}
+.p_top {
+	border-bottom: #dfe3e6 solid 1px;
+	line-height: 1.8rem;
+	margin-top: 1rem;
+	position: relative;
+	font-size: 0.8rem;
+}
+.p_times {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+.p_tit {
+	font-size: 0.9rem;
+}
+.p_cont {
+	padding-top: 0.2rem;
+}
+.p_cont p {
+	font-size: 1rem;
+	margin: .2rem 0 .8rem;
+	color: #000;
+}
+.p_cont .tb td {
+	line-height: 1.8rem;
+	color: #808080;
+}
+.pri_tit1 {
+	font-size: 1.2rem;
+	height: 1.6rem;
+	overflow: hidden;
+}
+.pri_tit1 a {
+	color: #000;
+}
+.user_jion_info {
+	color: #666;
+	padding: 0.8rem 0 0.8rem;
+	position: relative;
+	font-size: 0.93rem;
+	border-bottom: #dfe3e6 solid 1px;
+}
+.abs_right {
+	position: absolute;
+	top: 0.8rem;
+	right: 0;
+}
+.lucky_code_list .tb {
+	line-height: 1.8rem;
+	font-size: 1rem;
+	color: #666;
+	padding-top: 1rem;
+}
+.ctg_tips1 {
+	margin-top: 1rem;
+}
+.load_more {
+	display: block;
+	margin: 0.5rem 0;
+	font-size: 0.8rem;
+	text-align: center;
+	cursor: pointer;
+}
+.address .tips {
+	color: #666;
+	margin: 2rem 1rem 0.8rem;
+	font-size: 1rem;
+}
+.addr_info li {
+	display: block;
+	background: #fff;
+	border-top: #dfe3e6 solid 1px;
+	border-bottom: #dfe3e6 solid 1px;
+	margin-bottom: 1rem;
+	height: 3.07rem;
+	position: relative;
+	cursor: pointer;
+}
+.addr_info li .lb {
+	color: #333;
+	position: absolute;
+	left: 1rem;
+	top: 0.7rem;
+}
+.addr_info li .ipt {
+	background: none;
+	border: none;
+	color: #ccc;
+	display: block;
+	margin: 0 0 0 6rem;
+	font-size: 1rem;
+	height: 3.07rem;
+	width: 13rem;
+	overflow: hidden;
+	line-height: 3.07rem;
+}
+.del_opt {
+	background: url("http://1.vip.xunlei.com/one_wap/img/clear_ico.png") no-repeat;
+	background-size: 100%;
+	display: block;
+	width: 1.17rem;
+	height: 1.17rem;
+	position: absolute;
+	top: 0.9rem;
+	right: 1rem;
+	cursor: pointer;
+}
+.save_opt {
+	margin-top: 2.5rem;
+}
+.s_tips {
+	font-size: 1rem;
+	color: #000;
+	margin: 0 1rem;
+}
+.more_code {
+	height: 9rem;
+	padding: 0 0 10px;
+	overflow: auto;
+	overflow-x: hidden;
+}
+.fc {
+	color: #ea2127;
+}
+.fc1 {
+	color: #f73636;
+}
+.fc2 {
+	color: #000;
+}
+.fc3 {
+	color: #007dff;
+}
+@media (min-width: 1081px) and (max-width: 1920px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 80px;
+	}
+}
+@media (min-width: 1025px) and (max-width: 1080px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 45px;
+	}
+}
+@media (min-width: 961px) and (max-width: 1024px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 42.5px;
+	}
+}
+@media (min-width: 801px) and (max-width: 960px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 40px;
+	}
+}
+@media (min-width: 751px) and (max-width: 800px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 33.34px;
+	}
+}
+@media (min-width: 721px) and (max-width: 750px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 31.25px;
+	}
+}
+@media (min-width: 641px) and (max-width: 720px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 30px;
+	}
+}
+@media (max-width: 640px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 26.67px;
+	}
+}
+@media (max-width: 540px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 22.5px;
+	}
+}
+@media (max-width: 480px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 20px;
+	}
+}
+@media (max-width: 414px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 17.25px;
+	}
+}
+@media (max-width: 375px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 15.625px;
+	}
+}
+@media (max-width: 360px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 15px;
+	}
+}
+@media (max-width: 320px) {
+	html,
+	body,
+	input,
+	button {
+		font-size: 13.33px;
+	}
+}

@@ -1,0 +1,110 @@
+{include file='_header'}
+<div class="page-header">
+    当前位置：<span class="text-primary">{if !empty($item['id'])}编辑{else}添加{/if}商户分组 <small>{if !empty($item['id'])}修改【{$item['groupname']}】{/if}</small></span>
+</div>
+<div class="page-content">
+    <div class="page-sub-toolbar">
+        <span>
+            <a class="btn btn-primary btn-sm" href="{:url('admin/merch/groupadd')}">添加新商户分组</a>
+        </span>
+    </div>
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="{$item['id']}" />
+     <div class="form-group">
+        <label class="col-lg control-label must">分组名称</label>
+        <div class="col-sm-9 col-xs-12 ">
+            <input type="text" id='groupname' name="groupname" class="form-control" value="{$item['groupname']}" data-rule-required="true" />
+        </div>
+    </div>
+
+    <div class="form-group-title">权限</div>
+
+    <div class="form-group">
+        <label class="col-lg control-label">商品免审核</label>
+        <div class="col-sm-9 col-xs-12">
+            <label class='radio-inline'>
+                <input type='radio' name='goodschecked' value=1' {if $item['goodschecked']==1}checked{/if} /> 是
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='goodschecked' value=0' {if $item['goodschecked']==0}checked{/if} /> 否
+            </label>
+            <span class="help-block">商户添加的商品是否免审核</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg control-label">设置商品佣金</label>
+        <div class="col-sm-9 col-xs-12">
+            <label class='radio-inline'>
+                <input type='radio' name='commissionchecked' value=1' {if $item['commissionchecked']==1}checked{/if} /> 是
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='commissionchecked' value=0' {if $item['commissionchecked']==0}checked{/if} /> 否
+            </label>
+            <span class="help-block">商户添加的商品是否可以设置商品佣金</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg control-label">修改订单价格</label>
+        <div class="col-sm-9 col-xs-12">
+            <label class='radio-inline'>
+                <input type='radio' name='changepricechecked' value=1' {if $item['changepricechecked']==1}checked{/if} /> 是
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='changepricechecked' value=0' {if $item['changepricechecked']==0}checked{/if} /> 否
+            </label>
+            <span class="help-block">商户是否可以修改订单价格</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg control-label">订单确认收货</label>
+        <div class="col-sm-9 col-xs-12">
+            <label class='radio-inline'>
+                <input type='radio' name='finishchecked' value=1' {if $item['finishchecked']==1}checked{/if} /> 是
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='finishchecked' value=0' {if $item['finishchecked']==0}checked{/if} /> 否
+            </label>
+            <span class="help-block">商户是否可以在后台点击确认收货</span>
+        </div>
+    </div>
+
+    <div class="form-group-title">其他</div>
+
+    <div class="form-group">
+        <label class="col-lg control-label">是否默认分组</label>
+        <div class="col-sm-9 col-xs-12">
+            <label class='radio-inline'>
+                <input type='radio' name='isdefault' value='1' {if $item['isdefault']==1}checked{/if} /> 是
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='isdefault' value='0' {if $item['isdefault']==0}checked{/if} /> 否
+            </label>
+            <span class="help-block">商户入驻后默认的分组</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg control-label">状态</label>
+        <div class="col-sm-9 col-xs-12">
+            <label class='radio-inline'>
+                <input type='radio' name='status' value=1' {if $item['status']==1}checked{/if} /> 启用
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='status' value=0' {if $item['status']==0}checked{/if} /> 禁用
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg control-label"></label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="submit" value="提交" class="btn btn-primary"  />
+            <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+        </div>
+    </div>
+    </form>
+</div>
+{include file='_footer'}

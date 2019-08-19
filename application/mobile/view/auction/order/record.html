@@ -1,0 +1,31 @@
+{include file='_header'}
+{include file='auction/style'}
+<link  href="/public/static/plugin/auction/css/member.css"  rel="stylesheet"  type="text/css">
+<style type="text/css">
+    .box_swipe {overflow: hidden; position: relative;}
+    .box_swipe ul {overflow: hidden; position: relative;margin:0;padding:0;}
+    .box_swipe ul > li {float:left; width:100%; position: relative; text-align:center;}
+    .box_swipe ul > li a{color:#FFF; text-decoration:none;}
+    .box_swipe ul > li .title{position: absolute; bottom: 6px; display: block; padding:0 10px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; color:#FFF; z-index:100;}
+    .box_swipe>ol{height:20px; position: relative; z-index:10; margin-top:-24px; text-align:right; padding-right:15px;}
+    .box_swipe>ol>li{display:inline-block; margin-bottom:1px; width:8px; height:8px; background-color:#757575; border-radius: 8px;}
+    .box_swipe>ol>li.on{background-color:#ffffff;}
+</style>
+<div class='fui-page creditshop-index-page'>
+	<div class='fui-content navbar'>
+        <div  class="wrapper">
+            <div  id="divBuyList"  class="m_buylist">
+                {foreach name='p_record' key='goodsid' item='goods'}
+                <ul id="ul{$goods['state']}" style="display: block;"><li><cite><a  href="{:url('mobile/auction/recorddetail', array('goodsid' => $goods['id']))}"><img  src="{$goods['thumb']}"></a><i>{if $goods['state']==0}已结束{else}进行中{/if}</i></cite><dl><dt><a  href="{:url('mobile/auction/recorddetail', array('goodsid' => $goods['id']))}"  class="gray6">{$goods['title']}</a></dt><dd>获得者：<a  href="{:url('mobile/auction/recorddetail', array('goodsid' => $goods['id']))}"  class="blue">{if empty($goods['dealmid'])}待揭晓{else}{$goods['dealmember']}{/if}</a></dd><dd>开始时间：<em>{:date('Y-m-d H:i:s',$goods['starttime'])}</em></dd><dd>结束时间：<em>{:date('Y-m-d H:i:s',$goods['endtime'])}</em></dd></dl></li></ul>
+                {/foreach}
+                {if empty($p_record)}
+                <div class="noRecords gray9"><s></s>暂无记录</div>
+                {/if}
+                <div  id="divGoodsLoading"  class="loading"  style="display: none;"><b></b>正在加载</div>
+            </div>
+            <div  class="load_more"  id="btnLoadMore"  style="display: block;"><a  href="{:url('mobile/auction/recorddetail', array('goodsid' => $goods['id']))}"  title="加载更多"></a></div>
+        </div>
+    </div>
+</div>
+{include file='auction/footerMenus'}
+{include file='_footer'}

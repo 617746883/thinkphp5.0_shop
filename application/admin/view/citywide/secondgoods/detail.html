@@ -1,0 +1,169 @@
+{include file='_header'}
+<script type="text/javascript" src="/public/static/js/dist/area/cascade1.js"></script>
+<style>
+    .checkbox-inline{
+        display: block;
+    }    .btns a i{
+        display: inline-block;
+        width: 100%;
+        height: 20px;
+        background: #f95959;
+    }
+    .btn-color {
+        width: 25px;
+        height: 25px;
+        border: 1px solid #fff;
+        margin: 2px;
+        padding: 0;
+    }
+
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">二手商品<small>{if !empty($item['id'])}修改【{$item['title']}】{/if}详情</small>
+    </span>
+</div>
+<div class="page-content">
+    <div class="page-sub-toolbar">
+        <!-- <a class="btn btn-primary btn-sm" href="{:url('admin/citywide/storeadd')}">添加新门店</a> -->
+    </div>
+<form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="{$item['id']}"/>
+    <div class="form-group">
+        <label class="col-lg control-label must">商品名称</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="title" class="form-control" value="{$item['title']}" data-rule-required="true"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label must">所属分类</label>
+        <div class="col-sm-9 col-xs-12">
+            <select class="form-control tpl-category-parent select2" id="cate" name="cate">
+                {foreach name='category' item='category'}
+                <option value="{$category['id']}" {if $item['cate'] == $category['id']}selected="true"{/if} 
+                    >{$category['name']}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label must">商品图片</label>
+           <div class="col-sm-9 col-xs-12 gimgs">
+            {:tpl_form_field_multi_image2('thumb_url',$thumb_url)}
+            <span class="help-block image-block">第一张缩略图为长方形，建议尺寸750*310，其他为正方型图片，尺寸建议宽度为640*640，并保持图片大小一致</span>
+           </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">原价</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="productprice" class="form-control" value="{$item['productprice']}"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">二手价</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="marketprice" class="form-control" value="{$item['marketprice']}"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">联系人号码</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="mobile" class="form-control" value="{$item['mobile']}"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">新旧程度</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="degree" class="form-control" value="{$item['degree']}"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">购买时间</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="buytime" class="form-control" value="{:date('Y-m-d H:i',$item['buytime'])}"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">商品简介</label>
+        <div class="col-sm-9 col-xs-12">
+            <textarea name="description" class="form-control richtext" rows="5">{$item['description']}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">商品详情</label>
+        <div class="col-sm-9 col-xs-12">
+            {:tpl_ueditor('content',$item['content'],array('height'=>400))}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label must">地址</label>
+        <div class="col-sm-9 col-xs-12">
+            <p>
+                <select id="sel-provance" name="province" onChange="selectCity();" class="select form-control" style="width:130px;display:inline;">
+                    <option value="" selected="true">省/直辖市</option>
+                </select>
+                <select id="sel-city" name="city" onChange="selectcounty(0)" class="select form-control" style="width:135px;display:inline;">
+                    <option value="" selected="true">请选择</option>
+                </select>
+                <select id="sel-area" name="area" class="select form-control" style="width:130px;display:inline;">
+                    <option value="" selected="true">请选择</option>
+                </select>
+            </p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">审核</label>
+        <div class="col-sm-9 col-xs-12">
+            <label class='radio-inline'>
+                <input type='radio' name='checked' value='1' {if $item['checked']==1}checked{/if} /> 正在审核
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='checked' value='0' {if $item['checked']==0}checked{/if} /> 通过审核
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='checked' value='-1' {if $item['checked']==-1}checked{/if} /> 不通过
+            </label>
+        </div>
+    </div>
+    <div class="form-group" id="failedreason" {if intval($item['checked']) != -1 }style="display:none;"{/if}>
+        <label class="col-lg control-label">原因</label>
+        <div class="col-sm-9 col-xs-12">
+            <textarea name="failedreason" class="form-control richtext" rows="5">{$item['failedreason']}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">状态</label>
+        <div class="col-sm-9 col-xs-12">
+            <label class='radio-inline'>
+                <input type='radio' name='status' value='1' {if $item['status']==1}checked{/if} /> 上架
+            </label>
+            <label class='radio-inline'>
+                <input type='radio' name='status' value='0' {if $item['status']==0}checked{/if} /> 下架
+            </label>
+        </div>
+    </div>
+    <div class="form-group"></div>
+    <div class="form-group">
+        <label class="col-lg control-label"></label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="submit" value="提交" class="btn btn-primary"/>
+            <input type="button" name="back" onclick='history.back()' {ifp  'store.add|store.edit'}style='margin-left:10px;'{/if} value="返回列表" class="btn btn-default" />
+        </div>
+    </div>
+</form>
+</div>
+<script language='javascript'>
+cascdeInit1("{$new_area}","0","{$item['province']}","{$item['city']}","{$item['area']}");
+require(['jquery.ui'],function(){
+    $('.multi-img-details').sortable();
+})
+$(function(){
+    $("input[name='checked']").click(function(){
+        if(this.value == -1){
+            $("#failedreason").show()
+        }else{
+            $("#failedreason").hide();
+        }
+    })
+})
+</script>
+{include file='_footer'}

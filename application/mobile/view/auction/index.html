@@ -1,0 +1,165 @@
+{include file='_header'}
+{include file='auction/style'}
+
+<style type="text/css">
+    .box_swipe {overflow: hidden; position: relative;}
+    .box_swipe ul {overflow: hidden; position: relative;margin:0;padding:0;}
+    .box_swipe ul > li {float:left; width:100%; position: relative; text-align:center;}
+    .box_swipe ul > li a{color:#FFF; text-decoration:none;}
+    .box_swipe ul > li .title{position: absolute; bottom: 6px; display: block; padding:0 10px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; color:#FFF; z-index:100;}
+    .box_swipe>ol{height:20px; position: relative; z-index:10; margin-top:-24px; text-align:right; padding-right:15px;}
+    .box_swipe>ol>li{display:inline-block; margin-bottom:1px; width:8px; height:8px; background-color:#757575; border-radius: 8px;}
+    .box_swipe>ol>li.on{background-color:#ffffff;}
+</style>
+<div class='fui-page creditshop-index-page'>
+	<div class='fui-content navbar'>
+        <div class='fui-swipe' data-transition="500" data-gap="1">
+            <div class='fui-swipe-wrapper'>
+            {foreach name='banners' item='adv'}
+                <a class='fui-swipe-item' href="{if !empty($adv['link'])}{$adv['link']}{else}javascript:;{/if}">
+                    <img src="{$adv['thumb']}" alt="{$adv['advname']}" onerror="this.src='/public/static/images/nopic100.jpg'"/>
+                </a>
+            {/foreach}
+            </div>
+            <div class='fui-swipe-page'></div>
+        </div>
+        <div class="column" style="position: absolute;">
+            <a href="javascript:;" title="进行中的拍卖" class="entry-list">进行中的拍卖<span></span><b class="fr"></b><cite id="biaoji"><em></em></cite></a>
+            <div class="sort_list" id="sort_listnow" style="display: none;">
+                <ul>
+                	<li order="10"><a href="{:url('mobile/auction/index',array('type'=>'sale'))}">所有进行中的拍卖<i></i></a></li>
+                	{foreach name='category' item='row'}
+                    <li order="10"><a href="{:url('mobile/auction/index')}?type=sale&gid={$row['id']}">{$row['name']}<i></i></a></li>
+					{/foreach}
+                </ul>
+            </div>
+            <a href="javascript:;" title="即将开始的拍卖" class="ann-publicly">即将开始的拍卖<span></span><b class="fl"></b></a>
+            <div class="sort_list" id="sort_listwait" style="display: none;">
+                <ul>
+                	<li order="10"><a href="{:url('mobile/auction/index',array('type'=>'wait'))}">所有即将开始的拍卖<i></i></a></li>
+                	{foreach name='category' item='row'}
+                    <li order="10"><a href="{:url('mobile/auction/index')}?type=wait&gid={$row['id']}">{$row['name']}<i></i></a></li>
+					{/foreach}
+                </ul>
+            </div>
+            <a href="javascript:;" title="已完成的拍卖" class="as-publicly">已完成的拍卖<span></span><b class="ff"></b></a>
+            <div class="sort_list" id="sort_listfin" style="display: none;">
+                <ul>
+                	<li order="10"><a href="{:url('mobile/auction/index',array('type'=>'finish'))}">所有已完成的拍卖<i></i></a></li>
+                	{foreach name='category' item='row'}
+                    <li order="10"><a href="{:url('mobile/auction/index')}?type=finish&gid={$row['id']}">{$row['name']}<i></i></a></li>
+					{/foreach}
+                </ul>
+            </div>
+        </div>
+        <div class="goodList" style="position: relative;top: 38px;">
+	        {foreach name='list' item='row'}
+	        <ul id="21960">
+	            <li><span class="gList_l fl" style=""><a href="{:url('mobile/auction/detail',array('id' => $row['id']))}"><img src="{$row['thumb']}"  onerror="this.src='/public/static/images/nopic100.jpg'"></a></span>
+	            <div class="gList_r gList_r{$row['id']}"><a href="{:url('mobile/auction/detail',array('id' => $row['id']))}"><h3 class="gray6" style="height: 1.2em;overflow-y:hidden;margin-bottom: 5px;">{$row['title']}</h3><em class="gray9"><p style="color:#999;position: relative;float:left;">起拍价：￥{$row['shprice']}</p><p style="color:#999;position: relative;float:right;">保证金：￥{$row['bond']}</p></em><br/><em class="gray9"><p style="color:#FF0000;">当前价：￥{$row['stprice']}</p></em></a>
+	            <div class="gRate"><div class="Progress-bar"><p class="u-progress"><span style="width: {$row['bili']}%;" class="pgbar"><span class="pging"></span></span></p>
+	            <ul class="Pro-bar-li">
+	                <li class="P-bar01"><em id="LeftTime{$row['id']}"></em>{if time() > $row['starttime']}时间剩余{else}即将开始{/if}</li>
+	                <li class="P-bar03"><em>{$row['pos']}</em>出价次数</li>
+	            </ul></div>
+	            <a href="{:url('mobile/auction/exchange', array('id' => $row['id']))}" codeid="253706"><s></s></a></div></div></li>
+	        </ul>
+	        <script>
+		        $(document).ready(function(){		                
+	                $('.gList_r'+{$row['id']}).click(function(){
+	                    window.location.href='{:url('mobile/auction/detail',array('id' => $row['id']))}';
+	                });
+	            })
+		        function FreshTime() {
+		            var str ='{:date('Y-m-d H:i:s',$row['starttime'])}';
+		            str = str.replace(/-/g,"/");
+		            var starttime= new Date(str);//开始时间
+		            var strr ='{:date('Y-m-d H:i:s',$row['endtime'])}';
+		            strr = strr.replace(/-/g,"/");
+		            var endtime = new Date(strr);//结束时间
+		            var nowtime = new Date();//当前时间
+		            var now_time = parseInt(nowtime.getTime());
+		            var starttime = parseInt(starttime.getTime());
+		            if (now_time > starttime) {
+		                var lefttime = parseInt((endtime.getTime()-nowtime.getTime())/1000);
+		                if (lefttime > 0 ) {
+		                    d=parseInt(lefttime/3600/24);
+		                    h=parseInt((lefttime/3600)%24);
+		                    m=parseInt((lefttime/60)%60);
+		                    s=parseInt(lefttime%60);
+		                    document.getElementById("LeftTime"+{$row['id']}).innerHTML=d+"天"+h+"时"+m+"分"+s+"秒";
+		                }else{
+		                    document.getElementById("LeftTime"+{$row['id']}).innerHTML="拍卖已结束";
+		                }
+		            }
+		        }
+		        FreshTime()
+		        var sh;
+		        sh=setInterval(FreshTime,1000);
+	        </script>
+	        {/foreach}
+	        {if empty($list)}
+	        <div class="noRecords gray9"><s></s>暂无记录</div>
+	        {/if}
+	        <div id="divGoodsLoading" class="loading" style="height: 0px;"><!-- <b></b>正在加载 --></div>
+        </div>
+        {if !empty($list)}
+        <div class="load_more" id="btnLoadMore" style="display: block;"><aside class="more"><a href="javascript:void(0);" onclick="getMoreRecru(2)">查看更多</a></aside></div>{/if}
+    </div>
+</div>
+{include file='auction/footerMenus'}
+<script type="text/javascript">
+function getMoreRecru(page){
+    var ajxurl="{:url('mobile/auction/Ajaxgetzwlist').'&pages='}"+page;
+     $.ajax({
+        type:"GET",
+        url:ajxurl,
+        dataType:'json',
+        beforeSend:function(XMLHttpRequest){ 
+            $('.more').html('<img src="/public/static/images/loading.gif" style="width:35px;height:35px;"/>');
+        },
+        success:function(data){
+            if (data.success){
+                if (data.list.length > 0){
+                    for (var i in data.list){
+                        var info = data.list[i];
+                        $('#container').append('<a  class="block arr"  href="{:url('mobile/auction/showdetail')}?id='+info.id+'"><img  src="/public/static/plugin/auction/images/'+info.zptype+'.png"><dl  class="fix"><dt><span class="ongoing">'+info.residedist+'</span>'+info.title+'</dt><dd><span class="location">'+info.pubdate+'</span><span class="date">浏览量：'+info.hitnumber+'</span></dd></dl></a>');
+                    };
+                    page+= 1;
+                    $('.more').html('<a href="javascript:void(0);" onclick="getMoreRecru('+page+');">查看更多</a>');
+                } else{
+                   $('.more').html('没有更多内容了...');
+                }
+            } else {
+                alert('加载失败, 当前网络不给力?');
+                $('.more').html('<a href="javascript:void(0);" onclick="getMoreRecru('+page+');">再次尝试加载</a>');
+            }
+        }
+     });
+}
+$('.entry-list').click(function(){
+    $('.goodList').hide();
+    $('#sort_listfin').hide();
+    $('#sort_listwait').hide();
+    $('#biaoji').remove();
+    $('.entry-list .fr').after("<cite id='biaoji'><em></em></cite>");
+    $('#sort_listnow').show();
+});
+$('.ann-publicly').click(function(){
+    $('.goodList').hide();
+    $('#sort_listnow').hide();
+    $('#sort_listfin').hide();
+    $('#biaoji').remove();
+    $('.ann-publicly .fl').after("<cite id='biaoji'><em></em></cite>");
+    $('#sort_listwait').show();
+});
+$('.as-publicly').click(function(){
+    $('.goodList').hide();
+    $('#sort_listnow').hide();
+    $('#sort_listwait').hide();
+    $('#biaoji').remove();
+    $('.as-publicly .ff').after("<cite id='biaoji'><em></em></cite>");
+    $('#sort_listfin').show();
+});
+</script>
+{include file='_footer'}

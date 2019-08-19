@@ -1,0 +1,167 @@
+{include file='_header'}
+
+<div class="page-header">
+    当前位置：<span class="text-primary">{if !empty($item['id'])}编辑{else}添加{/if}专题<small>{if !empty($item['id'])}修改【{$item['title']}】{/if}</small></span>
+</div>
+
+<div class="page-content">
+    <div class="page-sub-toolbar">
+        <span class=''>
+            <a class="btn btn-primary btn-sm" href="{:url('admin/seckill/taskadd')}">添加新专题</a>
+            {if !empty($item['id'])}
+            <a class="btn btn-success btn-sm" href="{:url('admin/seckill/room',array('taskid'=>$item['id']))}">会场管理</a>
+            {/if}
+        </span>
+    </div>
+<form action="" method="post" class="form-horizontal form-validate " enctype="multipart/form-data">
+<input type="hidden" name="id" value="{$item['id']}"/>
+
+<div class="">
+    <div class="form-group-title">
+        专题信息
+    </div>
+    <div class="">
+        <div class="form-group">
+            <label class="col-lg control-label must">专题名称</label>
+            <div class="col-sm-9 col-xs-12 ">
+                <input type="text" name="title" class="form-control" value="{$item['title']}" data-rule-required="true" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">标签</label>
+            <div class="col-sm-9 col-xs-12 ">
+                <input type="text" name="tag" class="form-control" value="{$item['tag']}"/>
+                <span class="help-block">显示在首页橱窗头部，和商品详情页面</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">分类</label>
+            <div class="col-sm-9 col-xs-12 ">
+                <select class="form-control" name="cateid">
+                    <option value=""></option>
+                    {foreach name='category' key='k' item='v'}
+                    <option value="{$k}" {if $item['cateid']==$k}selected{/if}>{$v['name']}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">秒杀点</label>
+            <div class="col-sm-9 col-xs-12">
+                <?php for($i=0;$i<=23;$i++) { ?>
+                <label class="checkbox-inline" style="width:60px">
+                    <input type="checkbox" name="times[]" value="{$i}" {if in_array($i, $alltimes)}checked{/if} />{$i}点
+                </label>
+                <?php } ?>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg control-label">自动取消</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="closesec" class="form-control" value="{:$item['closesec']<=0?'120':$item['closesec']}"/>
+                <span class="help-block">抢购成功，不付款多少秒之后，自动取消资格，默认120秒(2分钟)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg control-label">状态</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'>
+                    <input type='radio' name='enabled' value=1' {if $item['enabled']==1}checked{/if} /> 启用
+                </label>
+                <label class='radio-inline'>
+                    <input type='radio' name='enabled' value=0' {if $item['enabled']==0}checked{/if} /> 禁用
+                </label>
+                <span class="help-block">设置禁用，不出现在搜索列表</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="">
+    <div class="form-group-title">
+        分享及标题设置
+    </div>
+    <div class="">
+        <div class="form-group">
+            <label class="col-lg control-label">页面标题</label>
+            <div class="col-sm-9 col-xs-12 ">
+                <input type="text" name="page_title" class="form-control" value="{$item['page_title']}" data-rule-required="true"/>
+                <span class="help-block">专题专题的页面标题 ,默认为 专题标题</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">分享标题</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="share_title" id="share_title" class="form-control" value="{$item['share_title']}" />
+                <span class='help-block'>如果不填写，默认为页面标题</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">分享图标</label>
+            <div class="col-sm-9 col-xs-12">
+                {:tpl_form_field_image2('share_icon', $item['share_icon'])}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label">分享描述</label>
+            <div class="col-sm-9 col-xs-12">
+                <textarea name="share_desc" class="form-control" rows="5">{$item['share_desc']}</textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-1 control-label"></label>
+    <div class="col-sm-9 col-xs-12">
+        <input type="submit" value="提交" class="btn btn-primary"/>
+        <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+    </div>
+</div>
+
+</form>
+</div>
+
+<script language='javascript'>
+    function formcheck() {
+        if ($("#advname").isEmpty()) {
+            Tip.focus("advname", "请填写专题名称!");
+            return false;
+        }
+        return true;
+    }
+    $(function(){
+        require(['jquery.ui'],function(){
+            //$(".ui-sortable").sortable();
+        })
+        $('#btn-add-time').click(function(){
+
+            var time = $('#select-times').val();
+            $('#time-' + time).show();
+            $(':hidden[name="timeopen['+time+']"]').val(1);
+            $('#times').show();
+
+        });
+        $('.btn-delete-time').click(function(){
+            var time = $(this).data('time');
+            $('#time-' + time).hide();
+            $(':hidden[name="timeopen['+time+']"]').val(0);
+            var has = false;
+            for(var i=0;i<=23;i++){
+                if( $(':hidden[name="timeopen['+i+']"]').val()=='1'){
+                    has =true;
+                    break;
+                }
+            }
+            if(!has){
+                $('#times').hide();
+            }
+
+
+        })
+
+    })
+</script>
+
+{include file='_footer'}

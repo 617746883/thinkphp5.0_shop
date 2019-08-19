@@ -1,0 +1,85 @@
+{include file='_header'}
+<style type='text/css'>
+	.feed-activity-list {
+		width: 100%;
+		overflow: hidden;
+	}
+	
+	.feed-element {
+		float: left;
+		width: 320px;
+		height:100px;
+		margin-left: 15px;
+		margin-bottom: 20px;
+		border:1px solid #efefef;
+		padding: 20px;
+	}
+	
+	.feed-element::after {
+		display: none
+	}
+	
+	.feed-element .title {
+		font-size: 14px;
+		height: 24px;
+		line-height: 24px;
+		vertical-align: bottom;
+		color: #333;
+		font-weight: bold;
+		margin-left: 10px;
+	}
+	.feed-element img.img-circle,
+	.dropdown-messages-box img.img-circle {
+		float: left;
+		width: 60px;
+		height: 60px;
+		border-radius: 4px;
+	}
+	
+	.media-body {
+		margin-top: 3px;
+	}
+	.text-muted{
+		margin-left:10px;
+		width:200px;
+		display: block;
+		overflow : hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+</style>
+<div class="page-header">
+	当前位置：<span class="text-primary">我的应用</span>
+</div>
+
+<div class="page-content">
+	<div class='panel panel-default' style='border:none;'>
+		<div class="panel-heading" style='background:none;border:none;'>业务类</div>
+		<div class="feed-activity-list">
+			<a class="feed-element" href="{:url('merch/luckbuy/index')}">
+				<span class="pull-left">
+					<img src="/public/static/images/lottery.jpg" class="img-circle" alt="image" onerror="this.src='/public/static/images/lottery.png'">
+				</span>
+				<div class="media-body ">
+					<span class="title">幸运购</span>
+					<br>
+					<small class="text-muted">幸运购</small>
+				</div>
+			</a>
+			</a>
+		</div>
+	</div>
+</div>
+<script>
+	$(document).ready(function () {
+		$('.feed-activity-list,.plugin_tabs').each(function(){
+			if($(this).children().length<=0){
+				$(this).prev().remove();
+				$(this).remove();
+			}
+		});
+	})
+</script>
+{include file='_footer'}

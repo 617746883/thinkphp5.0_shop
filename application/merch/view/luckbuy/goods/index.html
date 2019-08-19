@@ -1,0 +1,344 @@
+{include file='_header'}
+<style>
+    tbody tr td{
+        position: relative;
+    }
+    tbody tr  .icow-weibiaoti--{
+        visibility: hidden;
+        display: inline-block;
+        color: #fff;
+        height:18px;
+        width:18px;
+        background: #e0e0e0;
+        text-align: center;
+        line-height: 18px;
+        vertical-align: middle;
+    }
+    tbody tr:hover .icow-weibiaoti--{
+        visibility: visible;
+    }
+    tbody tr  .icow-weibiaoti--.hidden{
+        visibility: hidden !important;
+    }
+    .full .icow-weibiaoti--{
+        margin-left: 10px;
+    }
+    .full>span{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        vertical-align: middle;
+        align-items: center;
+    }
+    tbody tr .label{
+        margin: 5px 0;
+    }
+    .goods_attribute a{
+        cursor: pointer;
+    }
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">商品管理</span>
+</div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal form-search" role="form">
+        <input type="hidden" name="goodsfrom" value="{$goodsfrom}" />
+        <div class="page-toolbar">
+            <span class="pull-left" style="margin-right:30px;">
+                <a class='btn btn-sm btn-primary' href="{:url('merch/goods/add',array('luckbuy'=>1))}" target="_blank"><i class='fa fa-plus'></i> 添加商品</a>
+            </span>
+            <div class="input-group col-sm-6 pull-right">
+                <span class="input-group-select">
+                    <select name="cate" class='form-control select2' style="width:200px;" data-placeholder="商品分类">
+                        <option value="" {if empty($cate)}selected{/if} >商品分类</option>
+                        {foreach name='category' item='c'}
+                        <option value="{$c['id']}" {if $cate==$c['id']}selected{/if} >{$c['name']}</option>
+                        {/foreach}
+                    </select>
+                </span>
+                <input type="text" class="input-sm form-control" name='keyword' value="{$keyword}" placeholder="ID/名称/编号/条码{if $merch_plugin}/商户名称{/if}">
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit"> 搜索</button>
+                </span>
+            </div>
+        </div>
+    </form>
+{if count($list)>0}
+    <div class="page-table-header">
+        <input type='checkbox' />
+        <div class="btn-group">
+                {if $goodsfrom=='sale'}
+                <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch'  data-href="{:url('merch/goods/status',array('status'=>0))}"><i class='icow icow-xiajia3'></i> 下架</button>
+                {/if}
+                {if $goodsfrom=='stock'}
+                <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch' data-href="{:url('merch/goods/status',array('status'=>1))}"><i class='icow icow-shangjia2'></i> 上架</button>
+                {/if}
+                {if $goodsfrom=='cycle'}
+                <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="如果商品存在购买记录，会无法关联到商品, 确认要彻底删除吗?" data-href="{:url('merch/goods/delete1')}"><i class='icow icow-shanchu1'></i> 彻底删除</button>
+                <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要恢复?" data-href="{:url('merch/goods/restore')}"><i class='icow icow-huifu1'></i> 恢复到仓库</button>
+                {else}
+                <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除吗?" data-href="{:url('merch/goods/delete')}"><i class='icow icow-shanchu1'></i> 删除</button>
+                {/if}
+        </div>
+    </div>
+    <table class="table table-hover table-responsive">
+        <thead class="navbar-inner">
+        <tr>
+            <th style="width:25px;"></th>
+            <th style="width:80px;text-align:center;">排序</th>
+            <th style="width:80px;">商品</th>
+            <th style="">&nbsp;</th>
+            <th style="width: 100px;">价格</th>
+            <th style="width: 80px;">库存</th>
+            <th style="width: 80px;">销量</th>
+            {if $goodsfrom!='cycle'}
+            <th style="width:80px;" >状态</th>
+            {/if}
+            <th>属性</th>
+            <th style="width: 120px;">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+            {foreach name='list' item='item'}
+            <tr>
+                <td>
+                    <input type='checkbox'  value="{$item['id']}"/>
+                </td>
+                <td style='text-align:center;'>
+                    <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('merch/goods/change',array('type'=>'merchdisplayorder','id'=>$item['id']))}" >{$item['merchdisplayorder']}</a>
+                    <i class="icow icow-weibiaoti-- " data-toggle="ajaxEdit2"></i>
+                </td>
+                <td>
+                    <img src="{$item['thumb']}" style="width:72px;height:72px;padding:1px;border:1px solid #efefef;margin: 7px 0" onerror="this.src='/public/static/images/nopic.png'" />
+                </td>
+                <td class='full' >
+                    <span>
+                        <span>
+                            <a href='javascript:;' data-toggle='ajaxEdit' data-edit='textarea'  data-href="{:url('merch/goods/change',array('type'=>'title','id'=>$item['id']))}" style="overflow : hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;">{$item['title']}</a>
+                            {if !empty($category[$item['pcate']])}
+                                <span class="text-danger">[{$category[$item['pcate']]['name']}]</span>
+                            {/if}
+                            {if !empty($category[$item['ccate']])}
+                                <span class="text-info">[{$category[$item['ccate']]['name']}]</span>
+                            {/if}
+                            {if !empty($category[$item['tcate']]) && intval($shopset['catlevel'])==3}
+                                <span class="text-info">[{$category[$item['tcate']]['name']}]</span>
+                            {/if}
+                        </span>
+                         <i class="icow icow-weibiaoti-- " data-toggle="ajaxEdit2"></i>
+                    </span>
+                </td>
+                <td>&yen;
+                    {if $item['hasoption']==1}
+                    <span data-toggle='tooltip' title='多规格不支持快速修改'>{$item['marketprice']}</span>
+                    {else}
+                    <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('merch/goods/change',array('type'=>'marketprice','id'=>$item['id']))}" >{$item['marketprice']}</a>
+                    <i class="icow icow-weibiaoti-- " data-toggle="ajaxEdit2"></i>
+                    {/if}
+                </td>
+                <td>
+                    {if !empty($item['hoteldaystock'])}
+                    <span data-toggle='tooltip' title='民宿类商品显示每日库存'>{$item['hoteldaystock']}/日</span>
+                    {elseif $item['hasoption']==1}
+                    <span data-toggle='tooltip' title='多规格不支持快速修改'>{$item['total']}</span>
+                    {else}
+                    <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('merch/goods/change',array('type'=>'total','id'=>$item['id']))}" >
+                        {$item['total']}
+                    </a>
+                    <i class="icow icow-weibiaoti-- " data-toggle="ajaxEdit2"></i>
+                    {/if}
+                </td>
+                <td>{$item['salesreal']}</td>
+                {if $goodsfrom!='cycle'}
+                <td  style="overflow:visible;">
+                    {if $item['status']==2}
+                    <span class="label label-danger">赠品</span>
+                    {else}
+                    <span class='label {if $item['status']==1}label-primary{else}label-default{/if}'
+                    data-toggle='ajaxSwitch'
+                    data-confirm = "确认是{if $item['status']==1}下架{else}上架{/if}？"
+                    data-switch-refresh='true'
+                    data-switch-value='{$item['status']}'
+                    data-switch-value0='0|下架|label label-default|{:url('merch/goods/status',array('status'=>1,'id'=>$item['id']))}'
+                    data-switch-value1='1|上架|label label-primary|{:url('merch/goods/status',array('status'=>0,'id'=>$item['id']))}'
+                    >
+                    {if $item['status']==1}上架{else}下架{/if}</span>
+                    {/if}
+                </td>
+                {/if}
+                <td  class="goods_attribute">
+                    <a class='{if $item['isnew']==1}text-danger{else}text-default{/if}'
+                    data-toggle='ajaxSwitch'
+                    data-switch-value='{$item['isnew']}'
+                    data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'new', 'data'=>1,'id'=>$item['id']))}'
+                    data-switch-value1='1||text-danger|{:url('merch/goods/property',array('type'=>'new','data'=>0,'id'=>$item['id']))}'
+                    >新品</a>
+                    <a class='{if $item['ishot']==1}text-danger{else}text-default{/if}'
+                    data-toggle='ajaxSwitch'
+                    data-switch-value='{$item['ishot']}'
+                    data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'hot', 'data'=>1,'id'=>$item['id']))}'
+                    data-switch-value1='1||text-danger|{:url('merch/goods/property',array('type'=>'hot','data'=>0,'id'=>$item['id']))}'
+                    >热卖</a>
+                    <a class='{if $item['isrecommand']==1}text-danger{else}text-default{/if}'
+                    data-toggle='ajaxSwitch'
+                    data-switch-value='{$item['isrecommand']}'
+                    data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'recommand', 'data'=>1,'id'=>$item['id']))}'
+                    data-switch-value1='1||text-danger|{:url('goods/property',array('type'=>'recommand','data'=>0,'id'=>$item['id']))}'
+                    >推荐</a>
+                    <a class='{if $item['isdiscount']==1}text-danger{else}text-default{/if}'
+                    data-toggle='ajaxSwitch'
+                    data-switch-value='{$item['isdiscount']}'
+                    data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'discount', 'data'=>1,'id'=>$item['id']))}'
+                    data-switch-value1='1||text-danger|{:url('goods/property',array('type'=>'discount','data'=>0,'id'=>$item['id']))}'
+                    >促销</a>
+                    <a class='{if $item['issendfree']==1}text-danger{else}text-default{/if}'
+                    data-toggle='ajaxSwitch'
+                    data-switch-value='{$item['issendfree']}'
+                    data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'sendfree', 'data'=>1,'id'=>$item['id']))}'
+                    data-switch-value1='1||text-danger|{:url('goods/property',array('type'=>'sendfree','data'=>0,'id'=>$item['id']))}'
+                    >包邮</a>
+                    <a class='{if $item['istime']==1}text-danger{else}text-default{/if}'
+                    data-toggle='ajaxSwitch'
+                    data-switch-value='{$item['istime']}'
+                    data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'time', 'data'=>1,'id'=>$item['id']))}'
+                    data-switch-value1='1||text-danger|{:url('goods/property',array('type'=>'time','data'=>0,'id'=>$item['id']))}'
+                    >限时卖</a>
+                    <a class='{if $item['isnodiscount']==1}text-danger{else}text-default{/if}'
+                    data-switch-value='{$item['isnodiscount']}'
+                    data-switch-value0='0||text-default|{:url('merch/goods/property',array('type'=>'nodiscount', 'data'=>1,'id'=>$item['id']))}'
+                    data-switch-value1='1||text-danger|{:url('goods/property',array('type'=>'nodiscount','data'=>0,'id'=>$item['id']))}'
+                    title="多商户商品默认不参与商城会员折扣"
+                    >不参与折扣</a>
+                </td>
+                <td  style="overflow:visible;position:relative">
+                    {if empty($item['ishotel'])}
+                    <a  class='btn btn-op btn-operation' href="{:url('merch/goods/edit', array('id' => $item['id'],'goodsfrom'=>$goodsfrom,'page'=>$page,'luckbuy'=>1))}" >
+                        <span data-toggle="tooltip" data-placement="top" title="" data-original-title="编辑"><i class="icow icow-bianji2"></i></span></a>
+                    {else}
+                    <a  class='btn  btn-op btn-operation' href="{:url('hotelreservation/goods/edit', array('id' => $item['id'],'goodsfrom'=>$goodsfrom,'page'=>$page))}"><span data-toggle="tooltip" data-placement="top" title="" data-original-title="编辑"><i class='icow icow-bianji2'></i></span>
+                    </a>
+                    {/if}
+                    {if $goodsfrom =='cycle'}
+                    <a  class='btn  btn-op btn-operation' data-toggle='ajaxRemove' href="{:url('merch/goods/restore', array('id' => $item['id']))}" data-confirm='确认要恢复?'><span data-toggle="tooltip" data-placement="top" title="" data-original-title="恢复"><i class='icow icow-huifu1'></i></span>
+                    </a>
+                    <a  class='btn  btn-op btn-operation' data-toggle='ajaxRemove' href="{:url('merch/goods/delete1', array('id' => $item['id']))}" data-confirm='如果此商品存在购买记录，会无法关联到商品, 确认要彻底删除吗?？'><span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除"><i class='icow icow-shanchu1'></i></span>
+                    </a>
+                    {else}
+                    <a  class='btn  btn-op btn-operation' data-toggle='ajaxRemove' href="{:url('merch/goods/delete', array('id' => $item['id']))}" data-confirm='确认删除此商品？'><span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除"><i class='icow icow-shanchu1'></i></span>
+                    </a>
+                    {/if}
+                    {if $goodsfrom !='cycle'}
+                    <a style="display: none;" href="javascript:;" class='btn  btn-op btn-operation js-clip' data-url="{php echo mobileUrl('goods/detail', array('id' => $item['id']),true)}">
+                        <span data-toggle="tooltip" data-placement="top"  data-original-title="复制链接"><i class='icow icow-lianjie2'></i></span>
+                    </a>
+                    <a style="display: none;" href="javascript:void(0);" class="btn  btn-op btn-operation" data-toggle="popover" data-trigger="hover" data-html="true"
+                       data-content="<img src='{$item['qrcode']}' width='130' alt='链接二维码'>" data-placement="auto right">
+                        <i class="icow icow-erweima3"></i>
+                    </a>
+                    {/if}
+                </td>
+            </tr>
+            {/foreach}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td    {if $goodsfrom!='cycle'}colspan="4"{else}colspan="3" {/if}>
+                <div class="btn-group">
+                    {if $goodsfrom=='sale'}
+                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch'  data-href="{:url('merch/goods/status',array('status'=>0))}">
+                        <i class='icow icow-xiajia3'></i> 下架</button>
+                    {/if}
+                    {if $goodsfrom=='stock'}
+                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch' data-href="{:url('merch/goods/status',array('status'=>1))}">
+                        <i class='icow icow-shangjia2'></i> 上架</button>
+                    {/if}
+                    {if $goodsfrom=='cycle'}
+                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="如果商品存在购买记录，会无法关联到商品, 确认要彻底删除吗?" data-href="{:url('goods/delete1')}"><i class='icow icow-shanchu1'></i> 彻底删除</button>
+                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要恢复?" data-href="{:url('merch/goods/restore')}"><i class='icow icow-huifu1'></i> 恢复到仓库</button>
+                    {else}
+                    <button class="btn btn-default btn-sm  btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除吗?" data-href="{:url('merch/goods/delete')}"><i class='icow icow-shanchu1'></i> 删除</button>
+                    {/if}
+                </div>
+                </td>
+                <td colspan="5" style="text-align: right">
+                    {$pager}
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+{else}
+<div class='panel panel-default'>
+  <div class='panel-body' style='text-align: center;padding:30px;'>
+      暂时没有任何商品!
+  </div>
+</div>
+{/if}
+</div>
+<script>
+    $(document).on("click", '[data-toggle="ajaxEdit2"]',
+        function (e) {
+            var _this = $(this)
+            $(this).addClass('hidden')
+            var obj = $(this).parent().find('a'),
+                url = obj.data('href') || obj.attr('href'),
+                data = obj.data('set') || {},
+                html = $.trim(obj.text()),
+                required = obj.data('required') || true,
+                edit = obj.data('edit') || 'input';
+            var oldval = $.trim($(this).text());
+            e.preventDefault();
+            submit = function () {
+                e.preventDefault();
+                var val = $.trim(input.val());
+                if (required) {
+                    if (val == '') {
+                        tip.msgbox.err(tip.lang.empty);
+                        return;
+                    }
+                }
+                if (val == html) {
+                    input.remove(), obj.html(val).show();
+                    //obj.closest('tr').find('.icow').css({visibility:'visible'})
+                    return;
+                }
+                if (url) {
+                    $.post(url, {
+                        value: val
+                    }, function (ret) {
+                        ret = eval("(" + ret + ")");
+                        if (ret.status == 1) {
+                            obj.html(val).show();
+                        } else {
+                            tip.msgbox.err(ret.result.message, ret.result.url);
+                        }
+                        input.remove();
+                    }).fail(function () {
+                        input.remove(), tip.msgbox.err(tip.lang.exception);
+                    });
+                } else {
+                    input.remove();
+                    obj.html(val).show();
+                }
+                obj.trigger('valueChange', [val, oldval]);
+            },
+            obj.hide().html('<i class="fa fa-spinner fa-spin"></i>');
+            var input = $('<input type="text" class="form-control input-sm" style="width: 80%;display: inline;" />');
+            if (edit == 'textarea') {
+                input = $('<textarea type="text" class="form-control" style="resize:none;" rows=3 width="100%" ></textarea>');
+            }
+            obj.after(input);
+            input.val(html).select().blur(function () {
+                submit(input);
+                _this.removeClass('hidden')
+            }).keypress(function (e) {
+                if (e.which == 13) {
+                    submit(input);
+                    _this.removeClass('hidden')
+                }
+            });
+        })
+</script>
+{include file='_footer'}
+

@@ -1,0 +1,59 @@
+</div>
+
+<script language='javascript'>
+    require(['jquery','bootstrap'], function ($,bs) {
+        $('[data-toggle="tooltip"]').tooltip("destroy").tooltip({
+            container: $(document.body)
+        });
+        $('[data-toggle="popover"]').popover("destroy").popover({
+            container: $(document.body)
+        });
+    });
+
+    $(function () {
+        $('.page-content').show();
+        $('.img-thumbnail').each(function () {
+            if ($(this).attr('src').indexOf('nopic.jpg') != -1) {
+                $(this).attr('src', "{EWEI_SHOPV2_LOCAL}static/images/nopic.jpg");
+            }
+        })
+        $(window).bind('scroll resize', function () {
+            var scrolltop = $(window).scrollTop();
+            if (scrolltop > 300) {
+                $(".page-gotop").fadeIn(300)
+            } else {
+                $(".page-gotop").fadeOut(300)
+            }
+            $(".page-gotop").unbind('click').click(function () {
+                $('body').animate({scrollTop: "0px"}, 1000)
+            })
+        });
+
+    });
+</script>
+{if !empty($copyright) && !empty($copyright['copyright'])}
+<div class="footer" style='width:100%;'>
+    <div>{$copyright['copyright']}</div>
+</div>
+{/if}
+<div id="page-loading" style="position: fixed;width:100%;height:100%;background:rgba(255,255,255,0.8);left:0;top:0;z-index:9999">
+    <div class="sk-spinner sk-spinner-double-bounce" style="position:fixed;top:50%;left:50%;width:40px;height:40px;margin-left:-20px;margin-top:-20px;">
+        <div class="sk-double-bounce1"></div>
+        <div class="sk-double-bounce2"></div>
+    </div>
+</div>
+<script language="javascript">
+    myrequire(['web/init']);
+    if( $('form.form-validate').length<=0){
+        window.formInited = true;
+    }
+    window.formInitTimer = setInterval(function () {
+         if (typeof(window.formInited ) !== 'undefined') {
+             $('#page-loading').remove();
+              clearInterval(window.formInitTimer);
+          }
+    }, 1);
+</script>
+
+</body>
+</html>

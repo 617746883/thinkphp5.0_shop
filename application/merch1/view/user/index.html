@@ -1,0 +1,39 @@
+{include file='_header'}
+<div class="page-heading"> 
+    <h2>账号信息</h2>
+</div>
+<form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="{$merch_info['id']}" />
+    <div class="form-group">
+        <label class="col-sm-2 control-label">管理员账号</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" readonly class="form-control" value="{$merch_info['username']}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label must">管理员密码</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" id='password' name="password" class="form-control" value="" data-rule-required='true' />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label must">新密码</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" id='pwd' name="pwd" class="form-control" value="" data-rule-required='true' />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label must">确认新密码</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" id='repwd' name="repwd" class="form-control" value="" data-rule-required='true' />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label "></label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="submit" value="提交" class="btn btn-primary"  />
+            <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回" class="btn btn-default" />
+        </div>
+    </div>
+</form>
+{include file='_footer'}

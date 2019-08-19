@@ -1,0 +1,90 @@
+{include file='_header'}
+<div class="page-heading"> 
+    <span class='pull-right'>
+        <a class='btn btn-primary btn-sm' href="{:url('merch/sysset/noticeadd')}"><i class='fa fa-plus'></i> 添加公告</a>
+    </span>
+    <h2>公告管理</h2> 
+</div>
+<form action="" method="get" class="form-horizontal  ">
+    <div class="page-toolbar row m-b-sm m-t-sm">
+        <div class="col-sm-4">
+            <div class="input-group-btn">
+                <button class="btn btn-default btn-sm"  type="button" data-toggle='refresh'><i class='fa fa-refresh'></i></button>
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch' data-href="{:url('merch/sysset/noticestatus',array('status'=>1))}"><i class='fa fa-circle'></i> 显示</button>
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch'  data-href="{:url('merch/sysset/noticestatus',array('status'=>0))}"><i class='fa fa-circle-o'></i> 隐藏</button>
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('merch/sysset/notice',array('op'=>'delete'))}"><i class='fa fa-trash'></i> 删除</button>
+            </div> 
+        </div>  
+        <div class="col-sm-6 pull-right">
+            <select name="status" class='form-control input-sm select-sm'>
+                <option value="" {if $status == ''} selected{/if}>状态</option>
+                <option value="1" {if $status== '1'} selected{/if}>显示</option>
+                <option value="0" {if $status == '0'} selected{/if}>隐藏</option>
+            </select>   
+            <div class="input-group">                
+                <input type="text" class="input-sm form-control" name='keyword' value="{$keyword}" placeholder="请输入关键词"> 
+                <span class="input-group-btn">
+                    <button class="btn btn-sm btn-primary" type="submit"> 搜索</button> 
+                </span>
+            </div>
+        </div>
+    </div>
+</form>
+<form action="" method="post">
+{if count($list)>0}
+<table class="table table-responsive table-hover" >
+    <thead class="navbar-inner">
+        <tr>
+            <th style="width:25px;" ><input type='checkbox' /></th>
+            <th style='width:50px'>顺序</th>                  
+            <th class='th-sortable' data-sort-name='title'>标题</th>
+            <th>链接</th>
+            <th>状态</th>
+            <th >操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {foreach name='list' item='row'}
+        <tr>
+            <td>
+                <input type='checkbox'   value="{$row['id']}"/>
+            </td>
+            <td>     
+                <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('merch/sysset/noticedisplayorder',array('id'=>$row['id']))}" >{$row['displayorder']}</a>
+            </td>
+            <td>{$row['title']}</td>
+            <td>{$row['link']}</td>
+            <td>
+                <span class='label {if $row['status']==1}label-success{else}label-default{/if}' 
+                      data-toggle='ajaxSwitch' 
+                      data-switch-value='{$row['status']}'
+                      data-switch-value0='0|隐藏|label label-default|{:url('merch/sysset/noticestatus',array('status'=>1,'id'=>$row['id']))}'  
+                      data-switch-value1='1|显示|label label-success|{:url('merch/sysset/noticestatus',array('status'=>0,'id'=>$row['id']))}'  
+                  >
+                    {if $row['status']==1}显示{else}隐藏{/if}</span>
+                </td>
+                <td style="text-align:left;">
+                    <a href="{:url('merch/sysset/noticeedit',array('id' => $row['id']))}" class="btn btn-default btn-sm" >
+                        <i class='fa fa-edit'></i> 修改
+                    </a>
+                    <a data-toggle='ajaxRemove' href="{:url('merch/sysset/noticedelete', array('id' => $row['id']))}"class="btn btn-default btn-sm" data-confirm='确认要删除此公告吗?'><i class="fa fa-trash"></i> 删除</a>
+                </td>
+            </tr>
+            {/foreach}
+            <tr>
+                <td colspan='6'>
+                    <div class='pagers' style='float:right;'>
+                        {$pager}            
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    {else}
+    <div class='panel panel-default'>
+        <div class='panel-body' style='text-align: center;padding:30px;'>
+            暂时没有任何公告!
+        </div>
+    </div>{/if}
+</form>
+{include file='_footer'}

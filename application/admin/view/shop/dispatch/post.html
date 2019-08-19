@@ -1,0 +1,337 @@
+{include file='_header'}
+<div class="page-header">
+    当前位置11：<span class="text-primary">{if !empty($dispatch['id'])}编辑{else}添加{/if}配送方式{if !empty($dispatch['id'])}({$dispatch['dispatchname']}){/if}</span>
+</div>
+
+<div class="page-content">
+    <div class="page-sub-toolbar">
+        <span class=''>
+            <a class="btn btn-primary btn-sm" href="{:url('admin/shop/dispatchadd')}">添加新配送方式</a>
+        </span>
+    </div>
+    <form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$dispatch['id']}" />
+        <div class="form-group">
+            <label class="col-lg control-label">排序</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="displayorder" class="form-control" value="{$dispatch['displayorder']}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label must">配送方式名称</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" id='dispatchname' name="dispatchname" class="form-control" value="{$dispatch['dispatchname']}" data-rule-required='true' />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label ">是否默认</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'><input type='radio' name='isdefault' id="isdefault1" value='1' {if $dispatch['isdefault']==1}checked{/if} /> 是</label>
+                <label class='radio-inline'><input type='radio' name='isdefault' id="isdefault0" value='0' {if $dispatch['isdefault']==0}checked{/if} /> 否</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label ">计费方式</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'><input type='radio' name='calculatetype' value='0' {if $dispatch['calculatetype']==0}checked{/if} /> 按重量计费</label>
+                <label class='radio-inline'><input type='radio' name='calculatetype' value='1' {if $dispatch['calculatetype']==1}checked{/if} /> 按件计费</label>
+            </div>
+        </div>
+        <div class="form-group dispatch0">
+            <label class="col-lg control-label ">物流公司</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type='hidden' name='expressname' value='{$dispatch['expressname']}'/>
+                <select name='express' class="form-control select2">
+                    <option value="" data-name="其他快递">其他快递</option>
+                    {foreach name='express_list' item='value'}
+                        <option value="{$value['express']}" data-name="{$value['name']}">{$value['name']}</option>
+                    {/foreach}
+                </select>
+                <span class="help-block">如果您选择了常用快递，则客户可以订单中查询快递信息，如果缺少您想要的快递，您可以联系我们! </span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label " style="padding-top: 11px">配送区域</label>
+            <div class="col-sm-9 col-xs-12">
+                <table  style='width:100%;'>
+                    <thead>
+                        <tr>
+                            <th style="height:40px;width:400px;">运送到</th>
+                            <th class="show_h" style="width:110px;">首重(克)</th>
+                            <th class="show_h" style="width:110px;">首费(元)</th>
+                            <th class="show_h" style="width:110px;">续重(克)</th>
+                            <th class="show_h" style="width:110px;">续费(元)</th>
+
+                            <th class="show_n" style="width:110px;">首件(个)</th>
+                            <th class="show_n" style="width:110px;">运费(元)</th>
+                            <th class="show_n" style="width:110px;">续件(个)</th>
+                            <th class="show_n" style="width:110px;">续费(元)</th>
+                            <th style="width:80px;">管理</th>
+                        </tr>
+                    </thead>
+                    <tbody id='tbody-areas'>
+                    <tr>
+                        <td style="padding:10px;">全国 [默认运费]</td>
+                        <td class="show_h text-center">
+                            <input type="text" value="{$dispatch['firstweight']}" class="form-control" name="default_firstweight" style="width:80px;"></td>
+                        <td class="show_h text-center">
+                            <input type="text" value="{$dispatch['firstprice']}" class="form-control" name="default_firstprice"  style="width:80px;"></td>
+                        <td class="show_h text-center">
+                            <input type="text" value="{$dispatch['secondweight']?$dispatch['secondweight']:1000}" class="form-control" name="default_secondweight"  style="width:80px;">
+                        </td>
+                        <td class="show_h text-center">
+                            <input type="text" value="{$dispatch['secondprice']}" class="form-control" name="default_secondprice"  style="width:80px;">
+                        </td>
+                        <td class="show_n text-center">
+                            <input type="text" value="{$dispatch['firstnum']?$dispatch['firstnum']:1}" class="form-control" name="default_firstnum" style="width:80px;">
+                        </td>
+                        <td class="show_n text-center">
+                            <input type="text" value="{$dispatch['firstnumprice']}" class="form-control" name="default_firstnumprice"  style="width:80px;">
+                        </td>
+                        <td class="show_n text-center">
+                            <input type="text" value="{$dispatch['secondnum']?$dispatch['secondnum']:1}" class="form-control" name="default_secondnum"  style="width:80px;">
+                        </td>
+                        <td class="show_n text-center">
+                            <input type="text" value="{$dispatch['secondnumprice']}" class="form-control" name="default_secondnumprice"  style="width:80px;">
+                        </td>
+                        <td class="text-center">
+                            <input type="text" value="{$dispatch['freeprice']}" class="form-control" name="default_freeprice"  style="width:80px;">
+                        </td>
+                    </tr>
+                        {foreach name='dispatch_areas' item='row'}
+                            <?php $random = random(16);?>
+                            {include file='shop/dispatch/tpl'}
+                        {/foreach}
+                    </tbody>
+                </table>
+                <a class='btn btn-default' href="javascript:;" onclick='addArea(this)'><span class="fa fa-plus"></span> 新增配送区域</a>
+                    <span class='help-block show_h' {if $dispatch['calculatetype']==1}style='display:none'{/if}>根据重量来计算运费，当物品不足《首重重量》时，按照《首重费用》计算，超过部分按照《续重重量》和《续重费用》乘积来计算</span>
+                    <span class='help-block show_n' {if $dispatch['calculatetype']==0}style='display:none'{/if}>根据件数来计算运费，当物品不足《首件数量》时，按照《首件费用》计算，超过部分按照《续件重量》和《续件费用》乘积来计算</span>
+            </div>
+        </div>
+        <div class="form-group-title">特殊区域设置</div>
+
+        <div class="form-group">
+            <label class="col-lg control-label ">类型</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'><input type='radio' name='isdispatcharea' value='0' {if $dispatch['isdispatcharea']==0}checked{/if} /> 不配送区域</label>
+                <label class='radio-inline'><input type='radio' name='isdispatcharea' value='1' {if $dispatch['isdispatcharea']==1}checked{/if} /> 只配送区域</label>
+                <span class='help-block'>不配送区域:不配送选择的区域,只配送未选择的区域<br>只配送区域:只配送选择的区域,不配送未选择的区域<br>只能选择一种类型</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label"><span id="dispatcharea_name">{if empty($dispatch['isdispatcharea'])}不{else}只{/if}</span>配送区域</label>
+            <div class="col-sm-9 col-xs-12">
+                <div id="areas" class="form-control-static">{$dispatch_nodispatchareas}</div>
+                <div class="input-group-btn">
+                    <a href="javascript:;" class="btn btn-default" onclick="selectAreas()">选择地区</a>
+                </div>
+                <input type="hidden" id='selectedareas' name="nodispatchareas" value="{$dispatch_nodispatchareas}" />
+                <input type="hidden" id='selectedareas_code' name="nodispatchareas_code" value="{$dispatch_nodispatchareas_code}" />
+            </div>
+        </div>
+        <!--<div class="form-group-title"></div>-->
+
+        <div class="form-group">
+            <label class="col-lg control-label ">状态</label>
+            <div class="col-sm-9 col-xs-12">
+                <label class='radio-inline'><input type='radio' name='enabled' value=1' {if $dispatch['enabled']==1}checked{/if} /> 启用</label>
+                <label class='radio-inline'><input type='radio' name='enabled' value=0' {if $dispatch['enabled']==0}checked{/if} /> 禁用</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg control-label "></label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="submit" value="提交" class="btn btn-primary"  />
+                <input type="button" name="back" onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+            </div>
+        </div>
+    </form>
+</div>
+
+{if empty($new_area)}
+    {include file='shop/selectareas'}
+{else}
+    {include file='shop/selectareasNew'}
+{/if}
+
+<script language='javascript'>
+    function show_type(flag){
+        if (flag == 1) {
+            $('.show_h').hide();
+            $('.show_n').show();
+        } else {
+            $('.show_h').show();
+            $('.show_n').hide();
+        }
+    }
+    $(function(){
+        show_type({$dispatch['calculatetype']});
+        $(':radio[name=calculatetype]').click(function(){
+            var val = $(this).val();
+            show_type(val);
+        })
+        $(':radio[name=dispatchtype]').click(function(){
+            var val = $(this).val();
+            $(".dispatch0,.dispatch1").hide();
+            $(".dispatch" + val).show();
+        })
+
+        $(':radio[name=isdispatcharea]').click(function(){
+            var val = $(this).val();
+            var name = '不';
+            if(val == 1) {
+                name = '只';
+            }
+            $("#dispatcharea_name").html(name);
+        })
+
+        $("select[name=express]").change(function(){
+            var obj = $(this);
+            var sel = obj.find("option:selected");
+            $(":input[name=expressname]").val(sel.data("name"));
+        });
+        {if !empty($dispatch['express'])}
+        $("select[name=express]").val("{$dispatch['express']}");
+        {/if}
+
+        {if empty($new_area)}
+        $('.province').mouseenter(function(){
+            $(this).find('ul').show();
+        }).mouseleave(function(){
+            $(this).find('ul').hide();
+        });
+
+        $('.cityall').click(function(){
+            var checked = $(this).get(0).checked;
+            var citys = $(this).parent().parent().find('.city');
+            citys.each(function(){
+                $(this).get(0).checked = checked;
+            });
+            var count = 0;
+            if (checked){
+                count = $(this).parent().parent().find('.city:checked').length;
+            }
+            if (count > 0){
+                $(this).next().html("(" + count + ")");
+            }
+            else{
+                $(this).next().html("");
+            }
+        });
+
+        $('.city').click(function(){
+            var checked = $(this).get(0).checked;
+            var cityall = $(this).parent().parent().parent().parent().find('.cityall');
+            if (checked){
+                cityall.get(0).checked = true;
+            }
+            var count = cityall.parent().parent().find('.city:checked').length;
+            if (count > 0){
+                cityall.next().html("(" + count + ")");
+            }
+            else{
+                cityall.next().html("");
+            }
+        });
+        {/if}
+    });
+    function getCurrents(withOutRandom){
+        var citys = "";
+        $('.citys').each(function(){
+            var crandom = $(this).prev().val();
+            if (withOutRandom && crandom == withOutRandom){
+                return true;
+            }
+            citys += $(this).val();
+        });
+        return citys;
+    }
+    function getCurrentsCode(withOutRandom){
+        var citys = "";
+        $('.citys_code').each(function(){
+            var crandom = $(this).prev().prev().prev().val();
+            if (withOutRandom && crandom == withOutRandom){
+                return true;
+            }
+            citys += $(this).val();
+        });
+        return citys;
+    }
+    var current = '';
+    function addArea(btn){
+        $(btn).button('loading');
+        $.ajax({
+            url:"{:url('admin/shop/dispatchtpl')}",
+            dataType:'json',
+            success:function(json){
+                $(btn).button('reset');
+                current = json.random;
+                $('#tbody-areas').append(json.html);
+                $('#tbody-areas tr').last().hide();
+                clearSelects();
+                $("#modal-areas").modal();
+
+                var citystrs = "";
+
+                {if empty($new_area)}
+                var currents = getCurrents();
+                currents = currents.split(';');
+                $('.city').each(function(){
+                    var parentdisabled = false;
+                    for (var i in currents){
+                        if (currents[i] != '' && currents[i] == $(this).attr('city')){
+                            $(this).attr('disabled', true);
+                            $(this).parent().parent().parent().parent().find('.cityall').attr('disabled', true);
+                        }
+                    }
+                });
+                $('#btnSubmitArea').unbind('click').click(function(){
+                    $('.city:checked').each(function(){
+                        citystrs += $(this).attr('city') + ";";
+                    });
+                    $('.' + current + ' .cityshtml').html(citystrs);
+                    $('.' + current + ' .citys').val(citystrs);
+                    $('#tbody-areas tr').last().show();
+                })
+                {else}
+                var currents = getCurrentsCode();
+                currents = currents.split(';');
+
+                var parentdisabled = false;
+                for (var i in currents){
+                    var area_info = currents[i].split(' ');
+                    if(area_info[0]) {
+                        $('#ch_pcode'+area_info[0]).prop("disabled",true);
+                    }
+                    if(area_info[1]) {
+                        $('#ch_ccode'+area_info[1]).prop("disabled",true);
+                    }
+                    if(area_info[2]) {
+                        $('#ch_acode'+area_info[2]).prop("disabled",true);
+                    }
+                }
+
+                $('#btnSubmitArea').unbind('click').click(function(){
+                    update_area();
+                    var city_html = $('#city_info').html();
+                    var area_html = $('#area_info').html();
+                    if (city_html && area_html) {
+                        $('.' + current + ' .cityshtml').html(city_html);
+                        $('.' + current + ' .citys').val(city_html);
+                        $('.' + current + ' .citys_code').val(area_html);
+                        $('#tbody-areas tr').last().show();
+                    }
+
+
+                })
+                {/if}
+
+                var calculatetype1 = $('input[name="calculatetype"]:checked ').val();
+                show_type(calculatetype1);
+            }
+        })
+    }
+
+</script>
+{include file='_footer'}

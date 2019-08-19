@@ -1,0 +1,57 @@
+{include file='_header'}
+<link rel="stylesheet" href="/public/static/plugin/groups/css/style.css?v=2018531" />
+<div class='fui-page creditshop-index-page'>
+	<div class='fui-content navbar'>
+		<div class='fui-swipe' data-transition="500" data-gap="1">
+		    <div class='fui-swipe-wrapper'>
+			{foreach name='banners' item='adv'}
+				<a class='fui-swipe-item' href="{if !empty($adv['link'])}{$adv['link']}{else}javascript:;{/if}">
+					<img src="{$adv['thumb']}" alt="{$adv['advname']}" onerror="this.src='/public/static/images/nopic100.jpg'"/>
+				</a>
+			{/foreach}
+		    </div>
+		    <div class='fui-swipe-page'></div>
+		</div>
+		{if count($category)>0}
+		<div class="lynn_index_menu row">
+			{foreach name='category' item='cate'}
+			<a href="{:url('mobile/groups/category', array('category'=>$cate['id']))}">
+				<img src="{$cate['thumb']}" alt="{$cate['name']}" onerror="this.src='/public/static/images/nopic100.jpg'">
+				<p>{$cate['name']}</p>
+			</a>
+			{/foreach}
+		</div>
+		{/if}
+		<div class="lynn_item"></div>
+		{if count($goods)>0}
+		<ul class="lynn_index_list_ul row">
+			{foreach name='goods' item='item'}
+			<li class="lynn_index_list_li fui-list goods-list">
+				<a href="{:url('mobile/groups/goods', array('id'=>$item['id']))}" class="external lynn_index_list_a fui-list-media">
+					<img data-lazy="{$item['thumb']}" alt="{$item['title']}" onerror="this.src='/public/static/images/nopic100.jpg'">
+				</a>
+				<div class="lynn_index_list_info fui-list-inner" onclick="window.location.href='{:url('mobile/groups/goods', array('id'=>$item['id']))}';">
+					<h3><span class="person">{if $item['is_ladder'] == 1}阶梯团{else}{$item['groupnum']}人团{/if}</span>{$item['title']}</h3>
+					<span>
+						原价：¥{$item['price']}
+					</span>
+					<div class="price">
+						<span>{$item['groupsprice']}/{$item['goodsnum']}{if $item['units']}{$item['units']}{else}件{/if}</span>
+						<a href="{:url('mobile/groups/goods', array('id'=>$item['id']))}" class="external lynn_index_list_team_a">去拼团 </a>
+					</div>
+				</div>
+			</li>
+			{/foreach}
+		</ul>
+		{else}
+		<div class="fui-message fui-message-popup in">
+			<div class="icon ">
+				<i class="icon icon-information"></i>
+			</div>
+			<div class="content">暂无任何活动</div>
+		</div>
+		{/if}
+	</div>
+</div>
+{include file='groups/footerMenus'}
+{include file='_footer'}

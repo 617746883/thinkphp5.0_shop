@@ -1,0 +1,58 @@
+{include file='_header'}
+ 
+<div class="page-header">
+    <span>当前位置：<span class="text-primary">推送记录</span></span>
+</div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal" user="form">
+        <div class="page-toolbar">
+            <div class="col-sm-6">
+                <span class="">
+                    <a class='btn btn-primary btn-sm' href="{:url('admin/system/pushsend')}"><i class="fa fa-plus"></i> 新建消息推送</a>
+                </span>
+            </div>
+            <div class="col-sm-6 pull-right">
+                    <div class="input-group">
+                        <input type="text" class=" form-control" name='keyword' value="{$keyword}" placeholder="请输入关键词"> <span class="input-group-btn">        
+                     <button class="btn  btn-primary" type="submit"> 搜索</button> </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    {if count($list)>0} 
+        <table class="table table-hover table-responsive">
+            <thead>
+                <tr>
+                    <th style="width:85px;"></th>
+                    <th style=''>标题</th>
+                    <th style='width:120px;'>用户</th>
+                    <th style='width:160px;'>推送时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {foreach name='list' item='row'}
+                <tr>
+                    <td>{$row['id']}</td>
+                    <td>{$row['title']}</td>
+                    <td>{$row['nickname'] ? $row['nickname'] : $row['mobile']}</td>
+                    <td>{:date('Y-m-d H:i:s',$row['createtime'])}</td>
+                </tr>
+                {/foreach}
+             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" style="text-align: right"> {$pager}</td>
+                </tr>
+            </tfoot>
+            </tbody>
+        </table>
+      {else}
+    <div class='panel panel-default'>
+        <div class='panel-body' style='text-align: center;padding:30px;'>
+             暂时没有任何推送记录!
+        </div>
+    </div>
+    </form>
+{/if}
+</div>
+{include file='_footer'}

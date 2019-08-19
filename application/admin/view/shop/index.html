@@ -1,0 +1,208 @@
+{include file='_header'}
+<div class="page-heading">
+    <span class='pull-right'>
+        <a class='btn btn-primary btn-sm' href="{:url('goods/add')}"><i class='fa fa-plus'></i> 添加商品</a>
+    </span>
+    <h2>商城概述</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="contact-box">
+            <div class="col-sm-1" style="padding:0">
+                <img src="{if empty($shop_data['logo'])}/public/static/images/nopic100.jpg{else}{$shop_data['logo']}{/if}" style="width:65px;height:65px;border-radius:5px">
+            </div>
+            <div class="col-sm-10"  style="padding-left:10px">
+                <h3>{if empty($shop_data['name'])}未设置商城名称{else}{$shop_data['name']}{/if}</h3>
+                <p>{if empty($shop_data['name'])}未设置商城描述{else}{$shop_data['description']}{/if}</p>
+            </div>
+            {ifp 'sysset.shop.edit'}
+                <div class="col-sm-1" style="padding-left: 0"><a class="btn btn-primary btn-sm" href="{:url('sysset/shop')}" style="color: #fff"> 点击修改</a></div>
+            {/if}
+            <div class="clearfix"></div>
+
+        </div>
+    </div>
+
+    {if count($notice)>0}
+    <div class="col-md-12 col-sm-12">
+        <div id="w0" class="list-group">
+            <a class="list-group-item" href="#w0-1" data-toggle="collapse" data-parent="#w0" id="notice" onclick="$(this).find('b').toggleClass('deg180')">
+                <span style="padding-left: 2rem;">{$notice[0]['title']}</span><b class="caret pull-right" style="margin-top: 8px;"></b>
+            </a>
+            <div id="w0-1" class="submenu panel-collapse collapse">
+                {loop $notice $key $value}
+                <a class="list-group-item" href="javascript:" data-toggle="ajaxModal" data-href="{:url('shop/index/view',array('id'=>$value['id']));}">
+                    <span style="padding-left: 2rem;">{$value['title']}</span>
+                </a>
+                {/loop}
+            </div>
+        </div>
+    </div>
+    {/if}
+
+        <div class="col-md-12 col-sm-12">
+        <div class="contact-box" style="border: 1px solid #e7eaec">
+            <div class="forum-item">
+                <div class="row">
+                    {ifp 'goods'}
+                    <a href="{:url('goods',array('goodsfrom'=>'out'))}">
+                        <div class="col-sm-3 forum-info">
+                                <span class="views-number goods_totals">
+                                    --
+                                </span>
+                            <div>
+                                <small>已售罄商品</small>
+                            </div>
+                        </div>
+                    </a>
+                    {/if}
+                    
+                    {ifp 'order.list.status1'}
+                    <a href="{:url('order/list/status1')}">
+                        <div class="col-sm-3 forum-info">
+                                                <span class="views-number status1">
+                                                    --
+                                                </span>
+                            <div>
+                                <small>{if $is_openmerch == 1}自营{/if}待发货订单</small>
+                            </div>
+                        </div>
+                        </a>
+                        {/if}
+                        
+                        {ifp 'order.list.status4'}
+                    <a href="{:url('order/list/status4')}">
+                        <div class="col-sm-3 forum-info">
+                                                <span class="views-number status4">
+                                                    --
+                                                </span>
+                            <div>
+                                <small>{if $is_openmerch == 1}自营{/if}维权中订单</small>
+                            </div>
+                        </div>
+                    </a>
+                    {/if}
+                    
+                    {ifp 'finance.log.withdraw'}
+                    <a href="{:url('finance/log/withdraw',array('status'=>0))}">
+                    <div class="col-sm-3 forum-info">
+                                            <span class="views-number finance_total">
+                                                --
+                                            </span>
+                        <div>
+                            <small>待审核提现</small>
+                        </div>
+                    </div>
+                        </a>
+                        {/if}
+                </div>
+            </div>
+
+   {if $hascommission}      
+            <div class="forum-item">
+                <div class="row">
+                    {ifp 'commission.agent'}
+                    <a href="{:url('commission/agent')}">
+                        <div class="col-sm-3 forum-info">
+                                                <span class="views-number commission_agent_total">
+                                                    --
+                                                </span>
+                            <div>
+                                <small>分销商总数</small>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{:url('commission/agent',array('status'=>0))}">
+                        <div class="col-sm-3 forum-info">
+                                                <span class="views-number commission_agent_status0_total">
+                                                   --
+                                                </span>
+                            <div>
+                                <small>待审核分销商</small>
+                            </div>
+                        </div>
+                    </a>
+                    {/if}
+                    
+                    {ifp 'commission.apply.view1'}
+                    <a href="{:url('commission/apply',array('status'=>1))}">
+                        <div class="col-sm-3 forum-info">
+                                            <span class="views-number commission_apply_status1_total">
+                                               --
+                                            </span>
+                            <div>
+                                <small>待审核佣金申请</small>
+                            </div>
+                        </div>
+                    </a>
+                    {/if}
+
+                    {ifp 'commission.apply.view2'}
+                    <a href="{:url('commission/apply',array('status'=>2))}">
+                        <div class="col-sm-3 forum-info">
+                                                <span class="views-number commission_apply_status2_total">
+                                                    --
+                                                </span>
+                            <div>
+                                <small>待打款佣金申请</small>
+                            </div>
+                        </div>
+                    </a>
+                    {/if}
+                </div>
+            </div>
+   {/if}
+
+    </div>
+</div>
+
+    <div class="col-md-12 col-sm-12">
+        {if !empty($order_ok)}
+        <div class="ibox float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="ibox-title">
+                <h5>用户购买待发货订单</h5>
+            </div>
+            <div class="ibox-content">
+                <table class="table table-hover no-margins">
+                    <thead>
+                    <tr>
+                        <th class="col-sm-1">状态</th>
+                        <th class="col-sm-2">日期</th>
+                        <th class="col-sm-1">金额</th>
+                        <th class="col-sm-2">用户</th>
+                        <th class="col-sm-3">订单号</th>
+                        <th class="col-sm-2">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {loop $order_ok $key $value}
+                    <tr>
+                        <td><span class="label label-warning">待发货</span>
+                        </td>
+                        <td>{php echo date('Y-m-d H:i',$value['createtime'])}</td>
+                        <td class="text-navy">{$value['price']}</td>
+                        <td>{php echo !empty($value['address']['realname']) ? $value['address']['realname'] : $value['invoicename']}</td>
+                        <td class="text-navy">{$value['ordersn']}</td>
+                        <td>
+                            {ifp 'order.detail'}
+                                <a href="{:url('order/detail',array('id'=>$value['id']))}" class="btn btn-xs btn-primary">查看详情</a></td>
+                            {/if}
+                    </tr>
+                    {/loop}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {else}
+        <div class="panel panel-default">
+            <div class="panel-body" style="text-align: center;padding:30px;">
+                暂时没有任何待处理订单!
+            </div>
+        </div>
+        {/if}
+    </div>
+
+</div>
+{include file='_footer'}

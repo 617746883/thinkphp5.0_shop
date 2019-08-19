@@ -1,0 +1,81 @@
+{include file='_header'}
+<style>
+    .fui-cell-group:not(.fui-cell-group-o):before{
+        border:0
+    }
+    .fui-cell-group:first-child{
+        margin-top: 0;
+    }
+</style>
+<div class='fui-page  fui-page-current'>
+    <div class="fui-header">
+        <div class="fui-header-left">
+            <a class="back"></a>
+        </div>
+        <div class="title">{if empty($address)}新建地址{else}编辑地址{/if}</div>
+        <div class="fui-header-right"><a data-toggle="delete" data-addressid="{$address['id']}">{if !empty($address)}删除{/if}</a></div>
+    </div>
+    <div class='fui-content'>
+        <form method='post' class='form-ajax' >
+            <input type='hidden' id='addressid' value="{$address['id']}"/>
+            <div class='fui-cell-group'>
+                <div class='fui-cell'>
+                    <div class='fui-cell-label'>收货人</div>
+                    <div class='fui-cell-info c000'><input type="text" id='realname'  name='realname' value="{$address['realname']}" placeholder="请填写收货人姓名" class="fui-input"/></div>
+                </div>
+                <div class='fui-cell'>
+                    <div class='fui-cell-label'>联系电话</div>
+                    <div class='fui-cell-info c000'><input type="tel" id='mobile' name='mobile' value="{$address['mobile']}" placeholder="请填写联系电话"  class="fui-input"/></div>
+                </div>
+                <div class='fui-cell'>
+                    <div class='fui-cell-label'>所在地区</div>
+                    <div class='fui-cell-info c000'><input type="text" id='areas'  name='areas' data-value="{if !empty($show_data) && !empty($address)}{$address['datavalue']}{/if}" value="{if !empty($address)}{$address['province']} {$address['city']} {$address['area']}{/if}" placeholder="所在地区"  class="fui-input" readonly=""/></div>
+                </div>
+                {if !empty($new_area) && !empty($address_street)}
+                <div class='fui-cell'>
+                    <div class='fui-cell-label'>所在街道</div>
+                    <div class='fui-cell-info c000'><input type="text" id='street'  name='street' data-value="{if !empty($address)}{$address['streetdatavalue']}{/if}" value="{if !empty($address)}{$address['street']}{/if}" placeholder="所在街道"  class="fui-input" readonly=""/></div>
+                </div>
+                {/if}
+                <div class='fui-cell'>
+                    <div class='fui-cell-label'>详细地址</div>
+                    <div class='fui-cell-info c000'><input type="text" id='address' name='address' value="{$address['address']}" placeholder='街道，楼牌号等'  class="fui-input"/></div>
+                </div>
+                {if empty($address['isdefault'])}
+                    <div class="fui-cell ">
+                        <div class="fui-cell-label" style="width:auto">设置默认地址</div>
+                        <div class="fui-cell-info ">
+                            <input type="checkbox" id='isdefault' class="fui-switch fui-switch-danger pull-right">
+                        </div>
+                    </div>
+                {/if}
+            </div>          
+            <a id="btn-submit" class='external btn btn-danger block' style="margin-top:1.25rem">保存地址</a>
+        </form>
+
+    </div>
+
+    <script language='javascript' type="text/javascript">
+
+
+
+        require(['biz/member/address'], function (modal) {
+
+            modal.initPost({new_area: {:$new_area}, address_street: {:$address_street}});
+
+        });
+
+    </script>
+
+    <script language='javascript'>require(['biz/member/address'], function (modal) {
+
+        modal.initList();
+
+    });</script>
+
+</div>
+
+
+
+{include file='_footer'}
+

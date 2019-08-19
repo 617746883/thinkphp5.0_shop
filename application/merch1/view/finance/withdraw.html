@@ -1,0 +1,133 @@
+{include file='_header'}
+<div class="page-heading"> <h2>结算申请</h2> </div>
+<form action="" method="get" class="form-horizontal" role="form" id="form1">
+    <div class="page-toolbar row m-b-sm m-t-sm">
+        <div class="col-sm-4" style='padding-right:0;'>
+            <div class="btn-group btn-group-sm" style='float:left'>
+                <button class="btn btn-default btn-sm"  type="button" data-toggle='refresh'><i class='fa fa-refresh'></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="page-toolbar row" id='moresearch' >        
+        <select name='status' class='form-control  input-sm'   style="width:100px;"  >
+            <option value='' {if $status==''}selected{/if}>状态</option>
+            <option value='1' {if $status=='1'}selected{/if}>完成</option>
+            <option value='0' {if $status=='0'}selected{/if}>申请中</option>
+            <option value='-1' {if $status=='-1'}selected{/if}>失败</option>
+        </select>
+        <div class='col-sm-4' style='padding-right:0'>
+            {:tpl_daterange('time', array('sm'=>true,'placeholder'=>'提现时间'),true);}
+        </div>
+        <div class="col-sm-4 pull-right">
+            <div class="input-group " >
+                <input type="text" class="form-control input-sm"  name="keyword" value="{$keyword}" placeholder="请输入关键词" />
+				 <span class="input-group-btn">
+					<button class="btn btn-sm btn-primary" type="submit"> 搜索</button>
+                    <button type="submit" name="export" value="1" class="btn btn-success btn-sm">导出 Excel</button>
+				</span>
+            </div>
+        </div>
+    </div>
+</form>
+<table class="table table-hover table-responsive">
+    <thead class="navbar-inner">
+    <tr>
+        <th style='width:200px;'>单号 </th>
+        <th style='width:100px;'>提现金额<br/>应到账金额<br/>手续费金额</th>
+        <th style='width:90px;'>已发送金额 </th>
+        <th style='width:180px;'>提现方式</th>
+        <th style='width:90px;'>提现时间</th>
+        <th style='width:80px;'>状态</th>
+        <th style='width:50px;'>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {foreach name='list' item='row'}
+    <tr>
+        <td>{$row['applyno']}</td>
+        <td>{$row['money']}<br/>{$row['realmoney']}<br/>{$row['deductionmoney']}</td>
+        <td>{if (float)$row['sendmoney'] != 0}{$row['sendmoney']}{else}-{/if}</td>
+        <td title="{if empty($row['applytype'])}{$row['typestr']}{elseif $row['applytype']=='2'}{$row['typestr']}{elseif $row['applytype']=='3'}{$row['typestr']}{/if}{if $row['applytype'] == 2}
+            姓名:{$row['realname']}
+            帐号:{$row['alipay']}
+            {elseif $row['applytype'] == 3}
+            姓名:{$row['applyrealname']}
+            银行:{$row['bankname']}
+            帐号:{$row['bankcard']}
+            {/if}">
+            {if empty($row['applytype'])}
+            <span class='label label-success'>{$row['typestr']}</span>
+            {elseif $row['applytype']=='2'}
+            <span class='label label-warning'>{$row['typestr']}</span>
+            {elseif $row['applytype']=='3'}
+            <span class='label label-primary'>{$row['typestr']}</span>
+            {/if}
+
+            {if $row['applytype'] == 2}
+            <br/>
+            姓名:{$row['realname']}<br/>
+            帐号:<br/>{$row['alipay']}
+            {elseif $row['applytype'] == 3}
+            <br/>
+            姓名:{$row['applyrealname']}<br/>
+            银行:{$row['bankname']}<br/>
+            帐号:<br/>{$row['bankcard']}
+            {/if}
+        </td>
+
+        <td>{:date('Y-m-d',$row['createtime'])}<br/>{:date('H:i',$row['createtime'])}</td>
+        <td>
+            {if $row['status']==0}
+            <span class='label label-default'>{if $row['type']==1}申请中{else}未充值{/if}</span>
+            {elseif $row['status']==1}
+            <span class='label label-success'>成功</span>
+            {elseif $row['status']==-1}
+            <span class='label label-default'>{if $row['type']==1}拒绝{else}失败{/if}</span>
+            {elseif $row['status']==3}
+            <span class='label label-danger'>{if $row['type']==0}退款{/if}</span>
+            {/if}
+        </td>
+
+        <td  style="overflow:visible;">
+            {if $row['status']<1 && $row['status']!=-1 }
+            <div class="btn-group btn-group-sm" >
+                <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="javascript:;">操作 <span class="caret"></span></a>
+                <ul class="dropdown-menu dropdown-menu-left" role="menu" style='z-index: 9999'>
+                    {if $row['status']==0 || $row['status']==-1}
+                    {if $row['applytype'] < 2}
+                    {ifp 'finance.log.wechat'}
+                    <li> <a data-toggle='ajaxPost' data-confirm="确认微信钱包提现?" href="{:url('merch/finance/wechat',array('id' => $row['id']));}">微信提现</a>	</li>
+                    {/if}
+                    {/if}
+
+                    {if $row['applytype'] == '2'}
+                    {ifp 'finance.log.alipay'}
+                    <li> <a data-toggle='ajaxPost' data-confirm="确认支付宝提现?(提现成功可能需要等待两到三分钟处理完成!)" href="{:url('merch/finance/alipay',array('id' => $row['id']));}">支付宝提现</a>	</li>
+                    {/if}
+                    {/if}
+
+                    {ifp 'finance.log.manual'}
+                    <li><a data-toggle='ajaxPost' data-confirm="确认手动提现完成?" href="{:url('merch/finance/manual',array('id' => $row['id']));}">手动提现</a>	</li>
+                    {/if}
+
+                    {/if}
+
+                    {if $row['status']==0}
+                    {ifp 'finance.log.refuse'}
+                    <li><a class='text-danger' data-toggle='ajaxPost' data-confirm="确认拒绝提现申请?" href="{:url('merch/finance/refuse',array('id' => $row['id']));}">拒绝</a></li>
+                    {/if}
+                    {/if}
+
+                </ul>
+            </div>
+            {/if}
+        </td>
+
+    </tr>
+    {/foreach}
+    </tbody>
+</table>
+{$pager}
+
+
+{include file='_footer'}

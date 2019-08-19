@@ -1,0 +1,143 @@
+{include file='_header'}
+<script type="text/javascript" src="__STATIC__/js/lib/moment.js"></script>
+<link rel="stylesheet" href="__STATIC__/components/datetimepicker/jquery.datetimepicker.css">
+<link rel="stylesheet" href="__STATIC__/components/daterangepicker/daterangepicker.css">
+<style type="text/css">
+.pd0{padding:0;}
+input[type=checkbox].team-check{vertical-align:middle;margin:0 4px 0 0;}
+    table tr td,table tr th{
+        border:none !important;
+        border-bottom:1px solid #efefef !important;
+        padding: 15px 0 !important;
+    }
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">团购管理</span>
+</div>
+<div class="page-content">
+<div class="main">
+    <div class="page-toolbar row m-b-sm m-t-sm">
+        <form action="" method="get" class="form-horizontal" plugins="form">
+            <div class="col-sm-6">
+                <div class="btn-group btn-group-sm">
+                    {:tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d H:i', $starttime),'endtime'=>date('Y-m-d H:i', $endtime)),true);}
+                </div>
+            </div>
+            <div class="col-sm-6 pull-right">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name='searchtime'  class='form-control  input-sm select-md' style="width:100px;"  >
+                            <option value=''>不按时间</option>
+                            <option value='starttime' {if $_GET['searchtime']=='starttime'}selected{/if}>开团时间</option>
+                        </select>
+                    </div>
+                    <div  class="input-group-select">
+                        <select name='searchfield'  class='form-control  input-sm select-md' style="width:100px;"  >
+                            <option value='teamid' {if $_GET['searchfield']=='teamid'}selected{/if}>团ID</option>
+                            <option value='orderno' {if $_GET['searchfield']=='orderno'}selected{/if}>订单号</option>
+                        </select>
+                    </div>
+                    <input type="text" class="form-control input-sm"  name="keyword" value="{$_GET['keyword']}" placeholder="请输入关键词"/>
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit"> 搜索</button>
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+    {if $type == 'ing'}
+    <div class="panel panel-info" style="border:none;margin: 0;padding-bottom: 20px">
+        <div class="input-group-btn">
+            {if $sort==''}
+            <button class="btn btn-primary btn-sm" type="button" onclick="javascript:window.location.href='{:url('admin/groups/teaming',array('sort'=>'desc'))}'">
+                <i class='fa fa-sort'></i> 参团人数
+            </button>
+            {/if}
+            {if $sort=='desc'}
+            <button class="btn btn-primary btn-sm" type="button" onclick="javascript:window.location.href='{:url('admin/groups/teaming',array('sort'=>'asc'))}'">
+                <i class='fa fa-caret-down'></i> 参团人数
+            </button>
+            {/if}
+            {if $sort=='asc'}
+            <button class="btn btn-primary btn-sm" type="button" onclick="javascript:window.location.href='{:url('admin/groups/teaming',array('sort'=>'desc'))}'">
+                <i class='fa fa-caret-up'></i> 参团人数
+            </button>
+            {/if}
+            <button class="btn btn-success btn-sm" type="button" onclick="javascript:window.location.href='{:url('admin/groups/teaming',array('sort'=>$sort,'team'=>'groups'))}'">
+                <i class='fa fa-group'></i> 即将成团
+            </button>
+            {if $type=='ing'}
+            <button class="btn btn-default btn-sm" type="button" data-toggle='batch' data-href="{:url('admin/groups/teamgroup')}">
+                <i class='fa fa-circle'></i> 手动成团
+            </button>
+            {/if}
+        </div>
+    </div>
+    {/if}
+    <div class="panel-default">
+        <div class="panel-body table-responsive" style="padding:0;">
+            <form action="" method="post">
+            {if count($teams) > 0}
+            <table class="table table-hover ">
+                <thead class="navbar-inner">
+                <tr>
+                    <th style="width:60px; text-align: center;">团ID</th>
+                    <th style="width:220px;">商品名称</th>
+                    <th style="width:80px;text-align: center;">团购进度</th>
+                    <th style="width:140px;text-align: center;">开团时间</th>
+                    <th style="width:140px;text-align: center;">到期时间</th>
+                    <th style="width:80px;text-align: center;">状态</th>
+                    <th style="width:40px; text-align: center;">操作</th>
+                </tr>
+                </thead>
+                <tbody style="text-align: center;">
+                    {foreach name='teams' item='row'}
+                    <tr>
+                        <td>{$row['teamid']}</td>
+                        <td style="text-align:left;">{if !empty($row['title'])}{$row['title']}{else}--{/if}</td>
+                        <td>
+                            <font color="red">{$row['num']}</font>/{$row['groupnum']}
+                        </td>
+                        <td>{$row['starttime']}</td>
+                        <td>{$row['endtime']}</td>
+                        <td>
+                            {if $row['success']==0 && $row['status'] > 0}<span class="label label-info">拼 团 中</span>{/if}<!--label-warning-->
+                            {if $row['success']==1}<span class="label label-success">拼团成功</span>{/if}<!--label-warning-->
+                            {if $row['success']==-1}<span class="label label-danger">拼团失败</span>{/if}<!--label-warning-->
+                        </td>
+                        <td>
+                            <a href="{:url('admin/groups/teamdetail',array('teamid'=>$row['id']))}" class="btn  btn-op btn-operation">
+                             <span data-toggle="tooltip" data-placement="top" title="" data-original-title="查看团信息">
+                                        <i class='icow icow-chakan-copy'></i>
+                             </span>
+                            </a>
+                            {if $row['success'] == 1}
+                            <a data-toggle="ajaxPost" href="{:url('admin/groups/cancel_group', array('id' => $row['teamid']))}" data-confirm="确认取消成团吗？" class="btn  btn-op btn-operation"> <span data-toggle="tooltip" data-placement="top" title="" data-original-title="取消成团"> <i class='fa fa-group'></i></span>
+                            </a>
+                            {/if}
+                            {if $row['success'] == 0}
+                            <br /><a class="btn btn-primary btn-xs" data-toggle="ajaxPost" href="{:url('admin/groups/teamgroup', array('id' => $row['teamid']))}" data-confirm="确认立即成团吗？">立即成团</a>
+                            {/if}
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="7" class="text-right">{$pager}</td>
+                    </tr>
+                </tfoot>
+            </table>
+                {else}
+                <div class='panel panel-default'>
+                    <div class='panel-body' style='text-align: center;padding:30px;'>
+                        暂时没有任何拼团
+                    </div>
+                </div>
+                {/if}
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+{include file='_footer'}

@@ -1,0 +1,150 @@
+{include file='_header'}
+<div class="page-header">当前位置：<span class="text-primary">会员等级管理</span></div>
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal form-search" role="form">
+        <div class="page-toolbar">
+            <div class="pull-left">
+                <a class='btn btn-primary btn-sm' href="{:url('admin/member/leveladd')}"><i class='fa fa-plus'></i> 添加会员等级</a>
+            </div>
+            <div class="pull-right col-md-6">
+                <div class="input-group">
+                    <div class="input-group-select">
+                        <select name="enabled" class='form-control'>
+                            <option value="" {if $enabled == ''} selected{/if}>状态</option>
+                            <option value="1" {if $enabled== '1'} selected{/if}>启用</option>
+                            <option value="0" {if $enabled == '0'} selected{/if}>禁用</option>
+                        </select>
+                    </div>
+                    <input type="text" class=" form-control" name='keyword' value="{$keyword}" placeholder="请输入关键词">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit"> 搜索</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    {if empty($list)}
+        <div class="panel panel-default">
+            <div class="panel-body empty-data">未查询到相关数据</div>
+        </div>
+    {else}
+        <form action="" method="post" >
+            <div class="page-table-header">
+                <input type="checkbox">
+                <div class="btn-group">
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/member/leveldelete')}"><i class='icow icow-shanchu1'></i> 删除</button>
+                </div>
+            </div>
+            <table class="table table-hover table-responsive">
+                <thead>
+                    <tr>
+                        <th style="width:25px;"></th>
+                        <th style="width:60px;">等级</th>
+                        <th>等级名称</th>
+                        <th style="width:80px;">折扣</th>
+                        <th>升级条件</th>
+                        <th style="width:80px;">状态</th>
+                        <th style="width: 95px">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name="list" item="row"}
+                        <tr {if $row['id']=='default'}style='background:#eee;{if !empty($keyword)}display:none;{/if}'{/if}>
+                            <td>{if $row['id']!='default'}<input type='checkbox'   value="{$row['id']}"/>{/if}</td>
+                            <td>{if $row['id']=='default'}--{else}{$row['level']}{/if}</td>
+                            <td>{$row['levelname']}</td>
+                            <td>{$row['discount']}</td>
+                            <td>
+                                {if $row['id']=='default'}
+                                默认等级
+                                {else}
+                                {if empty($shopset['leveltype'])}
+                                {if $row['ordermoney']>0}
+                                完成订单金额满 {$row['ordermoney']}元
+                                {else}
+                                不自动升级
+                                {/if}
+                                {/if}
+                                {if $shopset['leveltype']==1}
+                                {if $row['ordercount']>0}
+                                完成订单数量满 {$row['ordercount']}个
+                                {else}
+                                不自动升级
+                                {/if}
+                                {/if}
+                                {if $shopset['leveltype']==2}
+                                {if $row['creditnum']>0}
+                                已获得积分满 {$row['creditnum']}
+                                {else}
+                                不自动升级
+                                {/if}
+                                {/if}
+                                {/if}
+                            </td>
+                             <td>                               
+                                {if $row['id']!='default'}
+                                <span class='label {if $row['enabled']==1}label-primary{else}label-default{/if}'
+                                data-toggle='ajaxSwitch'
+                                data-switch-value='{$row['enabled']}'
+                                data-switch-value0='0|禁用|label label-default|{:url('admin/member/levelenabled',array('enabled'=>1,'id'=>$row['id']))}'
+                                data-switch-value1='1|启用|label label-primary|{:url('admin/member/levelenabled',array('enabled'=>0,'id'=>$row['id']))}'
+                                >
+                                {if $row['enabled']==1}启用{else}禁用{/if}</span>
+                                {/if}                    
+                            </td>
+                            <td>
+                                <a class='btn btn-default  btn-sm btn-op btn-operation' href="{:url('admin/member/mlist', array('level' => $row['id']))}">
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="等级会员">
+                                        <i class='icow icow-member'></i>
+                                    </span>
+                                </a>                          
+                                <a href="{:url('admin/member/leveledit', array('id' => $row['id']))}" class="btn btn-op btn-operation">
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="修改">
+                                        <i class='icow icow-bianji2'></i>
+                                    </span>
+                                </a>                              
+                                {if $row['id']!='default'}                                   
+                                <a data-toggle='ajaxRemove' href="{:url('admin/member/leveldelete', array('id' => $row['id']))}"class="btn btn-op btn-operation" data-confirm='确认要删除此会员等级吗?'>
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="删除">
+                                       <i class='icow icow-shanchu1'></i>
+                                    </span>
+                                </a>                                   
+                                {/if}
+                            </td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td colspan="2">
+                            <div class="btn-group">
+                                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('admin/member/leveldelete')}"><i class='icow icow-shanchu1'></i> 删除</button>
+                            </div>
+                        </td>
+                        <td colspan="4" style="text-align: right">
+
+
+                            {$pager}
+
+                        </td>
+
+                    </tr>
+
+                </tfoot>
+
+            </table>
+
+        </form>
+
+    {/if}
+
+</div>
+
+
+
+{include file='_footer'}
+
+
+
+<!--4000097827-->

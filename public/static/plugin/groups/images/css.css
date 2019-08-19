@@ -1,0 +1,128 @@
+body {width:100%; margin:0px; background:#eee;}
+a {text-decoration:none;}
+.top .left .info .name ,.list .good .info .name   { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; clear:both; content:"..."}
+
+.page_topbar {height:45px; background:#f9f9f9; border-bottom:1px solid #e8e8e8; font-size:16px; line-height:45px; text-align:center; }
+.page_topbar .title {height:45px;;line-height:45px; color:#666; text-align: center;}
+.page_topbar a.back {position:absolute;left:15px;height:45px;line-height:45px;display:block;color:#999; font-size:24px;}
+.page_topbar a.btn { position: absolute;right:10px;height:45px;line-height:45px;display:block;color:#999; font-size:24px; }
+
+.index_sub {height:40px; background:#fff; border-top:1px solid #eee;color:#f90; border-bottom:1px solid #eee; line-height:40px; text-align: center;}
+.index_sub a {height:40px; width:45%; display:inline-block; text-align:center; line-height:40px; font-size:14px; color:#777;}
+.index_sub a { color:#666; }
+.index_sub a i { color:#eee;border:1px solid #eee;padding:4px; width:8px;height:8px; border-radius: 8px; font-size:8px;margin-top:-2px; }
+.index_sub a d {color:#f90;}
+
+.top {height:198px; background:#fff; border-top:1px solid #eee; border-bottom:1px solid #eee; margin-top:12px;}
+.top .left {height:198px; width:40%; margin-left:-1px; border-right:1px solid #eee; float:left;}
+.top .left .info {height:178px; padding:10px;}
+.top .left .info .classs {height:16px; font-size:10px; color:#999;}
+.top .left .info .classs .span1 {background:#f90; color:#fff; padding:2px 3px; margin-left:2px; border-radius:2px;}
+.top .left .info .classs .span2 {background:#ccc; color:#fff; padding:2px 3px; margin-left:2px; border-radius:2px;}
+.top .left .info .name {height:20px; font-size:14px; color:#777;line-height:20px;overflow: hidden;}
+.top .left .info .price {height:16px; font-size:12px; line-height:16px; color:#f90;}
+.top .left .info .price i {color:#777; margin-left:2px; font-size:10px; color:#999;}
+.top .left .info .img {height:146px; text-align:center; line-height:146px;margin-top:20px;}
+.top .left .info .img img {max-height:146px; max-width:100%}
+
+.top .right {height:198px; width:60%; float:left;}
+.top .right .good {height:99px; border-bottom:1px solid #eee;}
+.top .right .good .info {height:79px; width:auto; padding:10px; margin-right:100px; float:left; word-break:break-all;}
+.top .right .good .info .classs {height:16px; font-size:10px; color:#999;}
+.top .right .good .info .span1 {background:#f90; color:#fff; padding:2px 3px; margin-left:2px; border-radius:2px; font-size:14px; float:left;}
+.top .right .good .info .span2 {background:#ccc; color:#fff; padding:2px 3px; margin-left:2px; border-radius:2px; font-size:14px; float:left;}
+.top .right .good .info .name {height:20px; font-size:14px; color:#777; line-height:20px;overflow: hidden}
+.top .right .good .info .price {height:16px; font-size:12px; line-height:16px; color:#f90;}
+.top .right .good .info .price i {color:#777; margin-left:2px; font-size:10px; color:#999;}
+.top .right .good .img {height:89px; width:89px; padding:5px; float:right; line-height:89px;}
+.top .right .good .img img {max-height:89px; max-width:89px;}
+.index_footer {padding:5px 0 5px 0; font-size:12px; color:#666; line-height:20px; text-align:center;background:#efefef;}
+
+.class1 {background:#fff; margin-top:12px; border-top:1px solid #eee; border-bottom:1px solid #eee;overflow:hidden}
+.class1 .class2 {height:85px; width:25%; float:left;}
+.class1 .class2:active {background:#f7f7f7;}
+.class1 .class2 .class3 {height:70px; width:80px; margin:auto;}
+.class1 .class2 .class3 .ico {height:40px; width:40px; margin:10px 15px 10px 15px; border-radius:40px; line-height:40px; text-align:center; color:#fff; font-size:18px;}
+.class1 .class2 .class3 .ico img { width:50px;height:50px; border-radius:25px;}
+.class1 .class2 .class3 .text {height:20px; width:80px; font-size:12px; color:#999; text-align:center; line-height:20px;overflow:hidden;}
+.index_title {height:30px; background:url(d.png) center repeat-x; font-size:12px; color:#999; text-align:center; line-height:30px;}
+.index_title span {height:30px; width:auto; background:#eee; padding:0px 10px; margin:auto;}
+.list {height:auto;  background:#fff; overflow:hidden;}
+.list .good {height:140px; width:50%;float:left; margin-right:-1px; border-right:1px solid #eee; border-bottom:1px solid #eee; float:left;}
+.list .good .info {height:120px; padding:10px;}
+.list .good .info .classs {height:16px; font-size:10px; color:#999;}
+.list .good .info .span1 {background:#f90; color:#fff; padding:2px 3px; margin-left:2px; border-radius:2px;}
+.list .good .info .span2 {background:#ccc; color:#fff; padding:2px 3px; margin-left:2px; border-radius:2px;}
+.list .good .info .name {height:20px; font-size:14px; color:#777;}
+.list .good .info .price {height:16px; font-size:12px; line-height:16px; color:#f90;}
+.list .good .info .price i {color:#777; margin-left:2px; font-size:10px; color:#999;}
+.list .good .info .img {height:68px; text-align:center;}
+.list .good .info .img img {max-height:68px; max-width:100%}
+.list_footer {height:30px; font-size:12px; color:#666; line-height:30px; text-align:center;background:#efefef;}
+
+/*info页面*/
+.info_top {height:auto; position:relative;}
+.info_top img {width:100%;}
+.info_top .info {height:48px; width:100%; padding-top:10px; position:absolute; bottom:3px; left:0px; z-index:100;}
+.info_top .info {background: -ms-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.8)); 
+background:-moz-linear-gradient(top,rgba(0,0,0,0.0),rgba(0,0,0,0.8)); 
+      background:-webkit-gradient(linear, 0% 0%, 0% 100%,from(rgba(0,0,0,0.0)), to(rgba(0,0,0,0.8))); 
+      background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,0,0,0.0)), to(rgba(0,0,0,0.8))); 
+      background: -webkit-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.8)); 
+      background: -o-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.8));}
+.info_top .info .classs {height:20px; font-size:14px; padding:0px 10px; color:#fff; line-height:18px;font-weight: bold;}
+.info_top .info .name {height:24px; font-size:18px; padding:0px 10px; color:#fff; line-height:24px;overflow:hidden;}
+.info_price {height:55px; padding:0px 10px; border-bottom:1px solid #ddd;background:#fff;}
+.info_price .num {height:55px; font-size:24px; color:#f90; float:left; line-height:55px;}
+.info_price .num i {color:#f90; font-size:12px; margin-left:3px;}
+.info_price .sub {height:30px; width:90px; padding:0 10px; margin-top:10px; font-size:14px; background:#f90; float:right; border-radius:5px; line-height:30px; text-align:center; color:#fff;}
+.info_price .sub2 {height:30px; width:90px;padding:0 10px; margin-top:10px; font-size:14px; background:#ccc; float:right; border-radius:5px; line-height:30px; text-align:center; color:#fff;}
+.info_content {overflow:hidden; padding:10px;background: #fff; font-size:14px;line-height:20px;color:#000;}
+.info_content img { width:100%;outline-width:0px;  vertical-align:top; display:block;}
+.info_content img{ width:100% !important; max-width:100%;}
+.info_content .ctitle { padding-top:15px;}
+.info_content p {margin:0;padding:0;}
+
+.info_bottom { overflow:hidden;padding:5px;margin-top:20px;margin-bottom:10px; border:1px dotted #dedede;background:#fff;font-size:13px;color:#666;border-radius: 5px;}
+.info_bottom legend { text-align:center; color:#333;font-size:12px;height:20px;}
+.info_bottom .content { overflow: hidden;padding:10px;padding-top:0px;padding-bottom:10px; font-size:10px;color:#666;}
+
+.info_bottom .footer {  height:30px;line-height:33px; text-align: center;font-size:12px;border-top:1px dotted #dedede; }
+.info_timestate { height:50px; padding:0 10px;   line-height:50px; background:#f0f0f0; color:#333; font-size:14px; text-align: center;}
+.info_timestate span {color:#f90;font-size:16px; font-weight:bold;padding:0 2px;}
+/* 我的积分页面 */
+.my_rule {height:24px; padding:10px; text-align: right; font-size:14px; line-height:24px; color:#666;position: fixed; top:45px;width:100%;}
+.my_rule a {color:#666;margin-right:15px; }
+.my_int_container { width:100%;overflow:hidden; position: fixed; top:70px; }
+.my_int {height:100px; width:100px; background:#f90; margin:auto; border-radius:100px; text-align:center; overflow:hidden;}
+.my_int .text {height:20px; line-height:20px; color:#fff; font-size:14px; margin-top:30px;} 
+.my_int .num {height:20px; line-height:20px; color:#fff; font-size:20px;}
+.my_shop {height:32px; width:100%; position: fixed; top:190px;width:100%; text-align: center; }
+.my_shop a {height:30px; width:98px; border:1px solid #eee; padding:10px; border-radius:5px; font-size:12px; color:#777; line-height:30px;}
+
+#my_line_list { position: fixed; top:260px;width:100%;overflow: auto;}
+.my_line {height:35px; padding:10px 0px; margin:0px 10px; border-bottom:1px solid #eee;}
+.my_line .left {height:35px; padding-right:50px;}
+.my_line .left .desc {height:18px; line-height:18px; font-size:14px; color:#777; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;  content:"..."}
+.my_line .left .date {height:17px; line-height:20px; font-size:12px; color:#999;}
+.my_line .right {height:35px; width:50px; float:right; line-height:35px; font-size:16px; text-align:right;}
+ 
+/* 积分规则页面 */
+.rule_line {height:auto; padding:10px 0px; margin:0px 10px; border-bottom:1px solid #ddd;}
+.rule_line .q {height:30px; font-size:16px; color:#666; line-height:30px;}
+.rule_line .a {height:auto; font-size:14px; color:#999;}
+.rule_line .q .i,.rule_line .a .i {width:20px; color:#f93; float:left;}
+.rule_line .q .t,.rule_line .a .t {padding-left:20px;}
+
+/* 兑换记录页面 */
+.record_ico {height:60px; width:60px; margin:40px auto 0px; background:#f0f0f0; color:#fff; font-size:30px; text-align:center; line-height:60px; border-radius:60px;}
+.record_no {height:50px; font-size:14px; color:#666; line-height:50px; text-align:center;}
+.record_line {height:60px; padding:10px; border-bottom:1px solid #eee;}
+.record_line .img {height:60px; width:80px; float:left; background:#ccc;}
+.record_line .img img {height:60px; width:80px;}
+.record_line .info {height:60px; padding-left:90px; padding-right:20px;}
+.record_line .info .desc {height:20px; line-height:20px; font-size:14px; color:#666; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;  content:"..."}
+.record_line .info .result {height:20px; line-height:20px; font-size:12px; color:#f90; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;  content:"..."}
+.record_line .info .price {height:20px; line-height:20px; font-size:14px; color:#999; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;  content:"..."}
+.record_line .go {height:60px; width:20px; float:right; color:#ccc;line-height:60px; text-align: center; font-size:32px;}
+

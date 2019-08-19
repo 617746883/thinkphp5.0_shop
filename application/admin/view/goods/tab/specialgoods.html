@@ -1,0 +1,34 @@
+<style type='text/css'>
+    body { width:100%;} 
+    .img-thumbnail { width:100px; height:100px;}
+    .img-nickname { height:25px;line-height:25px;width:90px;margin-left:5px;margin-right:5px;position: absolute;bottom:55px;color:#fff;text-align: center;background:rgba(0,0,0,0.7)}
+</style>
+ <div class="region-goods-details row">
+     <div class="region-goods-left col-sm-2">栏位/开店码设置</div>
+     <div class="region-goods-right col-sm-10">
+         <div class="form-group">
+             <label class="col-xs-12 col-sm-3 col-md-2 control-label">支持栏位/开店码 卡密</label>
+             <div class="col-sm-6 col-xs-6">
+                 <label class="radio-inline"><input type="radio" name="isspecial" value="2" {if !empty($item['id'])}disabled {/if} {if empty($item['id']) || $item['isspecial'] == 2}checked="true"{/if}/> 支持</label>
+                 <label class="radio-inline"><input type="radio" name="isspecial" value="1" {if !empty($item['id'])}disabled {/if} {if $item['isspecial'] == 1}checked="true"{/if}  /> 不支持</label>
+                 {if !empty($item['id'])}<input type="hidden" name="isspecial" value="{$item['isspecial']}">{/if}
+             </div>
+         </div>
+
+         <div class="form-group">
+             <label class="col-xs-12 col-sm-3 col-md-2 control-label">卡密类型</label>
+             <div class="col-sm-6 col-xs-6">
+                 <label class="radio-inline"><input type="radio" name="specialtype" value="1" {if !empty($item['id'])}disabled {/if} {if empty($item) || $item['specialtype'] == 1}checked="true"{/if} /> 开店服务</label>
+                 <label class="radio-inline"><input type="radio" name="specialtype" value="3" {if !empty($item['id'])}disabled {/if} {if empty($item) || $item['specialtype'] == 3}checked="true"{/if} /> 开店码</label>
+                 <label class="radio-inline"><input type="radio" name="specialtype" value="2" {if !empty($item['id'])}disabled {/if} {if $item['specialtype'] == 2}checked="true"{/if} /> 栏位</label>
+                 {if !empty($item['id'])}<input type="hidden" name="specialtype" value="{$item['specialtype']}">{/if}
+                 <p class="help-block">
+                     开店服务： 购买后获得开店码，可用于挂卖、开店<br>
+                     开店码： 购买后获得开店码，只可用于挂卖<br>
+                     栏位：  购买后可获得商品栏位<br>
+                     <span style="color: red;">请谨慎选择，确定后不可修改</span>
+                 </p>
+             </div>
+         </div>
+    </div>
+</div>

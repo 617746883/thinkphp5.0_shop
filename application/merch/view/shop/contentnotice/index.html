@@ -1,0 +1,120 @@
+{include file='_header'}
+
+<div class="page-header">当前位置：<span class="text-primary">公告管理</span></div>
+
+<div class="page-content">
+    <form action="" method="get" class="form-horizontal  ">
+        <div class="page-toolbar row m-b-sm m-t-sm">
+            <div class="col-md-4">
+                <a class='btn btn-primary btn-sm' href="{:url('merch/shop/contentnoticeadd')}"><i class='fa fa-plus'></i> 添加公告</a>
+            </div>
+
+            <div class="col-md-6 pull-right">
+                <div class="input-group">
+                    <span class="input-group-select">
+                        <select name="status" class='form-control'>
+                            <option value="" {if $status == ''} selected{/if}>状态</option>
+                            <option value="1" {if $status== '1'} selected{/if}>显示</option>
+                            <option value="0" {if $status == '0'} selected{/if}>隐藏</option>
+                        </select>
+                    </span>
+                    <input type="text" class="form-control" name='keyword' value="{$keyword}" placeholder="请输入关键词">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit"> 搜索</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {if empty(count($list))}
+        <div class="panel panel-default">
+            <div class="panel-body empty-data">未查询到相关数据</div>
+        </div>
+    {else}
+        <form action="" method="post">
+            <div class="page-table-header">
+                <input type='checkbox' />
+                <div class="btn-group">
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('merch/shop/contentnoticestatus',array('status'=>1))}">
+                        <i class='icow icow-xianshi'></i> 显示</button>
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('merch/shop/contentnoticestatus',array('status'=>0))}">
+                        <i class='icow icow-yincang'></i> 隐藏</button>
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('merch/shop/contentnoticedelete')}">
+                        <i class='icow icow-shanchu1'></i> 删除</button>
+                </div>
+            </div>
+            <table class="table table-responsive table-hover" >
+                <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:25px;" ></th>
+                        <th style='width:50px'>顺序</th>
+                        <th class='th-sortable' data-sort-name='title'>标题</th>
+                        <th></th>
+                        <th style="width: 120px;">发布机构</th>
+                        <th style="width: 70px;">状态</th>
+                        <th style="width: 65px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name='list' item='row'}
+                        <tr>
+                            <td>
+                                <input type='checkbox'   value="{$row['id']}"/>
+                            </td>
+                            <td>
+                                <a href='javascript:;' data-toggle='ajaxEdit' data-href="{:url('merch/shop/contentnoticedisplayorder',array('id'=>$row['id']))}" >{$row['displayorder']}</a>
+                            </td>
+                            <td>{$row['title']}</td>
+                            <td></td>
+                            <td style="color: red;">{if !empty($item['merchid'])} {$item['merchname']} {else} 平台 {/if}</td>
+                            <td>
+                                <span class='label {if $row['status']==1}label-primary{else}label-default{/if}'
+                                    data-toggle='ajaxSwitch'
+                                    data-switch-value='{$row['status']}'
+                                    data-switch-value0='0|隐藏|label label-default|{:url('merch/shop/contentnoticestatus',array('status'=>1,'id'=>$row['id']))}'
+                                    data-switch-value1='1|显示|label label-primary|{:url('merch/shop/contentnoticestatus',array('status'=>0,'id'=>$row['id']))}'
+                                >
+                                {if $row['status']==1}显示{else}隐藏{/if}</span>
+                                <br>
+                                <span class='label {if $row['checked']==0}label-primary{else}label-warning{/if}'>
+                                {if $row['checked']==0}通过{else}审核中{/if}</span>
+                            </td>
+                            <td style="text-align:left;">
+                                <a href="{:url('merch/shop/contentnoticeedit',array('id' => $row['id']))}" class="btn btn-op btn-operation" >
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="修改">
+                                        <i class='icow icow-bianji2'></i>
+                                    </span>
+                                </a>
+                                <a data-toggle='ajaxRemove' href="{:url('merch/shop/contentnoticedelete', array('id' => $row['id']))}" class="btn btn-op btn-operation" data-confirm='确认要删除此公告吗?'>
+                                    <span data-toggle="tooltip" data-placement="top" data-original-title="删除">
+                                        <i class='icow icow-shanchu1'></i>
+                                    </span>
+                                </a>
+                            </td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td colspan="3">
+                            <div class="btn-group">
+                                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch' data-href="{:url('merch/shop/contentnoticestatus',array('status'=>1))}">
+                                    <i class='icow icow-xianshi'></i> 显示</button>
+                                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch'  data-href="{:url('merch/shop/contentnoticestatus',array('status'=>0))}">
+                                    <i class='icow icow-yincang'></i> 隐藏</button>
+                                <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{:url('merch/shop/contentnoticedelete')}">
+                                    <i class='icow icow-shanchu1'></i> 删除</button>
+                            </div>
+                        </td>
+                        <td colspan="3" style="text-align: right">
+                            {$pager}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </form>
+    {/if}
+</div>
+{include file='_footer'}

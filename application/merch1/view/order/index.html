@@ -1,0 +1,229 @@
+{include file='_header'}
+<div class="page-heading"> <h2>订单概述</h2> </div>
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <div class="ibox float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="ibox-title">
+                <span class="label label-primary pull-left">今日成交</span>
+                <span class="pull-right">人均消费 : ¥ <span class="today-avg"></span></span>
+                <h5></h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-md-6 text-center">
+                        成交量
+                        <h2 class="no-margins today-count">--</h2>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        成交额
+                        <h2 class="no-margins">¥ <span class="today-price">--</span></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <div class="ibox float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="ibox-title">
+                <span class="label label-success pull-left">昨日成交</span>
+                <span class="pull-right">人均消费 : ¥ <span class="yesterday-avg">--</span></span>
+                <h5></h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-md-6 text-center">
+                        成交量
+                        <h2 class="no-margins yesterday-count">--</h2>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        成交额
+                        <h2 class="no-margins">¥ <span class="yesterday-price">--</span></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <div class="ibox float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="ibox-title">
+                <span class="label label-warning pull-left">近7日成交</span>
+                <span class="pull-right">人均消费 : ¥ <span class="seven-avg">--</span></span>
+                <h5></h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-md-6 text-center">
+                        成交量
+                        <h2 class="no-margins seven-count">--</h2>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        成交额
+                        <h2 class="no-margins">¥ <span class="seven-price">--</span></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <div class="ibox float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="ibox-title">
+                <span class="label label-danger pull-left">近1个月成交</span>
+                <span class="pull-right">人均消费 : ¥ <span class="month-avg">--</span></span>
+                <h5></h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-md-6 text-center">
+                        成交量
+                        <h2 class="no-margins month-count">--</h2>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        成交额
+                        <h2 class="no-margins">¥ <span class="month-price">--</span></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins" style="border: 1px solid #e7eaec">
+            <div class="ibox-title">
+                <h5>交易走势图</h5>
+            </div>
+            <div class="ibox-content">
+                <div class="echarts" id="echarts-line-chart" style="display: none"></div>
+                <div class="spiner-example" id="echarts-line-chart-loading">
+                    <div class="sk-spinner sk-spinner-wave">
+                        <div class="sk-rect1"></div>
+                        <div class="sk-rect2"></div>
+                        <div class="sk-rect3"></div>
+                        <div class="sk-rect4"></div>
+                        <div class="sk-rect5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: "{:url('merch/order/ajaxorder')}",
+            dataType: "json",
+            success: function (data) {
+                var json = data.result;
+                $(".today-count").text(json.order0.count);
+                $(".today-price").text(json.order0.price);
+                $(".today-avg").text(json.order0.avg);
+                $(".yesterday-count").text(json.order1.count);
+                $(".yesterday-price").text(json.order1.price);
+                $(".yesterday-avg").text(json.order1.avg);
+                $(".seven-count").text(json.order7.count);
+                $(".seven-price").text(json.order7.price);
+                $(".seven-avg").text(json.order7.avg);
+                $(".month-count").text(json.order30.count);
+                $(".month-price").text(json.order30.price);
+                $(".month-avg").text(json.order30.avg);
+                $.ajax({
+                    type: "GET",
+                    async: false,
+                    url: "{:url('merch/order/ajaxtransaction')}",
+                    dataType: "json",
+                    success: function (json) {
+                        myrequire(['echarts'], function () {
+                            var lineChart = echarts.init(document.getElementById("echarts-line-chart"));
+                            var lineoption = {
+                                title: {
+                                    text: '最近7日交易走势'
+                                },
+                                tooltip: {
+                                    trigger: 'axis'
+                                },
+                                legend: {
+                                    data: ['成交额', '成交量']
+                                },
+                                grid: {
+                                    x: 50,
+                                    x2: 50,
+                                    y2: 30
+                                },
+                                calculable: true,
+                                xAxis: [
+                                    {
+                                        type: 'category',
+                                        boundaryGap: false,
+                                        data: json.price_key
+                                    }
+                                ],
+                                yAxis: [
+                                    {
+                                        type: 'value',
+                                        axisLabel: {
+                                            formatter: '{value}'
+                                        }
+                                    }
+                                ],
+                                series: [
+                                    {
+                                        name: '成交额',
+                                        type: 'line',
+                                        data: json.price_value,
+                                        markPoint: {
+                                            data: [
+                                                {type: 'max', name: '最大值'},
+                                                {type: 'min', name: '最小值'}
+                                            ]
+                                        },
+                                        markLine: {
+                                            data: [
+                                                {type: 'average', name: '平均值'}
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        name: '成交量',
+
+                                        type: 'line',
+
+                                        data: json.count_value,
+
+                                        markLine: {
+
+                                            data: [
+
+                                                {type: 'average', name: '平均值'}
+
+                                            ]
+
+                                        }
+
+                                    }
+
+                                ]
+
+                            };
+
+                            lineChart.setOption(lineoption);
+
+                            lineChart.resize();
+
+                        });
+
+                        $("#echarts-line-chart-loading").hide();
+
+                        $("#echarts-line-chart").show();
+
+                    }
+
+                });
+
+            }
+
+        });
+
+    });
+
+</script>
+
+{include file='_footer'}

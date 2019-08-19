@@ -1,0 +1,264 @@
+{include file='_header'}
+{if is_weixin()}
+    <script type="text/javascript">
+    (function () {
+
+      var ie = !!(window.attachEvent && !window.opera);
+
+      var wk = /webkit\/(\d+)/i.test(navigator.userAgent) && (RegExp.$1 < 525);
+
+      var fn = [];
+
+      var run = function () { for (var i = 0; i < fn.length; i++) fn[i](); };
+
+      var d = document;
+
+      d.ready = function (f) {
+
+        if (!ie && !wk && d.addEventListener)
+
+          return d.addEventListener('DOMContentLoaded', f, false);
+
+        if (fn.push(f) > 1) return;
+
+        if (ie)
+
+          (function () {
+
+            try { d.documentElement.doScroll('left'); run(); }
+
+            catch (err) { setTimeout(arguments.callee, 0); }
+
+          })();
+
+        else if (wk)
+
+          var t = setInterval(function () {
+
+            if (/^(loaded|complete)$/.test(d.readyState))
+
+              clearInterval(t), run();
+
+          }, 0);
+
+      };
+
+    })();
+
+    document.ready(function(){
+      callpay();
+    });
+    //调用微信JS api 支付
+    function jsApiCall()
+    {
+        WeixinJSBridge.invoke(
+            'getBrandWCPayRequest',{$wechat},
+            function(res){
+                WeixinJSBridge.log(res.err_msg);
+                alert(res.err_code+res.err_desc+res.err_msg);
+            }
+        );
+    }
+
+    function callpay()
+    {
+        if (typeof WeixinJSBridge == "undefined"){
+            if( document.addEventListener ){
+                document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+            }else if (document.attachEvent){
+                document.attachEvent('WeixinJSBridgeReady', jsApiCall); 
+                document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+            }
+        }else{
+            jsApiCall();
+        }
+    }
+    </script>
+    {/if}
+<style>
+</style>
+<div class='fui-page  fui-page-current order-pay-page'>
+    <div class="fui-header">
+        <div class="fui-header-left">
+            <a class="back" onclick='history.back()'></a>
+        </div>
+        <div class="title" style='margin-right:-2rem;'>收银台</div>
+        <div class="fui-header-right">
+            <!--<a href="{:url('order')}" class="external">我的订单</a>-->
+        </div>
+    </div>
+    <div class='fui-content' style="padding-bottom: 2.5rem;overflow: scroll;overflow-scrolling: touch;">
+        <div class="fui-list-group" style='margin-top: 10px'>
+            <div class="fui-list goods-item">
+                <div class="fui-list-media">
+                    <a href="{:url('mobile/auction/detail',array('id'=>$goods['id']))}" class="external">
+                        <img src="{:tomedia($goods['thumb'])}" alt="{$goods['title']}" class="round" onerror="this.src='/public/static/images/nopic100.jpg'">
+                    </a>
+                </div>
+                <div class="fui-list-inner">
+                    <a href="{:url('mobile/auction/detail',array('id'=>$goods['id']))}">
+                        <div class="text">
+                            {$goods['title']}
+                        </div>
+                    </a>
+                    <div class="text">
+                        <span class="price ">数量：1</span>
+                        <span class="total">
+                            （<span class='text-danger'>¥ {$goods['stprice']}</span>/1件
+                        </span>
+                        <div style="clear:both;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fui-cell-group" style="margin-top: 0">
+            <div class="fui-cell">
+                <div class="fui-cell-label">订单编号</div>
+                <div class="fui-cell-info"></div>
+                <div class="fui-cell-remark noremark">{$order['ordersn']}</div>
+            </div>
+            <div class="fui-cell">
+                <div class="fui-cell-label">订单金额</div>
+                <div class="fui-cell-info"></div>
+                <div class="fui-cell-remark noremark"><span class='text-danger bigprice'>￥{:number_format($order['price'],2)}</span>
+                </div>
+            </div>
+        </div>
+        <div class='fui-list-group' style="margin-top:10px;">
+
+            {if $order['price'] == 0}
+            <a id="btn-submit" class="external btn btn-danger block pay-btn"  style="margin-top:1.25rem" data-type='credit'>确认支付</a>
+
+            {else}
+            <div class='fui-list pay-btn' data-type='wechat' id="threeWX" {if is_weixin()} onclick="callpay()" {else} onclick="location='{$wechat['mweb_url']}'" {/if}>
+
+                <div class='fui-list-media'>
+
+                    <!--<i class='icon icon-wechat wechat'></i>-->
+
+                    <img src="/public/static/images/wx.png" alt="">
+
+                </div>
+
+                <div class='fui-list-inner'>
+
+                    <div class="title">
+
+                        微信支付
+
+                    </div>
+
+                    <div class="subtitle c999 f24">
+
+                        <img src="/public/static/images/safe.png" alt="" style="height: .8rem;vertical-align: text-bottom">微信安全支付
+
+                    </div>
+
+                </div>
+
+                <div class='fui-list-angle'><span class="angle"></span></div>
+
+            </div>
+            <div class='fui-list pay-btn' data-type='alipay' onclick="location='{$alipay}'">
+
+                <div class='fui-list-media'>
+
+                    <!--<i class='icon icon-alipay alipay'></i>-->
+
+                    <img src="/public/static/images/zfb.png" alt="">
+
+
+
+                </div>
+
+                <div class='fui-list-inner'>
+
+                    <div class="title">
+
+                        支付宝支付
+
+                    </div>
+
+                    <div class="subtitle c999 f24">
+
+                        <img src="/public/static/images/safe.png" alt="" style="height: .8rem;vertical-align: text-bottom">支付宝安全支付
+
+                    </div>
+
+                </div>
+
+                <div class='fui-list-angle'><span class="angle"></span></div>
+
+            </div>
+
+
+
+
+        {if $credit['success']}
+
+            <div class='fui-list pay-btn' data-type='credit'>
+
+                <div class='fui-list-media'>
+
+                    <!--<i class='icon icon-money credit'></i>-->
+
+                    <img src="/public/static/images/ye.png" alt="">
+
+                </div>
+
+                <div class='fui-list-inner'>
+
+                    <div class="title">{$_W['shopset']['trade']['moneytext']}支付</div>
+
+                    <div class="subtitle c999 f24">当前{$_W['shopset']['trade']['moneytext']}: <span class='text-danger'>￥{:number_format($member['credit2'],2)}</span>
+
+                    </div>
+
+                </div>
+
+                <div class='fui-list-angle'>
+
+		    <span class="angle">
+
+
+
+		    </span>
+
+                </div>
+
+            </div>
+
+            {/if}
+
+            {if $cash['success'] && empty($ispeerpay)&&!$haveverifygood}
+
+            <div class='fui-list pay-btn' data-type='cash'>
+
+                <div class='fui-list-media'>
+
+                    <!--<i class='icon icon-deliver1 cash'></i>-->
+
+                    <img src="/public/static/images/hdfk.png" alt="">
+
+
+
+                </div>
+
+                <div class='fui-list-inner'>
+
+                    <div class="title">货到付款</div>
+
+                    <div class="subtitle c999 f24">收到商品后进行付款</div>
+
+                </div>
+
+                <div class='fui-list-angle'><span class="angle"></span></div>
+
+            </div>
+            {/if}
+            {/if}
+        </div>
+    </div>
+</div>
+{include file='_footer'}
+

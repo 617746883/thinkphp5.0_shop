@@ -1,0 +1,221 @@
+{include file='_header_base'}
+<div class="wb-header" style="position: fixed;">
+    <div class="logo {if !empty($system['foldnav'])}small{/if}">
+        <img class='logo-img' src="{$copyright['logo']}" onerror="this.src='__STATIC__/images/nologo.png'"/>
+    </div>
+    <ul>
+        <li>
+            <a href="{:url('admin/index/index')}" data-toggle="tooltip" data-placement="bottom" title="管理首页"><i class="icow icow-homeL"></i></a>
+        </li>
+        <li class="wb-shortcut"><a id="showmenu"><i class="icow icow-list"></i></a></li>
+    </ul>
+    <div class="wb-topbar-search expand-search">
+        <form action="" id="topbar-search">
+            <div class="input-group">
+                <!-- <input type="text" placeholder="请输入关键词进行功能搜索..." class="form-control wb-search-box" maxlength="15" name="keyword"/> -->
+                <!-- <span class="input-group-btn">
+                    <a class="btn wb-header-btn"><i class="icow icow-sousuo-sousuo"></i></a>
+                </span> -->
+            </div>
+        </form>
+        <div class="wb-search-result">
+            <ul></ul>
+        </div>
+    </div>
+    <div class="wb-header-flex"></div>
+    <ul>
+        <li data-toggle="tooltip" data-placement="bottom" title="">
+            <a href="{:url('admin/system/index')}"><i class="icow icow-syssetL"></i>系统管理</a>
+        </li>
+        <li class="dropdown {if $system['merch']}auto{/if} ellipsis">
+            <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">{$system['right_menu']['menu_title']}<span style="position: relative;"></span></a>
+            <ul class="dropdown-menu">
+                {foreach name="system['right_menu']['menu_items']" item='right_menu_item'}
+                    {if !is_array($right_menu_item)}
+                    {else}
+                        <li>
+                            <a href="{$right_menu_item['href']}" {if $right_menu_item['blank']}target="_blank"{/if}>
+                                <i class="icow {$right_menu_item['icow']} " style="font-size: 30px;"></i>
+                                <span style="display: block">{$right_menu_item['text']}</span>
+                            </a>
+                        </li>
+                    {/if}
+                {/foreach}
+            </ul>
+        </li>
+        <li data-toggle="tooltip" data-placement="bottom" title="退出登陆" data-href="{$system['right_menu']['logout']}">
+            <a class="wb-header-logout"><i class="icow icow-exit"></i></a>
+        </li>
+    </ul>
+
+    <div class="fast-nav {if !empty($system['foldnav'])}indent{/if}">
+        <div class="fast-list menu">
+            <span class="title">全部导航</span>
+            {foreach name="sysmenus['shopmenu']" key='index' item='shopmenu'}
+                <a href="javascript:;" {if $index==0}class="active"{/if} data-tab="tab-{$index}">{$shopmenu['title']}</a>
+            {/foreach}
+        </div>
+        <div class="fast-list list">
+            {foreach name="sysmenus['shopmenu']" key='index' item='shopmenu'}
+                <div class="list-inner {if $index==0}in{/if}" data-tab="tab-{$index}">
+                    {foreach name="shopmenu['items']" item='shopmenu_item'}
+                        <a href="{$shopmenu_item['url']}">{$shopmenu_item['title']}</a>
+                    {/foreach}
+                </div>
+            {/foreach}
+        </div>
+    </div>
+</div>
+
+<!-- 一级导航 -->
+<div class="wb-nav {if !empty($system['foldnav'])}fold{/if}">
+    <p class="wb-nav-fold"><i class="icow icow-zhedie"></i></p>
+    <ul>
+        {foreach name="sysmenus['menu']" item='sysmenu'}
+            <!-- <li {if $sysmenu['active']}class="active"{/if}>
+                <a href="{$sysmenu['url']}">
+                    {if !empty($sysmenu['icon'])}
+                        <i class="icow icow-{$sysmenu['icon']}" {if !empty($sysmenu['iconcolor'])} style="color: {$sysmenu['iconcolor']}"{/if}></i>
+                    {/if}
+                    <span class="wb-nav-title">{$sysmenu['text']}</span>
+                </a>
+                <span class="wb-nav-tip">{$sysmenu['text']}</span>
+            </li> -->
+            <li {if $sysmenu['active']}class="active"{/if}>
+                <a href="{$sysmenu['url']}">
+                    {if $sysmenu['route']=='plugins'}
+                    <svg class="iconplug" aria-hidden="true">
+                        <use xlink:href="#icow-yingyong3"></use>
+                    </svg>
+                    {else}
+                        {if !empty($sysmenu['icon'])}
+                            <i class="icow icow-{$sysmenu['icon']}" {if !empty($sysmenu['iconcolor'])} style="color: {$sysmenu['iconcolor']}"{/if}></i>
+                        {/if}
+                    {/if}
+                    {if $sysmenu['route'] == 'sysset'}
+                        <span class="wb-nav-title {if empty($notice_redis_click['notice_redis_click']) || !isset($notice_redis_click['notice_redis_click'])}point{/if}">{$sysmenu['text']}</span>
+                    {else}
+                        <span class="wb-nav-title">{$sysmenu['text']}</span>
+                    {/if}
+                </a>
+                <span class="wb-nav-tip">{$sysmenu['text']}</span>
+            </li>
+        {/foreach}
+    </ul>
+</div>
+
+<!-- 二级导航 -->
+{if $no_left}
+{else}
+{if !empty($sysmenus['submenu']['items'])}
+    <div class="wb-subnav">
+      <div style="width: 100%;height: 100%;overflow-y: auto">
+          {include file='_tabs'}
+          <div class="wb-subnav-fold icow"></div>
+      </div>
+    </div>
+{/if}
+{/if}
+<div class="wb-panel {if empty($system['foldpanel'])}in{/if}">
+    <div class="panel-group" id="panel-accordion">
+        <div class="panel panel-default">
+            <div class="panel-heading" data-toggle="collapse" data-parent="#panel-accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <h4 class="panel-title">
+                    <i class="icow icow-dingdan"></i> <a class="news">订单消息</a> <span style="position: relative;"></span>
+                </h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse in" aria-labelledby="headingOne">
+                <ul class="panel-body">
+                    {if !empty($system['order1'])}
+                    <li class="panel-list">
+                        <a class="panel-list-text" href="{:url('admin/order/olist1')}">待发货订单 <span class="pull-right text-warning">({$system['order1']})</span> </a>
+                    </li>
+                    {/if}
+                    {if !empty($system['order4'])}
+                    <li class="panel-list">
+                        <a class="panel-list-text" href="{:url('admin/order/refund4')}">维权订单<span class="pull-right text-danger">({$system['order4']})</span></a>
+                    </li>
+                    {/if}
+                    {if empty($system['order1'])&&empty($system['order4'])}
+                    <li class="panel-list">
+                        <div class="panel-list-text text-center">暂无消息提醒</div>
+                    </li>
+                    {/if}
+                </ul>
+            </div>
+        </div>
+        {if $system['notice']!='none' && !$system['merch']}
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingTwo" data-toggle="collapse" data-parent="#panel-accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    <h4 class="panel-title">
+                        <i class="icow icow-gonggao"></i> <a>内部公告</a> <span style="position: relative;"></span>
+                    </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+                    <ul class="panel-body">
+                        {if empty($system['notice'])}
+                        <li class="panel-list small">
+                            <div class="panel-list-text text-center">暂无消息提醒</div>
+                        </li>
+                        {else}
+                        {foreach name="system['notice']" item='notice_item'}
+                        <li class="panel-list small">
+                            <a class="panel-list-text" href="javascript:;" data-toggle="ajaxModal" data-href="{:url('shop/index/view', array('id'=>$notice_item['id']))}" title="{$notice_item['title']}">{$notice_item['title']}</a>
+                        </li>
+                        {/foreach}
+                        <li class="panel-list small" style="padding: 10px;">
+                            <a class="panel-list-text text-center" href="{:url('shop/index/notice')}"><span class="text-primary">查看更多</span></a>
+                        </li>
+                        {/if}
+                    </ul>
+                </div>
+            </div>
+        {/if}
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingFour" data-toggle="collapse" data-parent="#panel-accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseThree">
+                <h4 class="panel-title">
+                    <i class="icow icow-pingjia"></i> <a>评价</a> <span style="position: relative;"></span>
+                </h4>
+            </div>
+            <div id="collapseFour" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingFour">
+                <ul class="panel-body">
+                    {if empty($system['comment'])}
+                    <li class="panel-list">
+                        <div class="panel-list-text text-center">暂无消息提醒</div>
+                    </li>
+                    {else}
+                    <li class="panel-list">
+                        <a class="panel-list-text" href="{:url('admin/shop/comment')}">待审核评价<span class="pull-right text-warning">({$system['comment']})</span></a>
+                    </li>
+                    {/if}
+                </ul>
+            </div>
+        </div>
+        <!--系统更新-->
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingFive" data-toggle="collapse" data-parent="#panel-accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseThree">
+                <h4 class="panel-title">
+                    <i class="icow icow-lingdang1"></i> <a style="position:relative;">系统提示 <i class="systips"></i></a> <span style="position: relative;"></span>
+                </h4>
+            </div>
+            <div id="collapseFive" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingFour">
+                <ul class="panel-body">
+                    <li class="panel-list">
+                        <div class="panel-list-text nomsg">暂无消息提醒</div>
+                        <div class="panel-list-text upmsg" style="display: none; max-height: none;">
+                            <div>检测到更新</div>
+                            <div>新版本 <span id="sysversion">------</span></div>
+                            <div>新版本 <span id="sysrelease">------</span></div>
+                            <div>
+                                <a class="text-primary" href="{:url('system/auth/upgrade')}">立即更新</a>
+                                <a class="text-warning" href="javascript:;" style="margin-left: 15px;">暂不提醒</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="wb-panel-fold {if empty($system['foldpanel'])}in{/if}">{if !empty($system['foldpanel'])}<i class="icow icow-info"></i> 消息提醒{else}<i class="fa fa-angle-double-right"></i> 收起面板{/if}</div>
+<div class="wb-container {if !empty($system['foldpanel'])}right-panel{/if}">

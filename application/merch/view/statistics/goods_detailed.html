@@ -1,0 +1,69 @@
+{include file='_header'}
+<div class="page-header"> 当前位置：<span class="text-primary">商品销售明细</span> </div>
+     <div class="page-content">
+         <form action="" method="get" class="form-horizontal">
+             <div class="page-toolbar m-b-sm m-t-sm">
+                 <div class="col-sm-5">
+                     {:tpl_daterange('datetime', array('sm'=>true,'placeholder'=>'下单时间'),true);}
+                 </div>
+                 <div class="col-sm-6 pull-right">
+                    <div class="input-group">
+                         <div class="input-group-select">
+                             <select name='orderby'  class='form-control  '   style="width:120px;"  >
+                                 <option value='' {if $_GET['orderby']==''}selected{/if}>排序</option>
+                                 <option value='0' {if $_GET['orderby']=='0'}selected{/if}>按销售额</option>
+                                 <option value='1' {if $_GET['orderby']=='1'}selected{/if}>按销售量</option>
+                             </select>
+                         </div>
+                         <input type="text" class="form-control"  name="title" value="{$_GET['title']}" placeholder="商品名称"/>
+        				<span class="input-group-btn">
+        					<button class="btn btn-primary" type="submit"> 搜索</button>
+                            <button type="submit" name="export" value="1" class="btn btn-success">导出</button>
+        				</span>
+                    </div>
+                 </div>
+             </div>
+         </form>
+
+         {if count($list)<=0}
+         <div class="panel panel-default">
+             <div class="panel-body empty-data">未查询到相关数据</div>
+         </div>
+         {else}
+         <table class="table table-hover">
+             <thead class="navbar-inner">
+             <tr>
+                 <th style="width:190px;">订单号</th>
+                 <th>商品名称</th>
+                 <th>商品编号</th>
+                 <th style="width: 80px">数量</th>
+                 <th>价格</th>
+                 <th style="width: 100px;">成交时间</th>
+             </tr>
+             </thead>
+             <tbody>
+             {foreach name='list' item='item'}
+             <tr>
+                 <td>{$item['ordersn']}</td>
+                 <td><img src="{$item['thumb']}" style="width: 30px; height: 30px;border:1px solid #ccc;padding:1px;"  onerror="this.src='/public/static/images/nopic.png'" >
+                     {$item['title']}
+                 </td>
+                 <td>{$item['goodssn']}</td>
+                 <td>{$item['total']}</td>
+                 <td>{$item['price']}</td>
+                 <td>{:date('Y-m-d',$item['createtime'])}<br/>{:date('H:i:s',$item['createtime'])}</td>
+             </tr>
+             {/foreach}
+             </tbody>
+             <tfoot>
+                <tr>
+                    <td colspan="6" style="text-align: right">
+                        {$pager}
+                    </td>
+                </tr>
+             </tfoot>
+         </table>
+         {/if}
+     </div>
+ 
+{include file='_footer'}

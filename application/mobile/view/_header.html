@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
+        <script> document.documentElement.style.fontSize =document.documentElement.clientWidth/750*40 +"px";</script>
+        <meta name="format-detection" content="telephone=no" />
+        <title>{if empty($this->merch_user)}{$shopset['shop']['name']}{else}{$this->merch_user['merchname']}{/if}</title>
+        <link rel="shortcut icon" href="__STATIC__/images/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="/public/static/js/dist/foxui/css/foxui.min.css?v=0.2">
+        <link rel="stylesheet" type="text/css" href="/public/static/mobile/css/style.css?v={:time()}">
+        <link rel="stylesheet" type="text/css" href="/public/static/fonts/iconfont.css?v=2017070719">
+        <script src="__STATIC__/js/lib/jquery-1.11.1.min.js"></script>
+        <script src='//res.wx.qq.com/open/js/jweixin-1.3.0.js'></script>
+        <script src="/public/static/js/require.js"></script>
+        <script src="/public/static/js/myconfig-app.js"></script>
+        <script language="javascript">require(['core'],function(modal){modal.init({siteUrl: "{$_SERVER['HTTP_HOST']}",baseUrl: "{:url('ROUTES')}"})});</script>
+        {if is_ios()}
+            <script type="text/javascript">
+                let info = getAppInfo();
+                if(!info.token) {
+                    window.webkit.messageHandlers.callApp.postMessage({link:'login'});
+                    window.webkit.messageHandlers.callApp.postMessage({link:'wxinpay?sign=""'});
+                }
+                $.ajax({
+                    url: "{:url('mobile/base/setToken')}",
+                    type: 'post',
+                    data: {token: info.token},
+                    dataType: 'json',
+                    cache: false,
+                    success: function (ret) {
+                        if (ret.status == 1) {
+                            console.log("成功");
+                        }
+                    }
+                })
+            </script>
+        {/if}
+        {if !empty($shopset['shop']['loading'])}
+        <style>.fui-goods-group.block .fui-goods-item .image {background-image: url("{$shopset['shop']['loading']}");}</style>
+        {/if}
+        {if !is_mobile() && !is_weixin()}
+        <style type="text/css">
+            body {
+                position: absolute;
+                max-width: 750px;  margin:auto;
+            }
+            .fui-navbar {
+                max-width:750px;
+            }
+            .fui-navbar,.fui-footer  {
+                max-width:750px;
+            }
+            .fui-page.fui-page-from-center-to-left,
+            .fui-page-group.fui-page-from-center-to-left,
+            .fui-page.fui-page-from-center-to-right,
+            .fui-page-group.fui-page-from-center-to-right,
+            .fui-page.fui-page-from-right-to-center,
+            .fui-page-group.fui-page-from-right-to-center,
+            .fui-page.fui-page-from-left-to-center,
+            .fui-page-group.fui-page-from-left-to-center {
+                -webkit-animation: pageFromCenterToRight 0ms forwards;
+                animation: pageFromCenterToRight 0ms forwards;
+            }
+        </style>
+        {/if}
+        <style>.danmu {display: none;opacity: 0;}</style>
+    </head>
+    <body ontouchstart>
+		<div class='fui-page-group {if is_ios()}statusbar{/if}'>

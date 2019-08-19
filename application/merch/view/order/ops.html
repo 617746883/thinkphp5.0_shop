@@ -1,0 +1,45 @@
+{if empty($item['statusvalue'])}
+<!--未付款-->
+    {if $item['paytypevalue']==3}
+        <a class="btn btn-primary btn-xs" data-toggle="ajaxModal"  href="{:url('merch/order/send', array('id' => $item['id']))}">确认发货</a>
+    {else}
+    {/if}
+
+{elseif $item['statusvalue'] == 1}
+<!--已付款-->
+
+    {if !empty($item['addressid']) }
+    <!--快递 发货-->
+        <a class="btn btn-primary btn-xs" data-toggle="ajaxModal"  href="{:url('merch/order/send', array('id' => $item['id']))}">确认发货</a>
+    {else}
+        {if $item['isverify']==1}
+        <!--核销 确认核销-->
+            <a class="btn btn-primary btn-xs" data-toggle='ajaxPost' href="{:url('merch/order/ofetch', array('id' => $item['id']))}" data-confirm="确认使用吗？">确认使用</a>
+        {else}
+        <!--自提 确认取货-->
+            <a class="btn btn-primary btn-xs" data-toggle='ajaxPost'  href="{:url('merch/order/ofetch', array('id' => $item['id']))}" data-confirm="确认取货吗？">确认取货</a>
+        {/if}
+    {/if}
+
+{elseif $item['statusvalue'] == 2}
+    <!--已发货-->
+    {if !empty($item['addressid'])}
+    <!--快递 取消发货-->
+
+        {if $detial_flag == 1}
+            <a class="btn btn-success btn-xs" data-toggle="ajaxModal"  href="{:url('merch/order/changeexpress', array('id' => $item['id']))}">修改物流</a>&nbsp;&nbsp;&nbsp;
+        {/if}
+
+        {if $merch_user['finishchecked'] == 1}
+            {if !$is_singlerefund}
+                <a class="btn btn-primary btn-xs" data-toggle='ajaxPost'  href="{:url('merch/order/finish', array('id' => $item['id']))}" data-confirm="确认订单收货吗？">确认收货</a>
+            {else}
+                <a class="btn btn-primary btn-xs" data-toggle='ajaxPost'  href="{:url('merch/order/finish', array('id' => $item['id']))}">确认收货</a>
+            {/if}
+        {/if}
+        <a class="btn-xs" style="color: #333;" data-toggle='ajaxModal'  href="{:url('merch/order/sendcancel', array('id' => $item['id']))}" >取消发货</a>
+    {/if}
+
+{elseif $item['statusvalue'] == 3}
+
+{/if}

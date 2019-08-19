@@ -1,0 +1,58 @@
+/* 文章营销样式 */
+.article-index-page .fui-content,
+.article-list-page .fui-content {background: #f4f4f4;}
+
+.fui-article-page {background: #fff; padding: 0.5rem;}
+
+.fui-article-page .fui-article-title {font-size: 1.2rem;}
+.fui-article-page .fui-article-subtitle {height: auto; font-size: 0.8rem; color: #8c8c8c; overflow: hidden;}
+.fui-article-page .fui-article-subtitle a {color: #607fa6;}
+.fui-article-page .fui-article-subtitle .nav {padding-top: 0.3rem; float: left; font-size: 0.75rem;}
+.fui-article-page .fui-article-subtitle .nav.right {float: right;}
+.fui-article-page .fui-article-subtitle .nav.padding {padding-left: 0.3rem;}
+.fui-article-page .fui-article-content {padding-top: 0.2rem;}
+.fui-article-page .fui-article-content .fui-article-notread {height: 8rem; background: #F4F4F4; margin: 0.5rem; padding-top: 2.5rem; border: 0.1rem dashed #999; display: none;}
+.fui-article-page .fui-article-content .fui-article-notread p {line-height: 1.5rem; text-align: center; font-size: 0.8rem; color: #666;}
+.fui-article-page .fui-article-content .fui-article-gps {font-size: 0.8rem; text-align: center; line-height: 2rem; color: #666; padding-top: 2rem; padding-bottom: 5rem;}
+.fui-article-page .fui-article-content img {vertical-align:bottom; max-width: 100%; border: 0;}
+
+.article-index-page .fui-list-group {margin-top: 0.3rem;}
+.article-index-page .fui-list-group .round {border-radius: 2.5rem;}
+
+.article-index-page .fui-line .text {color: #999;}
+.article-index-page .fui-line.link:before {height: 0; border: 0;}
+.article-index-page .fui-line.link .text {color: #607fa6;}
+.article-index-page .fui-line:before {background: none; border-top: 1px dashed #999;}
+
+.article-index-page .swipe {height: auto; background: #f4f4f4;}
+.article-index-page .swipe .inner {background: #fff; padding: 0.5rem; margin: 0 0.5rem; overflow: hidden; display: block;}
+.article-index-page .swipe img {width: 100%;}
+
+.article-report-page .fui-cell-title {color: #999;}
+.article-report-page .fui-cell-group {margin-top: 0;}
+.article-report-page .fui-cell-group .fui-cell.fui-cell-textarea .fui-cell-label {margin-top: -4.8rem;}
+.article-report-page .sub {display: block; margin-top: 2rem;}
+
+.fui-article-list.template-0 .fui-list-media img,
+.fui-article-list.template-2 .fui-list-media img {height: 2.5rem; width: 2.5rem;}
+
+.fui-article-list.template-0 {background: #fff;}
+.fui-article-list.template-0 .topimg {height: auto; padding-bottom: 0.5rem;}
+.fui-article-list.template-0 .topimg img {height: auto; width: 100%; display: block;}
+.fui-article-list.template-0 .fui-list-group {margin-top: 0;}
+
+.fui-article-list.template-1 a {color: #666;}
+.fui-article-list.template-1 .fui-card-list {padding-bottom: 0.4rem;}
+
+.fui-article-list.template-2 .fui-tab-scroll .item.on {color: #0cc;}
+.fui-article-list.template-2 .fui-tab-scroll .item.on:before {background: #0cc;}
+
+.fui-tab-scroll {height: 2rem; background: #fff; overflow-y: hidden; overflow-x: auto; white-space: normal; position: relative;}
+.fui-tab-scroll:after {content: ""; height: 1px; width: 100%; background: #efefef; position: absolute; left: 0; bottom: 0;}
+.fui-tab-scroll .container{z-index: -1;  height:2.4rem; overflow: auto;  white-space:nowrap;}
+.fui-tab-scroll .item {height:2rem; width:auto; overflow: hidden; line-height:2rem; text-decoration: none; color:#333; text-align: center; padding: 0.25rem 0.5rem; font-size: 0.7rem;}
+.fui-tab-scroll .item.on  {color:#ff6801; font-weight: bold; position: relative;}
+.fui-tab-scroll .item.on:before {content: ""; height: 2px; width: 100%; background: #ff6801; position: absolute; bottom: -0.2rem; left: 0;}
+
+
+/*NDAwMDA5NzgyNw==*/

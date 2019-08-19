@@ -1,0 +1,518 @@
+<link href="/favicon.ico" rel="shortcut icon" />
+<link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/static/css/card/index.css"/>
+<script type="text/javascript" src="js/bootstrap-colorpalette.js" charset="utf-8"></script>
+
+<style>
+	.dropdown-menu {
+		border: medium none;
+		font-size: 12px;
+		left: 0;
+		list-style: none outside none;
+		padding: 0;
+		text-shadow: none;
+		top: 100%;
+		z-index: 1000;
+		border-radius: 0;
+		box-shadow: 0 0 3px rgba(86, 96, 117, 0.3);
+	}
+
+	.dropdown-menu li {
+		display: inline-block;
+	}
+
+	.bootstrap-colorpalette {
+		padding-left: 4px;
+		padding-right: 4px;
+		white-space: normal;
+		line-height: 1;
+	}
+
+	.tabs-container .form-group-color {
+		margin-right: -15px;
+		margin-left: -15px;
+	}
+</style>
+<link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/web/sale/wxcard/css/iconfont.css"/>
+
+<div class="form-group">
+	<label class="col-xs-12 col-sm-3 col-md-2 control-label">是否开启</label>
+	<div class="col-sm-6 col-xs-6">
+		{ife 'goods' $item}
+		{if empty($item['id'])}
+		<label class="radio-inline">
+			<input type="radio" name="opencard" value="1"  {if !empty($item['opencard'])}checked="true"{/if} onclick="$('.showcard').show();$"/> 开启
+		</label>
+		<label class="radio-inline">
+			<input type="radio" name="opencard" value="0" {if empty($item['opencard'])}checked="true"{/if}  onclick="$('.showcard').hide();;" /> 关闭
+		</label>
+		{else}
+		<input type="hidden" name="opencard" value="{$item['opencard']}">
+		{if empty($item['opencard'])}
+		关闭
+		{else}
+		开启
+		{/if}
+		{/if}
+		{else}
+		<input type="hidden" name="opencard" value="{$item['opencard']}">
+		<div class='form-control-static'>
+			{if empty($item['opencard'])}
+			关闭
+			{else}
+			开启
+			{/if}
+		</div>
+		{/if}
+		<p class='frm_tip'>是否开启制作微信会员卡,开启后,用户可以领取此记次时商品绑定的微信会员卡,商品创建后此选项则无法修改</p>
+
+	</div>
+</div>
+
+<div class="wrapper showcard" style="width: auto;  {if empty($item) ||empty($item['opencard'])} display: none;  {/if}">
+	<div class="preview" style="overflow: visible;position: static;">
+		<div class="cart-top">
+			<img src="../addons/ewei_shopv2/static/images/cart_top.jpg" alt=""/>
+		</div>
+		<div class="title">
+			<i class="back icon icon-back"></i>
+			<i class="more pull-right icon icon-more"></i>
+		</div>
+		<div class="panel">
+			<!--商户信息-->
+			<div class="logo-area">
+
+				<div class="logo">
+					<img id="logoimg" src="{if empty($card)}../addons/ewei_shopv2/static/images/default.png{else}{$card['card_logoimg']}{/if}"/>
+				</div>
+				<div class="name"  id="brandname">
+					{php echo empty($card['card_brand_name'])?'会员卡商铺名称':$card['card_brand_name']}
+				</div>
+				</br>
+				<div class="name"  id="title">
+					{php echo empty($card['card_title'])?'会员卡标题名称':$card['card_title']}
+				</div>
+				<div class="code">
+					<img src="../addons/ewei_shopv2/static/images/code.jpg" alt="" />
+				</div>
+
+				<div class="bot">
+					<span>0268 8888 8888</span>
+					<i class="icon icon-info pull-right"></i>
+				</div>
+			</div>
+			<div class="card-other">
+				<ul>
+					<li id="show_custom_cell1" {if empty($card['custom_cell1'])}style="display:none;" {/if}>
+					<span id="show_custom_cell1_name">{php echo empty($card['custom_cell1_name'])?'自定义入口':$card['custom_cell1_name']}</span>
+
+					<span style="float: right;">
+						<span id="show_custom_cell1_tips">{php echo empty($card['custom_cell1_tips'])?'立即进入':$card['custom_cell1_tips']}</span>
+						<i class="go pull-right icon icon-right"></i>
+					</span>
+					</li>
+					<li>会员卡详情<i class="go pull-right icon icon-right"></i></li>
+					<li>公众号<i class="go pull-right icon icon-right"></i></li>
+				</ul>
+			</div>
+		</div>
+		<!--自定义入口-->
+		<!--卡券其他-->
+		<div class="card-other">
+			<ul>
+			</ul>
+		</div>
+	</div>
+
+
+
+	<!--控制台-->
+	<div class="control col-sm-7" style=" padding: 10px;">
+		<div class="editor_section">
+
+			<!--会员卡标题-->
+			<!--<div class="form-group limit">-->
+				<!--<label class="col-sm-2 control-label">是否开启</label>-->
+				<!--<div class="col-sm-9 col-xs-12" >-->
+					<!--{ife 'goods' $item}-->
+						<!--{if empty($item['id'])}-->
+					<!--<label class="radio-inline">-->
+						<!--<input type="radio" name="opencard" value="1"  {if !empty($item['opencard'])}checked="true"{/if}  /> 开启-->
+					<!--</label>-->
+					<!--<label class="radio-inline">-->
+						<!--<input type="radio" name="opencard" value="0" {if empty($item['opencard'])}checked="true"{/if}  /> 关闭-->
+					<!--</label>-->
+
+						<!--{else}-->
+							<!--<label class="radio-inline">-->
+								<!--<input type="hidden" name="opencard" value="{$item['opencard']}">-->
+							<!--</label>-->
+							<!--{if empty($item['opencard'])}-->
+							<!--关闭-->
+							<!--{else}-->
+							<!--开启-->
+							<!--{/if}-->
+						<!--{/if}-->
+					<!--{else}-->
+					<!--<label class="radio-inline">-->
+						<!--<input type="hidden" name="opencard" value="{$item['opencard']}">-->
+					<!--</label>-->
+						<!--<div class='form-control-static'>-->
+							<!--{if empty($item['opencard'])}-->
+							<!--关闭-->
+							<!--{else}-->
+							<!--开启-->
+							<!--{/if}-->
+						<!--</div>-->
+					<!--{/if}-->
+					<!--<p class='help-block'>是否开启制作微信会员卡,开启后,用户可以领取此记次时商品绑定的微信会员卡,商品创建后此选项则无法修改</p>-->
+				<!--</div>-->
+				<!--&lt;!&ndash;<p class='error'>会员卡标题创建后无法修改</p>&ndash;&gt;-->
+			<!--</div>-->
+
+			<!--商铺名称-->
+			<div class="form-group limit">
+				<label class="col-sm-2 control-label">商铺名称</label>
+				<div class="col-sm-9 col-xs-12">
+					{ifp 'member.card'}
+					<input type="text" name="card_brand_name" id="card_brand_name" class="input form-control" value="{$card['card_brand_name']}" {if !empty($card)}disabled{/if} />
+					{else}
+					{$card['card_brand_name']}
+					{/if}
+					<p class='help-block'>商铺名称创建后无法修改</p>
+				</div>
+			</div>
+
+			<!--会员卡标题-->
+			<div class="form-group limit">
+				<label class="col-sm-2 control-label">会员卡标题</label>
+				<div class="col-sm-9 col-xs-12">
+					{ifp 'member.card'}
+					<input type="text" name="card_title" id="card_title" class="input form-control" value="{$card['card_title']}" {if  !empty($card)}disabled{/if} />
+					{else}
+					{$card['card_title']}
+					{/if}
+					<p class='help-block'>会员卡标题创建后无法修改</p>
+				</div>
+			</div>
+
+
+
+			<!--库存总量-->
+			<div class="form-group limit">
+				<label class="col-sm-2 control-label">库存总量</label>
+				<div class="col-sm-9 col-xs-12">
+					{ifp 'member.card'}
+					<input type="text" name="card_totalquantity" id="card_totalquantity" class="input form-control" value="{$card['card_totalquantity']}" {if !empty($card)}disabled{/if} />
+					{else}
+					{$card['card_totalquantity']}
+					{/if}
+				</div>
+			</div>
+			<hr style="height: 3px;background-color: #fff;margin: 0 -30px">
+
+
+			<!--logo图片-->
+			<div class="form-group">
+				<label class="col-sm-2 control-label">logo图片</label>
+				<div class="col-sm-9 col-xs-12">
+					<div class="frm-image">
+						<input type="hidden" name="card_logoimg" id="card_logoimg" value="{$card['card_logoimg']}"/>
+						<input type="hidden" name="card_logolocalpath" id="card_logolocalpath" value=""/>
+						<img  id="showlogo"  style="border-radius: 50%;width: 50px;height: 50px;margin-bottom: 10px"  src="{if empty($card)}../addons/ewei_shopv2/static/images/nopic.png{else}{$card['card_logoimg']}{/if}" />
+					</div>
+				</div>
+				<label class="col-sm-2 control-label"></label>
+				<div class="col-sm-9 col-xs-12">
+					<a class="btn btn-default upload" href="javascript:void(0);" {ifp 'member.card'}id="uploadlogo"{else}disabled{/if} >上传图片</a>
+					<p class='help-block'>会员卡的商户logo，建议像素为300*300。图片大小不能超过1mb,仅支持jpg,png格式</p>
+				</div>
+			</div>
+
+			<!--卡券背景设置-->
+			<div class="form-group">
+				<label class="col-sm-2 control-label">卡券背景设置</label>
+				{ifp 'member.card'}
+				<label class="radio-inline">
+					<input type="radio" name="card_backgroundtype" value="0"
+						   onclick="$('.backgroundimg').hide();$('.color').show();$('.btn-color-down').hide();"
+						   {if empty($card['card_backgroundtype'])}checked="true"{/if} />使用背景色
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="card_backgroundtype" value="1"
+						   onclick="$('.backgroundimg').show();$('.color').hide();$('.btn-color-down').hide();"
+						   {if !empty($card['card_backgroundtype'])}checked="true"{/if} />使用背景图片
+				</label>
+				{else}
+				<input type="hidden" name="card_backgroundtype" value="{$card['card_backgroundtype']}">
+				<div class='col-sm-9 col-xs-12'>
+					{if empty($card['card_backgroundtype'])}
+					使用背景色
+					{else}
+					使用背景图片
+					{/if}
+				</div>
+				{/if}
+			</div>
+
+			<!--会员卡背景图-->
+			<div class="form-group backgroundimg" {if empty($card['card_backgroundtype'])} style="display:none;"{/if}>
+			<label class="col-sm-2 control-label">会员卡背景图</label>
+			<div class="col-sm-9 col-xs-12">
+				<div class="frm-image">
+					<input type="hidden" name="card_backgroundimg" id="card_backgroundimg" value="{$card['card_backgroundimg']}"/>
+					<input type="hidden" name="card_backgroundimg_localpath" id="card_backgroundimg_localpath" value=""/>
+					<img  id="showbackground"  src="{$card['card_backgroundimg']}" style="width: 50px;height: 50px;margin-bottom: 10px"/>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label"></label>
+			<div class="col-sm-9 col-xs-12">
+				<a class="btn btn-default upload" href="javascript:void(0);" {ifp 'member.card'} id="uploadbackground"    {else}disabled{/if} >上传图片</a>
+				<p class='frm_tip'>会员卡背景图，建议像素为1000*600。图片大小不能超过1mb,仅支持jpg,png格式</p>
+			</div>
+		</div>
+
+		<!--卡券颜色-->
+		<div class="control-group color"   {if !empty($card['card_backgroundtype'])} style="display:none;"{/if}>
+		<label class="col-sm-2 control-label">卡券背景色</label>
+		<div class="btn-groups  btn-group btns">
+			<input type="hidden" name="color2" id="color2" value="{$card['color2']}"/>
+			<input type="hidden" name="color" id="color" value="{if empty($card['color'])}Color010{else}{$card['color']}{/if}"/>
+			{ife 'sale.wxcard' $card}
+			<a id="selected-color2" class="dropdown-toggle" data-toggle="dropdown"><i  {if empty($card['color'])}style=" background-color: rgb(99, 179, 89);"{else}style=" background-color: {$card['color2']};"{/if}></i><span class="caret pull-right"></span></a>
+			{else}
+			<a class="dropdown-toggle" ><i {if empty($card['color'])}style=" background-color: rgb(99, 179, 89);"{else}style=" background-color: {$card['color2']};"{/if}></i><span class="caret pull-right"></span></a>
+			{/if}
+			<ul class="dropdown-menu" style="width:180px;">
+				<li style="display:inline-block;">
+					<div id="colorpalette3"></div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+		<!--特权说明-->
+		<div class="form-group">
+			<label class="col-sm-2 control-label">特权说明</label>
+			{ifp 'member.card'}
+			<div class="col-sm-9 col-xs-12">
+				<textarea  name="prerogative" rows="5" class="form-control">{$card['prerogative']}</textarea>
+				<p class='help-block'>文本长度不能超过300字</p>
+			</div>
+			{else}
+			<div class='form-control-static'>{$card['prerogative']}</div>
+			{/if}
+		</div>
+
+		<!--使用须知-->
+		<div class="form-group">
+			<label class="col-sm-2 control-label">使用须知</label>
+			{ifp 'member.card'}
+			<div class="col-sm-9 col-xs-12">
+				<textarea  name="card_description" rows="5"  class="form-control">{$card['card_description']}</textarea>
+				<p class='help-block'>文本长度不能超过300字</p>
+			</div>
+			{else}
+			<div class='form-control-static'>{$card['card_description']}</div>
+			{/if}
+		</div>
+
+		<!--商户服务-->
+		<div class="form-group">
+			<label class="col-sm-2 control-label">商户服务</label>
+			{ifp 'member.card'}
+			<div class="col-sm-9 col-xs-12">
+					<!--BIZ_SERVICE_FREE_WIFI-->
+					<label class="checkbox-inline">
+						<input type="checkbox" name="freewifi" id="freewifi" {if !empty($card['freewifi'])}checked{/if} {if  !empty($card)}disabled{/if} / >免费WIFI
+					</label>
+					<label class="checkbox-inline">
+						<!--BIZ_SERVICE_WITH_PET-->
+						<input type="checkbox" name="withpet" id="withpet" {if !empty($card['withpet'])}checked{/if} {if  !empty($card)}disabled{/if} />可带宠物
+					</label>
+					<label class="checkbox-inline">
+						<!--BIZ_SERVICE_FREE_PARK-->
+						<input type="checkbox" name="freepark" id="freepark" {if !empty($card['freepark'])}checked{/if} {if !empty($card)}disabled{/if} / >免费停车
+					</label>
+					<label class="checkbox-inline">
+						<!--BIZ_SERVICE_DELIVER-->
+						<input type="checkbox" name="deliver" id="deliver" {if !empty($card['deliver'])}checked{/if} {if  !empty($card)}disabled{/if} / >可外卖
+					</label>
+			</div>
+			{else}
+			<div class='frm_controls'>
+				{if !empty($card['freewifi'])}免费WIFI {/if}
+				{if !empty($card['withpet'])}可带宠物{/if}
+				{if !empty($card['freepark'])}免费停车{/if}
+				{if !empty($card['deliver'])}可外卖{/if}
+			</div>
+			{/if}
+		</div>
+
+		<!--是否自定义入口-->
+		<div class="form-group">
+			<label class="col-sm-2 control-label">自定入口</label>
+			<div class="col-sm-9 col-xs-12">
+				{ifp 'member.card'}
+				<label class="radio-inline">
+					<input type="radio" name="custom_cell1" value="1"  onclick="$('.custom_cell1').show();$('#show_custom_cell1').show();" {if !empty($card['custom_cell1'])}checked="true"{/if}  />开启
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="custom_cell1" value="0"   onclick="$('.custom_cell1').hide();$('#show_custom_cell1').hide();" {if empty($card['custom_cell1'])}checked="true"{/if} />关闭
+				</label>
+				{else}
+				<input type="hidden" name="custom_cell1" value="{$card['custom_cell1']}">
+				<div class='frm_controls'>
+					{if empty($card['custom_cell1'])}
+					关闭
+					{else}
+					开启
+					{/if}
+				</div>
+				{/if}
+			</div>
+		</div>
+
+		<!--入口名称-->
+		<div class="form-group custom_cell1"  {if empty($card['custom_cell1'])} style="display:none;"{/if}>
+			<label class="col-sm-2 control-label">入口名称</label>
+			<div class="col-sm-9 col-xs-12">
+				{ifp 'member.card'}
+				<input type="text" name="custom_cell1_name" id="custom_cell1_name" class="input form-control"  value="{$card['custom_cell1_name']}" />
+				{else}
+				{$card['custom_cell1_name']}
+				{/if}
+			</div>
+		</div>
+
+		<!--引导语-->
+		<div class="form-group custom_cell1"  {if empty($card['custom_cell1'])} style="display:none;"{/if}>
+		<label class="col-sm-2 control-label">引导语</label>
+			<div class="col-sm-9 col-xs-12">
+				{ifp 'member.card'}
+				<input type="text" name="custom_cell1_tips" id="custom_cell1_tips" class="input form-control" value="{$card['custom_cell1_tips']}" />
+				{else}
+				{$card['custom_cell1_tips']}
+				{/if}
+			</div>
+		</div>
+
+		<!--入口跳转链接-->
+		<div class="form-group custom_cell1"  {if empty($card['custom_cell1'])} style="display:none;"{/if}>
+		<label class="col-sm-2 control-label">跳转链接</label>
+			<div class="col-sm-9 col-xs-12">
+				{ifp 'member.card'}
+				<div class="input-group">
+					<input type="text" name="custom_cell1_url" id="custom_cell1_url" class="input form-control" value="{$card['custom_cell1_url']}"  />
+					<div class="input-group-btn">
+						<span data-input="#custom_cell1_url" data-toggle="selectUrl" class="btn btn-default" data-full="true">选择链接</span>
+					</div>
+				</div>
+				{else}
+				{$card['custom_cell1_url']}
+				{/if}
+			</div>
+		</div>
+	</div>
+</div>
+
+</div>
+
+
+<script type="text/javascript" src="../addons/ewei_shopv2/static/js/app/biz/sale/wxcard/colorpalette.js" charset="utf-8"></script>
+
+<script>
+	{if !empty($card)&&  !empty($card['card_backgroundtype']) &&!empty($card['card_backgroundimg'])}
+	$(".logo-area").css({
+		"background":"url('{$card['card_backgroundimg']}') no-repeat left top",
+		"background-size":"100% 100%",
+	});
+	{/if}
+
+
+	{if !empty($card)&&  empty($card['card_backgroundtype'])}
+	$(".logo-area").css({
+		"background":"{$card['color2']}"
+	});
+	{/if}
+
+	$('#colorpalette3').colorPalette()
+			.on('selectColor', function (e) {
+				$('#selected-color2 i').css('background-color', e.color);
+				$(".btn-color-down").hide();
+				$(".logo-area").css({
+					"background":e.color
+				});
+
+				$('#color2').val(e.color);
+			});
+
+	$(".btn-color-drop").off("click").on("click", function () {
+		if ($(".btn-color-down").css("display") == "block") {
+			$(".btn-color-down").hide();
+		} else {
+			$(".btn-color-down").show();
+		}
+	})
+
+	require(['jquery', 'util'], function ($, util) {
+		//示例图logo控制
+		$('#uploadlogo').click(function () {
+			util.image('', function (data) {
+				$("#showlogo").attr('src', data.url);
+				$("#showlogo").show();
+				$("#card_logoimg").val(data.url);
+				$("#card_logolocalpath").val(data.attachment);
+
+				$("#logoimg").attr('src', data.url);
+
+			});
+		});
+
+		//示例图封面图片控制
+		$('#uploadbackground').click(function () {
+			util.image('', function (data) {
+				$("#showbackground").attr('src', data.url);
+				$("#showbackground").show();
+				$("#card_backgroundimg").val(data.url);
+				$("#card_backgroundimg_localpath").val(data.attachment);
+
+
+				$(".logo-area").css({
+					"background":"url("+data.url+") no-repeat left top",
+					"background-size":"100% 100%",
+				});
+
+			});
+		});
+
+
+		//示例图自定义入口1文本控制
+		$('#custom_cell1_name').change(function(){
+
+			var str = $(this).val();
+
+			if(str=="")
+			{
+				str="自定义入口1(选填)";
+			}
+
+			$('#show_custom_cell1_name').html(str);
+		});
+		//示例图自定义入口1引导文本控制
+		$('#custom_cell1_tips').change(function(){
+			$('#show_custom_cell1_tips').html($(this).val());
+		});
+
+		//示例图自定义入口1引导文本控制
+		$('#card_title').change(function(){
+			$('#title').html($(this).val());
+		});
+
+		//示例图自定义入口1引导文本控制
+		$('#card_brand_name').change(function(){
+			$('#brandname').html($(this).val());
+		});
+
+	});
+
+</script>

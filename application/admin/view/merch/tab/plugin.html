@@ -1,0 +1,11 @@
+<div class="form-group">
+    <label class="col-lg control-label">积分商城</label>
+    <div class="col-sm-8">
+        <label class="radio-inline">
+            <input type="radio" name="pluginset[creditshop][close]" value="0" {if empty($item[pluginset]['creditshop']['close'])}checked{/if} /> 开启
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="pluginset[creditshop][close]" value="1" {if !empty($item[pluginset]['creditshop']['close'])}checked{/if} />禁用
+        </label>
+    </div>
+</div>
