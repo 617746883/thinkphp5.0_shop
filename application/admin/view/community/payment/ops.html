@@ -1,6 +1,0 @@
-{if $item['status'] == 1}
-<a class="btn btn-primary btn-xs" data-toggle='ajaxPost'  href="{:url('admin/community/paymentops', array('id' => $item['id'],'op' => 'finish'))}" data-confirm="确认已代缴费吗？">确认已缴费</a><br />
-{elseif $item['status'] == 0}
-<a class="btn btn-primary btn-xs" data-toggle="ajaxPost" href="{:url('admin/community/paymentops', array('id' => $item['id'],'op' => 'pay'))}" data-confirm="确认此订单已付款吗？">确认付款</a>
-
-{/if}

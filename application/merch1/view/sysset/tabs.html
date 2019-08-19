@@ -1,8 +1,0 @@
-<div class='menu-header'>商城</div>
-<ul>
-    <li {if $action=='shop'}class="active"{/if}><a href="{:url('merch/sysset/shop')}">基础设置</a></li>
-    <li {if $action== 'dispatch'} class="active" {/if}><a href="{:url('merch/sysset/dispatch')}">配送方式</a></li>
-    <li {if $action == 'notice'} class="active" {/if}><a href="{:url('merch/sysset/notice')}">公告管理</a></li>
-    <li {if $action == 'comment'} class="active" {/if}><a href="{:url('merch/sysset/comment')}">评价管理</a></li>
-    <li {if $action == 'refundaddress'} class="active" {/if}><a href="{:url('merch/sysset/refundaddress')}">退货地址管理</a></li>
-</ul>
